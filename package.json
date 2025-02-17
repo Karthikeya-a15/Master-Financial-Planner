@@ -1,0 +1,29 @@
+{
+  "name": "master-financial-planner",
+  "version": "1.0.0",
+  "description": "THE MASTER FINANCIAL PLANNER TOOL",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "npx nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Karthikeya-a15/Master-Financial-Planner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Karthikeya-a15/Master-Financial-Planner/issues"
+  },
+  "homepage": "https://github.com/Karthikeya-a15/Master-Financial-Planner#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1",
+    "zod": "^3.24.2"
+  }
+}
