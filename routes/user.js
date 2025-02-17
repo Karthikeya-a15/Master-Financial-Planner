@@ -1,37 +1,9 @@
 import express from "express";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
-import zod from "zod";
-
-
-const signUpSchema = zod.object({
-    name : zod.string(),
-    email : zod.string().email(),
-    password : zod.string()
-    .min(6, { message: "Password must be at least 6 characters long" }) // Minimum length check
-    .refine(
-      (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/.test(password),
-      {
-        message:
-          "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character",
-      }
-    ),
-    age : zod.number(),
-});
-
-const loginSchema = zod.object({
-    email : zod.string().email(),
-    password : zod.string()
-    .min(6, { message: "Password must be at least 6 characters long" }) // Minimum length check
-    .refine(
-      (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/.test(password),
-      {
-        message:
-          "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character",
-      }
-    )
-});
-
+import { signUpSchema, loginSchema, cashFlowsSchema } from "../schemas/userSchemas.js";
+import userAuth from "../middleware/userAuthMiddleware.js";
+import NetWorth from "../models/NetWorth.js";
 
 const router = express.Router();
 
@@ -88,6 +60,33 @@ router.post("/login", async (req, res) => {
     catch(err){
         return res.status(500).json({message : "Internal error"});
     }
+});
+
+router.post('/cashflows', userAuth, async (req,res)=>{
+    const body = req.body;
+
+    let {success, error} = cashFlowsSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Cash-Flow inputs are wrong",err : error.format()});
+    }
+
+    try{
+        const user = req.user;
+        const {inflows, outflows} = body;
+
+        const userCashFlows = await NetWorth.create({user, inflows, outflows});
+
+        if(userCashFlows){
+            return res.status(200).json({message : "Cash-Flows added successfully"});
+        }else{
+            return res.status(403).json({message : "Cash-Flows not added"});
+        }
+
+    }catch(err){
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+
 })
 
 export default router;

@@ -26,4 +26,4 @@ async function userAuth(req, res, next) {
     }
 }
 
-module.exports = userAuth;
+export default userAuth;

@@ -9,6 +9,7 @@ const app = express();
 connectDB();
 
 app.use(express.json());
+
 app.use("/api/v1/user",userRouter);
 
 app.listen(process.env.PORT,() => {
