@@ -28,19 +28,4 @@ const loginSchema = zod.object({
     )
 });
 
-const cashFlowsSchema = zod.object({
-    inflows : zod.object({
-        postTaxSalary : zod.number(),
-        businessIncome : zod.number(),
-        rentalIncome : zod.number(),
-        otherIncome : zod.number()
-    }),
-    outflows : zod.object({
-        monthlyExpenses : zod.number(),
-        compulsoryInvestments : zod.number(), //ulips and chit-funds
-        emis : zod.number(),
-        insurance : zod.number(),
-        others : zod.number()
-    })
-})
-export {signUpSchema,loginSchema,cashFlowsSchema};
+export {signUpSchema,loginSchema};

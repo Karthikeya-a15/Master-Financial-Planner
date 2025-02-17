@@ -18,6 +18,44 @@ const userSchema = new mongoose.Schema({
     age: {
         type: Number,
         required: true
+    },
+    netWorth : {
+        cashFlows : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CashFlows',
+            },
+            domesticEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'DomesticEquity',
+            },
+            debt : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Debt',
+            },
+            realEstate : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'RealEstate',
+            },
+            foreignEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'ForeignEquity',
+            },
+            cryptocurrency : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CryptoCurrency',
+            },
+            gold : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Gold',
+            },
+            liabilities : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Liabilities',
+            },
+            miscellaneous : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Miscellaneous',
+            }
     }
 });
 

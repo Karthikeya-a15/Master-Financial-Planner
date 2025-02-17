@@ -1,50 +1,46 @@
 import mongoose from "mongoose";
 
 const NetWorthSchema = new mongoose.Schema({
-    user: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    inflows: {
-        postTaxSalary: {
-            type: Number,
-            required: true
-        },
-        businessIncome: {
-            type: Number,
-            required: true
-        },
-        rentalIncome: {
-            type: Number,
-            required: true
-        },
-        otherIncome: {
-            type: Number,
-            required: true
-        }
+    cashFlows : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CashFlows',
     },
-    outflows: {
-        monthlyExpenses: {
-            type: Number,
-            required: true
-        },
-        compulsoryInvestments: {
-            type: Number,
-            required: true
-        },
-        emis: {
-            type: Number,
-            required: true
-        },
-        insurance: {
-            type: Number,
-            required: true
-        },
-        others: {
-            type: Number,
-            required: true
-        }
+    domesticEquity : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DomesticEquity',
+    },
+    debt : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Debt',
+    },
+    realEstate : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RealEstate',
+    },
+    foreignEquity : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ForeignEquity',
+    },
+    cryptocurrency : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'CryptoCurrency',
+    },
+    gold : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gold',
+    },
+    liabilities : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Liabilities',
+    },
+    miscellaneous : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Miscellaneous',
     }
 });
 
