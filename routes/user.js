@@ -39,17 +39,17 @@ router.post("/signup",async (req, res) => {
     const body = req.body;
 
     let {success, error} = signUpSchema.safeParse(body);
-
+    try{
+    
     if(!success){
         return res.status(403).json({message: "User inputs are incorrect",err : error.format()});
     }
 
-    try{
         const {name, email, password, age} = body;
 
         const user = new User(body);
 
-        user.password = await User.hashPassword();
+        user.password = await user.hashPassword();
 
         await user.save();
         return res.status(500).json({message : "User registered Successfully"});
@@ -60,7 +60,7 @@ router.post("/signup",async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-    const body = req.body();
+    const body = req.body;
     const {email,password} = body;
     
     let {success, error} = loginSchema.safeParse(body);

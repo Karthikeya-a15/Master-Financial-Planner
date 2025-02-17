@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -21,7 +22,7 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.hashPassword = async function(){
-    const SALT_ROUNDS = process.env.SALT_ROUNDS;
+    const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
     return await bcrypt.hash(this.password, SALT_ROUNDS);
 }
 
