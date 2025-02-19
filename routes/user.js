@@ -13,6 +13,8 @@ import liabilities from "../models/Liabilities.js";
 import RealEstate from "../models/RealEstate.js";
 import miscellaneous from "../models/miscellaneous.js";
 import GoldModel from "../models/Gold.js";
+import RAM from "../models/returnsAndAssets.js";
+import Goals from "../models/Goals.js";
 
 const router = express.Router();
 
@@ -44,7 +46,9 @@ router.post("/signup",async (req, res) => {
         const userLiabilities = await liabilities.create({});
         const userMisc = await miscellaneous.create({});
         const userRealEstate = await RealEstate.create({});
-        
+        const userGoals = await Goals.create({});
+        const userReturnsAndAssets = await RAM.create({});
+
         user.netWorth = {
             cashFlows : userCashFlows._id,
             domesticEquity : userDomesticEquity._id,
@@ -56,6 +60,9 @@ router.post("/signup",async (req, res) => {
             liabilities : userLiabilities._id,
             miscellaneous : userMisc._id
         };
+
+        user.goals = userGoals._id;
+        user.ram = userReturnsAndAssets._id;
         
         await user.save();
 
