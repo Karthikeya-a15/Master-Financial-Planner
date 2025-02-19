@@ -56,6 +56,14 @@ const userSchema = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Miscellaneous',
             }
+    },
+    goals: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Goals'
+    },
+    ram : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ReturnsAndAssets'
     }
 });
 
