@@ -3,9 +3,9 @@ import User from "../models/User.js";
 import { debtSchema } from "../schemas/netWorthSchemas.js";
 
 export default async function debtController(req,res){
-    const body = req.body;
+    const {liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt} = req.body;
 
-    const { success, error } = debtSchema.safeParse(body);
+    const { success, error } = debtSchema.safeParse({liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt});
 
     if(!success){
         return res.status(403).json({message : "Debt inputs are wrong",err : error.format()});
@@ -14,21 +14,25 @@ export default async function debtController(req,res){
     try{
         const userId = req.user;
         
-        const { liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt } = body;
+        const { selection }= req.body; 
 
         const user = await User.findOne({_id : userId});
 
         const debtId = user.netWorth.debt;
 
+        const updateField = {
+            liquidFund : { liquidFund },
+            fixedDeposit : { fixedDeposit },
+            debtFunds : { debtFunds },
+            governmentInvestments : { governmentInvestments },
+            sipDebt : { sipDebt }
+        }[selection] || { sipDebt }
+
+
         const userDebt = await Debt.findOneAndUpdate(
             {_id : debtId}, 
             {
-                $set : {
-                    "liquidFund" : liquidFund,
-                    "fixedDeposit" : fixedDeposit,
-                    "debtFunds" : debtFunds,
-                    "governmentInvestments" : governmentInvestments
-                }
+                $set : updateField
             }, 
             {new : true});
         
