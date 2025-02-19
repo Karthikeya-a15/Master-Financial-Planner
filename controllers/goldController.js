@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import GoldModel from "../models/Gold.js";
 import User from "../models/User.js";
 import { goldSchema } from "../schemas/netWorthSchemas.js";
@@ -11,6 +12,8 @@ export default async function goldController (req,res) {
         return res.status(403).json({message : "Gold inputs are wrong",err : error.format()});
     }
     
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try{
         const userId = req.user;
@@ -33,6 +36,9 @@ export default async function goldController (req,res) {
                 goldETF
             }, 
             {new : true});
+        
+        await session.commitTransaction();
+        session.endSession();
 
         if(userGold){
             return res.status(200).json({message : "Gold updated successfully to Networth"});
@@ -41,6 +47,8 @@ export default async function goldController (req,res) {
         }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 

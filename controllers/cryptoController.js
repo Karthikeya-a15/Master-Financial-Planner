@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import CryptoCurrency from "../models/CryptoCurrency.js";
 import User from "../models/User.js";
 import { cryptoSchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,9 @@ export default async function cryptoController(req,res){
     if(!success){
         return res.status(403).json({message : "Crypto inputs are wrong",err : error.format()});
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try{
         const userId = req.user;
@@ -30,6 +34,9 @@ export default async function cryptoController(req,res){
             {new : true}
         )
 
+        await session.commitTransaction();
+        session.endSession();
+
         if(userCrypto){
             return res.status(200).json({message : "Crypto updated successfully to Networth"});
         }else{
@@ -37,6 +44,8 @@ export default async function cryptoController(req,res){
         }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }

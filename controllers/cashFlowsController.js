@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import CashFlows from "../models/CashFlows.js";
 import User from "../models/User.js";
 import { cashFlowsSchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,9 @@ export default async function cashFlowsController(req, res) {
     if (!success) {
         return res.status(403).json({ message: "Cash-Flow inputs are wrong", err: error.format() });
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
         const userId = req.user;
@@ -32,6 +36,8 @@ export default async function cashFlowsController(req, res) {
             { new: true }
         );
         
+        await session.commitTransaction();
+        session.endSession();
 
         if (userCashFlows) {
             return res.status(200).json({ message: "Cash-Flows Updated successfully" });
@@ -40,6 +46,8 @@ export default async function cashFlowsController(req, res) {
         }
 
     } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({ message: "Internal error", err: err.message });
     }
 

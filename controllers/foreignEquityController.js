@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import ForeignEquity from "../models/ForeignEquity.js";
 import User from "../models/User.js";
 import { foreignEquitySchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,9 @@ export default async function foreignEquityController(req,res){
     if(!success){
         return res.status(403).json({message : "ForeignEquity inputs are wrong",err : error.format()});
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try{
         const userId = req.user;
@@ -31,6 +35,9 @@ export default async function foreignEquityController(req,res){
                 mutualFunds
             }, 
             {new : true});
+        
+        await session.commitTransaction();
+        session.endSession();
 
         if(userForeignEquity){
             return res.status(200).json({message : "ForeignEquity updated successfully to Networth"});
@@ -39,6 +46,8 @@ export default async function foreignEquityController(req,res){
         }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }

@@ -13,8 +13,9 @@ import liabilities from "../models/Liabilities.js";
 import RealEstate from "../models/RealEstate.js";
 import miscellaneous from "../models/miscellaneous.js";
 import GoldModel from "../models/Gold.js";
-import RAM from "../models/returnsAndAssets.js";
 import Goals from "../models/Goals.js";
+import RAM from "../models/returnsAndAssets.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -22,6 +23,9 @@ router.post("/signup",async (req, res) => {
     const body = req.body;
 
     let {success, error} = signUpSchema.safeParse(body);
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try{
     
     if(!success){
@@ -33,9 +37,6 @@ router.post("/signup",async (req, res) => {
         const user = new User(body);
 
         user.password = await user.hashPassword();
-
-        //transactions apply here
-        
         
         const userCashFlows = await CashFlows.create({});
         const userCrypto = await CryptoCurrency.create({});
@@ -48,7 +49,6 @@ router.post("/signup",async (req, res) => {
         const userRealEstate = await RealEstate.create({});
         const userGoals = await Goals.create({});
         const userReturnsAndAssets = await RAM.create({});
-
         user.netWorth = {
             cashFlows : userCashFlows._id,
             domesticEquity : userDomesticEquity._id,
@@ -65,10 +65,14 @@ router.post("/signup",async (req, res) => {
         user.ram = userReturnsAndAssets._id;
         
         await user.save();
+        await session.commitTransaction();
+        session.endSession();
 
         return res.json({message : "User registered Successfully"});
     }
     catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(401).json({error : err.message});
     }
 });
