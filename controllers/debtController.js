@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Debt from "../models/Debt.js";
 import User from "../models/User.js";
 import { debtSchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,10 @@ export default async function debtController(req,res){
     if(!success){
         return res.status(403).json({message : "Debt inputs are wrong",err : error.format()});
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
 
     try{
         const userId = req.user;
@@ -36,13 +41,18 @@ export default async function debtController(req,res){
             }, 
             {new : true});
         
-            if(userDebt){
-                return res.status(200).json({message : "Debt updated successfully to Networth"});
-            }else{
-                return res.status(403).json({message : "Debt not added"});
-            }
+        await session.commitTransaction();
+        session.endSession();
+        
+        if(userDebt){
+            return res.status(200).json({message : "Debt updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Debt not added"});
+        }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }

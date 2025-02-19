@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import miscellaneous from "../models/miscellaneous.js";
 import User from "../models/User.js";
 import { miscellaneousSchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,9 @@ export default async function miscellaneousController(req,res){
     if(!success){
         return res.status(403).json({message : "Miscellaneous inputs are wrong",err : error.format()});
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try{
         const userId = req.user;
@@ -32,6 +36,10 @@ export default async function miscellaneousController(req,res){
             { new: true }
         );
 
+        await session.commitTransaction();
+        session.endSession();
+
+
         if(userMisc){
             return res.status(200).json({message : "Miscellaneous updated successfully to Networth"});
         }else{
@@ -39,6 +47,8 @@ export default async function miscellaneousController(req,res){
         }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }

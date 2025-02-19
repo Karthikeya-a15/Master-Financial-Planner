@@ -37,9 +37,6 @@ router.post("/signup",async (req, res) => {
         const user = new User(body);
 
         user.password = await user.hashPassword();
-
-        //transactions apply here
-        
         
         const userCashFlows = await CashFlows.create({});
         const userCrypto = await CryptoCurrency.create({});

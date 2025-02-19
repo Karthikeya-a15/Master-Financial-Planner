@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import DomesticEquity from "../models/DomesticEquity.js";
 import User from "../models/User.js";
 import { domesticEquitySchema } from "../schemas/netWorthSchemas.js";
@@ -10,6 +11,9 @@ export default async function domesticEquityController(req, res) {
     if (!success) {
         return res.status(403).json({ message: "Domestic Equity inputs are wrong", err: error.format() });
     }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
         const userId = req.user;
@@ -36,6 +40,9 @@ export default async function domesticEquityController(req, res) {
             {new : true}
         )
 
+        await session.commitTransaction();
+        session.endSession();
+
         if (userDomesticEquity) {
             return res.status(200).json({ message: "Domestic Equity updated successfully to Networth" });
         } else {
@@ -43,6 +50,8 @@ export default async function domesticEquityController(req, res) {
         }
 
     } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({ message: "Internal error", err: err.message });
     }
 };
