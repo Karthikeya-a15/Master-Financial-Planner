@@ -2,15 +2,14 @@ import mongoose from "mongoose";
 
 async function connectDB(){
     try{
-        mongoose.connect(process.env.MONGO_URI, {
-            tls: true,
-          })
-        .then(() => {
-            console.log('Connected to MongoDB');
-        }).catch((error) => {
-            console.error('Error connecting to MongoDB:', error);
-        });
-        
+        mongoose.connect(process.env.MONGO_URI)
+            .then(() => {
+                console.log("Connection to database succesful");
+            }).catch(() => {
+                console.log("Connection to database Failed");
+            })
+
+
     }catch(error){
         console.log(error.message);
     }

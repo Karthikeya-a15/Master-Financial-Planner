@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -17,11 +18,49 @@ const userSchema = new mongoose.Schema({
     age: {
         type: Number,
         required: true
+    },
+    netWorth : {
+        cashFlows : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CashFlows',
+            },
+            domesticEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'DomesticEquity',
+            },
+            debt : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Debt',
+            },
+            realEstate : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'RealEstate',
+            },
+            foreignEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'ForeignEquity',
+            },
+            cryptocurrency : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CryptoCurrency',
+            },
+            gold : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Gold',
+            },
+            liabilities : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Liabilities',
+            },
+            miscellaneous : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Miscellaneous',
+            }
     }
 });
 
 userSchema.methods.hashPassword = async function(){
-    const SALT_ROUNDS = process.env.SALT_ROUNDS;
+    const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
     return await bcrypt.hash(this.password, SALT_ROUNDS);
 }
 
