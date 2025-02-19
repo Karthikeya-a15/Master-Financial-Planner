@@ -23,4 +23,4 @@ app.use("/api/v1/networth",netWorthRouter);
 
 app.listen(process.env.PORT,() => {
     console.log(`The app is running on port ${process.env.PORT}`);
-})
+});

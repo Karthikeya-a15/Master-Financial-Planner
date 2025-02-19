@@ -3,3 +3,4 @@ zod
 jsonwebtoken
 mongoose
 bcrypt
+dotenv

@@ -9,6 +9,7 @@ async function connectDB(){
                 console.log("Connection to database Failed");
             })
 
+
     }catch(error){
         console.log(error.message);
     }
