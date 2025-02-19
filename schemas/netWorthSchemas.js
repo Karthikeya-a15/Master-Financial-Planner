@@ -87,6 +87,9 @@ const governmentInvestmentSchema = zod.object({
     currentValue: zod.number().nonnegative()
 });
 
+const sipDebt = zod.object({
+
+});
 const debtSchema = zod.object({
     liquidFund: zod.array(liquidFundSchema).optional(),
     fixedDeposit: zod.array(fixedDepositSchema).optional(),
