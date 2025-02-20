@@ -57,13 +57,13 @@ const userSchema = new mongoose.Schema({
                 ref: 'Miscellaneous',
             }
     },
-    goals: {
+    goals : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Goals'
+        ref: 'Goals',
     },
     ram : {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'ReturnsAndAssets'
+        ref: 'returnsAndAssets',
     }
 });
 

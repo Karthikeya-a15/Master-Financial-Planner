@@ -49,7 +49,6 @@ router.post("/signup",async (req, res) => {
         const userRealEstate = await RealEstate.create({});
         const userGoals = await Goals.create({});
         const userReturnsAndAssets = await RAM.create({});
-        
         user.netWorth = {
             cashFlows : userCashFlows._id,
             domesticEquity : userDomesticEquity._id,
