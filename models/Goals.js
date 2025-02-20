@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const GoalSchema = mongoose.Schema({
+const GoalSchema = new mongoose.Schema({
     goals : {
         type : [
             {
@@ -37,6 +37,17 @@ const GoalSchema = mongoose.Schema({
 
         ],
         default : []
+    },
+    sipAssestAllocation: {
+        type: {
+            domesticEquity: { type: Number, default: 0 },
+            usEquity: { type: Number, default: 0 },
+            debt: { type: Number, default: 0 },
+            gold: { type: Number, default: 0 },
+            crypto: { type: Number, default: 0 },
+            realEstate: { type: Number, default: 0 }
+        },
+        default: {}
     }
     
 })

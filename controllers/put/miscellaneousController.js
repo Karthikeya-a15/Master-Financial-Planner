@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import miscellaneous from "../models/miscellaneous.js";
-import User from "../models/User.js";
-import { miscellaneousSchema } from "../schemas/netWorthSchemas.js";
+import miscellaneous from "../../models/miscellaneous.js";
+import User from "../../models/User.js";
+import { miscellaneousSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function miscellaneousController(req,res){
     const body = req.body;

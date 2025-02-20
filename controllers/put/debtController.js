@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import Debt from "../models/Debt.js";
-import User from "../models/User.js";
-import { debtSchema } from "../schemas/netWorthSchemas.js";
+import Debt from "../../models/Debt.js";
+import User from "../../models/User.js";
+import { debtSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function debtController(req,res){
     const {liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt} = req.body;

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import DomesticEquity from "../models/DomesticEquity.js";
-import User from "../models/User.js";
-import { domesticEquitySchema } from "../schemas/netWorthSchemas.js";
+import DomesticEquity from "../../models/DomesticEquity.js";
+import User from "../../models/User.js";
+import { domesticEquitySchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function domesticEquityController(req, res) {
     const {directStocks, mutualFunds, sipEquity } = req.body;

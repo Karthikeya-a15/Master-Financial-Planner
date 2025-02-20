@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import CryptoCurrency from "../models/CryptoCurrency.js";
-import User from "../models/User.js";
-import { cryptoSchema } from "../schemas/netWorthSchemas.js";
+import CryptoCurrency from "../../models/CryptoCurrency.js";
+import User from "../../models/User.js";
+import { cryptoSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function cryptoController(req,res){
     const body = req.body;

@@ -1,6 +1,6 @@
-import RealEstate from '../models/RealEstate.js';
-import { realEstateSchema } from '../schemas/netWorthSchemas.js';
-import User from '../models/User.js';
+import RealEstate from '../../models/RealEstate.js';
+import { realEstateSchema } from '../../schemas/netWorthSchemas.js';
+import User from '../../models/User.js';
 import mongoose from 'mongoose';
 
 export default async  function realEstatesController (req,res){

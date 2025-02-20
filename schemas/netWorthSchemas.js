@@ -87,14 +87,26 @@ const governmentInvestmentSchema = zod.object({
     currentValue: zod.number().nonnegative()
 });
 
-const sipDebt = zod.object({
-
+const sipDebtSchema = zod.object({
+  name: zod.string(),
+  duration: zod.enum([
+    "FD", 
+    "RD", 
+    "Arbitrage", 
+    "Banking PSU", 
+    "Corporate funds", 
+    "Goverment Securities", 
+    "Equity Saver"
+  ]),
+  currentValue: zod.number(),
 });
+
 const debtSchema = zod.object({
     liquidFund: zod.array(liquidFundSchema).optional(),
     fixedDeposit: zod.array(fixedDepositSchema).optional(),
     debtFunds: zod.array(debtFundSchema).optional(),
-    governmentInvestments: zod.array(governmentInvestmentSchema).optional()
+    governmentInvestments: zod.array(governmentInvestmentSchema).optional(),
+    sipDebt : zod.array(sipDebtSchema).optional()
 });
 
 const liabilitiesSchema = zod.object({

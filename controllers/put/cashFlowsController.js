@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import CashFlows from "../models/CashFlows.js";
-import User from "../models/User.js";
-import { cashFlowsSchema } from "../schemas/netWorthSchemas.js";
+import CashFlows from "../../models/CashFlows.js";
+import User from "../../models/User.js";
+import { cashFlowsSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function cashFlowsController(req, res) {
     const body = req.body;

@@ -10,7 +10,7 @@ const commonSchema = {
 };
 
 
-const ramSchema = mongoose.Schema({
+const ramSchema = new mongoose.Schema({
         expectedReturns : commonSchema,
         shortTerm : commonSchema,
         mediumTerm : commonSchema,

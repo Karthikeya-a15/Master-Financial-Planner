@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import ForeignEquity from "../models/ForeignEquity.js";
-import User from "../models/User.js";
-import { foreignEquitySchema } from "../schemas/netWorthSchemas.js";
+import ForeignEquity from "../../models/ForeignEquity.js";
+import User from "../../models/User.js";
+import { foreignEquitySchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function foreignEquityController(req,res){
     const body = req.body;
