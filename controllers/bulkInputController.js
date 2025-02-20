@@ -54,7 +54,10 @@ export default async function bulkInputController(req, res) {
         const updatedMiscellaneous = await updateDocument(Miscellaneous, user.netWorth.miscellaneous, miscellaneous);
         const updatedLiabilities = await updateDocument(Liabilities, user.netWorth.liabilities, liabilities);
         const updatedGold = await updateDocument(Gold, user.netWorth.gold, gold);
-        const updatedGoals = await updateDocument(Goals, user.goals, { goals: goalSchema.goals });
+        const updatedGoals = await updateDocument(Goals, user.goals, { 
+            goals: goalSchema.goals, 
+            sipAssetAllocation: goalSchema.sipAssetAllocation 
+        });
         const updatedForeignEquity = await updateDocument(ForeignEquity, user.netWorth.foreignEquity, foreignEquity);
         const updatedDomesticEquity = await updateDocument(DomesticEquity, user.netWorth.domesticEquity, { ...domesticEquity });
         const updatedDebt = await updateDocument(Debt, user.netWorth.debt, { ...debt });

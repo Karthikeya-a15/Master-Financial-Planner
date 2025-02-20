@@ -38,7 +38,7 @@ const GoalSchema = new mongoose.Schema({
         ],
         default : []
     },
-    sipAssestAllocation: {
+    sipAssetAllocation: {
         type: {
             domesticEquity: { type: Number, default: 0 },
             usEquity: { type: Number, default: 0 },
