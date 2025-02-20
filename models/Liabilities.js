@@ -29,4 +29,4 @@ const liabilitiesSchema = new mongoose.Schema({
 
 const liabilities = mongoose.model('Liabilities', liabilitiesSchema);
 
-export default liabilities
+export default liabilities;
