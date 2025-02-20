@@ -2,16 +2,15 @@ import express from 'express';
 
 import userAuth from '../middleware/userAuthMiddleware.js';
 
-import dashBoardController from '../controllers/get/getDashBoardController.js';
-import cashFlowsController from '../controllers/put/put/cashFlowsController.js';
-import realEstatesController from '../controllers/put/put/realEstateController.js';
-import cryptoController from '../controllers/put/put/cryptoController.js';
-import domesticEquityController from '../controllers/put/put/domesticEquityController.js';
-import debtController from '../controllers/put/put/debtController.js';
-import foreignEquityController from '../controllers/put/put/foreignEquityController.js';
-import goldController from '../controllers/put/put/goldController.js';
-import liabilitiesController from '../controllers/put/put/liabilitiesController.js';
-import miscellaneousController from '../controllers/put/put/miscellaneousController.js';
+import cashFlowsController from '../controllers/put/cashFlowsController.js';
+import realEstatesController from '../controllers/put/realEstateController.js';
+import cryptoController from '../controllers/put/cryptoController.js';
+import domesticEquityController from '../controllers/put/domesticEquityController.js';
+import debtController from '../controllers/put/debtController.js';
+import foreignEquityController from '../controllers/put/foreignEquityController.js';
+import goldController from '../controllers/put/goldController.js';
+import liabilitiesController from '../controllers/put/liabilitiesController.js';
+import miscellaneousController from '../controllers/put/miscellaneousController.js';
 
 
 import getCashFlowsController from '../controllers/get/getCashFlowsController.js';
@@ -23,14 +22,17 @@ import getForeignEquityController from '../controllers/get/getForeignEquityContr
 import getGoldController from '../controllers/get/getGoldController.js';
 import getCryptoController from '../controllers/get/getCryptoController.js';
 import getMiscellaneousController from '../controllers/get/getMiscellaneousController.js';
+import getDashBoardController from '../controllers/get/getDashBoardController.js';
 
+
+import bulkInputController from "../controllers/bulkInputController.js";
 
 const router = express.Router();
 
 router.use(userAuth);
 
-router.get("/dashboard", dashBoardController);
 //USER GET Routes 
+router.get("/dashboard", getDashBoardController);
 
 router.get('/cashFlows', getCashFlowsController);
 
@@ -49,6 +51,8 @@ router.get("/gold", getGoldController);
 router.get("/cryptoCurrency", getCryptoController);
 
 router.get("/miscellaneous",getMiscellaneousController);
+
+router.post("/bulk", bulkInputController);
 
 //USER PUT INPUTS
 

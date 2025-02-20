@@ -6,7 +6,6 @@ import Debt from  "../models/Debt.js";
 import DomesticEquity from "../models/DomesticEquity.js";
 import ForeignEquity from "../models/ForeignEquity.js";
 import CryptoCurrency from "../models/CryptoCurrency.js";
-import Liabilities from "../models/Liabilities.js";
 
 export default async function getNetWorth(userid) {
     try {
@@ -49,11 +48,11 @@ export default async function getNetWorth(userid) {
             crypto : cryptoCurrency.crypto,
             reits : realEstate.REITs
         }
-        const obj = {
+               
+        return {
             illiquid,
             liquid
-        }        
-        return obj;
+        };
     }
     catch(err){
         return {message : err.message};

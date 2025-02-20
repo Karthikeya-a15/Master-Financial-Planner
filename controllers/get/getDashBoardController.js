@@ -2,7 +2,7 @@ import Liabilities from "../../models/Liabilities.js";
 import getNetWorth  from "../../common/getNetWorth.js";
 import User from "../../models/User.js";
 
-export default async function dashBoardController(req, res){
+export default async function getDashBoardController(req, res){
     try{
         const userid = req.user;
         const user = await User.findById(userid);
