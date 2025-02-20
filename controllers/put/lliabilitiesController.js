@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import liabilities from "../models/Liabilities.js";
-import User from "../models/User.js";
-import { liabilitiesSchema } from "../schemas/netWorthSchemas.js";
+import liabilities from "../../models/Liabilities.js";
+import User from "../../models/User.js";
+import { liabilitiesSchema } from "../../schemas/netWorthSchemas.js";
 
 
 export default async function liabilitiesController(req,res){

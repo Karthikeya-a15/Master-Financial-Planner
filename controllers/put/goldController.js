@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import GoldModel from "../models/Gold.js";
-import User from "../models/User.js";
-import { goldSchema } from "../schemas/netWorthSchemas.js";
+import GoldModel from "../../models/Gold.js";
+import User from "../../models/User.js";
+import { goldSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function goldController (req,res) {
     const body = req.body;
