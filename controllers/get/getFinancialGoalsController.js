@@ -43,7 +43,7 @@ export default async function getFinancialGoalsController(req, res) {
         );
 
 
-    }catch(e){
+    }catch(err){
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }

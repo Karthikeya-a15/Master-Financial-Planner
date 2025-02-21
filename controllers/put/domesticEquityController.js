@@ -20,7 +20,11 @@ export default async function domesticEquityController(req, res) {
 
         const { selection } = req.body;
 
+        if(!selection)
+                return res.status(403).json({message : "Selection not provided"});
+
         const user = await User.findOne({ _id: userId });
+        // console.log(user);
 
         const domesticEquityId = user.netWorth.domesticEquity;
 

@@ -30,7 +30,7 @@ const domesticEquitySchema = new mongoose.Schema({
     sipEquity : {
         type: [
             {
-                fundName: { type: String },
+                sipName: { type: String },
                 category: { 
                     type: String, 
                     enum: ["large cap", "mid cap", "small cap", "flexi cap", "multi cap"], 

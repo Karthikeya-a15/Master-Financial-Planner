@@ -29,8 +29,7 @@ const cryptoSchema = zod.object({
 const goldSchema = zod.object({
     jewellery: zod.number().nonnegative().optional(),
     SGB: zod.number().nonnegative().optional(),
-    digitalGold: zod.number().nonnegative().optional(),
-    goldETF: zod.number().nonnegative().optional()
+    digitalGoldAndETF: zod.number().nonnegative().optional(),
 });
 
 const foreignEquitySchema = zod.object({
@@ -54,7 +53,7 @@ const mutualFundSchema = zod.object({
 const sipEquitySchema = zod.object({
     sipName: zod.string(),
     category: zod.enum(["large cap", "mid cap", "small cap", "flexi cap", "multi cap"]),
-    currentValue: zod.number().nonnegative()
+    sip: zod.number().nonnegative()
 });
 
 const domesticEquitySchema = zod.object({
@@ -88,18 +87,11 @@ const governmentInvestmentSchema = zod.object({
 });
 
 const sipDebtSchema = zod.object({
-  name: zod.string(),
-  duration: zod.enum([
-    "FD", 
-    "RD", 
-    "Arbitrage", 
-    "Banking PSU", 
-    "Corporate funds", 
-    "Goverment Securities", 
-    "Equity Saver"
-  ]),
-  currentValue: zod.number(),
-});
+    name: zod.string(),
+    duration: zod.enum(["FD/RD/Arbitrage", "Banking PSU/Corporate funds", "Government Securities/Equity Saver"]),
+    currentValue: zod.number().nonnegative(),
+  });
+  
 
 const debtSchema = zod.object({
     liquidFund: zod.array(liquidFundSchema).optional(),

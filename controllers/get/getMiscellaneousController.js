@@ -2,7 +2,7 @@ import miscellaneous from "../../models/miscellaneous.js";
 import User from "../../models/User.js";
 
 
-export default async function getMiscellaneousController(params) {
+export default async function getMiscellaneousController(req, res) {
     const userId = req.user;
 
     try{

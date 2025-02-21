@@ -18,7 +18,7 @@ export default async function goldController (req,res) {
     try{
         const userId = req.user;
 
-        const {jewellery, SGB, digitalGold, goldETF} = body;
+        const {jewellery, SGB, digitalGoldAndETF } = body;
 
         const user = await User.findOne({_id : userId});
 
@@ -32,8 +32,8 @@ export default async function goldController (req,res) {
                 ...existingGold.toObject(),
                 jewellery,
                 SGB,
-                digitalGold,
-                goldETF
+                digitalGoldAndETF,
+                
             }, 
             {new : true});
         

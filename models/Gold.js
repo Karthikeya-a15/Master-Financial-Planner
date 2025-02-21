@@ -9,14 +9,11 @@ const goldSchema = new mongoose.Schema({
         type : Number,
         default: 0
     },
-    digitalGold : {
+    digitalGoldAndETF : {
         type : Number,
         default: 0
     },
-    goldETF : {
-        type : Number,
-        default: 0
-    }
+   
 });
 
 const GoldModel = mongoose.model('Gold', goldSchema);
