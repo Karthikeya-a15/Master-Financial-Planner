@@ -38,6 +38,19 @@ const GoalSchema = new mongoose.Schema({
         ],
         default : []
     },
+    sipAmountDistribution : {
+        type : [    
+            {
+                domesticEquity : {type: Number, default: 0},
+                usEquity : {type: Number, default: 0},
+                debt : {type: Number, default: 0},
+                gold : {type: Number, default: 0},
+                crypto : {type: Number, default: 0},
+                realEstate : {type: Number, default: 0}
+            }
+        ],
+        default : []
+    },
     sipAssetAllocation: {
         type: {
             domesticEquity: { type: Number, default: 0 },
