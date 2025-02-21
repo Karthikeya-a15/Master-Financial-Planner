@@ -20,17 +20,15 @@ export default async function getFinancialGoalsController(req, res) {
 
         const cashAvailable = sum(userCashFlows.inflows) - sum(userCashFlows.outflows);
 
-        const { illiquid, liquid } = await getNetWorth(); 
+        const { illiquid, liquid } = await getNetWorth(userId); 
 
-        
-        let realEstate = liquid.otherRealEstate + illiquid.reits;
-        let domesticEquity = liquid.stocks + liquid.mutualFunds + liquid.smallCase + illiquid.ulips;
+        let realEstate = illiquid.otherRealEstate + liquid.reits;
+        let domesticEquity = liquid.domesticStockMarket + liquid.domesticEquityMutualFunds + liquid.smallCase + illiquid.ulips;
         let usEquity = liquid.usEquity;
-        let debt = illiquid.govermentInvestments + liquid.fixedDeposit + liquid.debtFunds + liquid.liquidFunds;
+        let debt = illiquid.governmentInvestments + liquid.fixedDeposit + liquid.debtFunds + liquid.liquidFunds;
         let gold = liquid.liquidGold + illiquid.sgb;
         let crypto = liquid.crypto;
     
-
         const currentInvestibleAssets = realEstate + domesticEquity + usEquity + debt + gold + crypto;
 
         return res.json(
@@ -43,7 +41,7 @@ export default async function getFinancialGoalsController(req, res) {
         );
 
 
-    }catch(e){
+    }catch(err){
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 }
