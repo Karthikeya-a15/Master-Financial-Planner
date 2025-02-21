@@ -2,7 +2,7 @@ import Goals from "../../models/Goals.js";
 import User from "../../models/User.js";
 import RAM from "../../models/returnsAndAssets.js";
 import CashFlows from "../../models/CashFlows.js";
-import getNetWorth from "../../common/getNetWorth.js";
+import getCurrentInvestibleAssets from "../../common/currentInvestibleAssets.js";
 
 export default async function getFinancialGoalsController(req, res) {
     const userId = req.user;
@@ -20,23 +20,16 @@ export default async function getFinancialGoalsController(req, res) {
 
         const cashAvailable = sum(userCashFlows.inflows) - sum(userCashFlows.outflows);
 
-        const { illiquid, liquid } = await getNetWorth(userId); 
-
-        let realEstate = illiquid.otherRealEstate + liquid.reits;
-        let domesticEquity = liquid.domesticStockMarket + liquid.domesticEquityMutualFunds + liquid.smallCase + illiquid.ulips;
-        let usEquity = liquid.usEquity;
-        let debt = illiquid.governmentInvestments + liquid.fixedDeposit + liquid.debtFunds + liquid.liquidFunds;
-        let gold = liquid.liquidGold + illiquid.sgb;
-        let crypto = liquid.crypto;
-            
-        const currentInvestibleAssets = realEstate + domesticEquity + usEquity + debt + gold + crypto;
+        const { currentInvestibleAssets } = await getCurrentInvestibleAssets(userId); 
 
         return res.json(
             {
                 goals : userGoals.goals,
                 returnsAndAssets : ram,
                 cashAvailable,
-                currentInvestibleAssets
+                currentInvestibleAssets,
+                sipAmountDistribution : userGoals.sipAmountDistribution,
+                sipAssetAllocation : userGoals.sipAssetAllocation
             }
         );
 

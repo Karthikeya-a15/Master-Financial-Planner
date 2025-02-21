@@ -28,11 +28,11 @@ export default async function financialGoalsController(req,res) {
 
         const sipAmountDistribution = getSipAmountDistribution(goals, returnsAndAssets);
 
-        // const sipAssetAllocation = 
+        const sipAssetAllocation = sumOfSip(sipAmountDistribution);
 
         const goalsId = user.goals;
 
-        const userGoals = await Goals.findOne({_id : goalsId});
+        console.log(sipAmountDistribution);
 
 
         const goalsUpdated = await Goals.findOneAndUpdate(
@@ -40,12 +40,13 @@ export default async function financialGoalsController(req,res) {
             {
                 $set : {
                     "goals" : goals,
-                    "sipAssestAllocation" : { ...userGoals.sipAssetAllocation, ...sipAssetAllocation}
+                    "sipAmountDistribution" : sipAmountDistribution,
+                    "sipAssetAllocation" : sipAssetAllocation
                 }
             },
             {new  : true}
         );
-
+        // console.log(goalsUpdated);
         await session.commitTransaction();
         session.endSession();
 
@@ -83,6 +84,8 @@ function getSipAmountDistribution(goals, returnsAndAssets){
             sipAmounts.push(getAmountDistribution(sipRequired, longTerm));
         }
     }
+
+    return sipAmounts;
 }
 
 function getAmountDistribution(sip, plan){
@@ -110,8 +113,7 @@ function getAmountDistribution(sip, plan){
 }
 
 
-
-function sumOfSip(sipAssetAllocation){
+function sumOfSip(sipAmountDistribution){
     let sumValues = {
         domesticEquity : 0,
         usEquity : 0,
@@ -121,9 +123,9 @@ function sumOfSip(sipAssetAllocation){
         realEstate : 0,
     }
 
-    for(let goal in sipAssetAllocation){
-        for(let asset in sipAssetAllocation[goal]){
-            sumValues[asset] += sipAssetAllocation[goal][asset];
+    for(let goal in sipAmountDistribution){
+        for(let asset in sipAmountDistribution[goal]){
+            sumValues[asset] += sipAmountDistribution[goal][asset];
         }
     }
     return sumValues;
