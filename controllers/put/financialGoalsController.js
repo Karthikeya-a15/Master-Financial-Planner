@@ -108,3 +108,23 @@ function getAmountDistribution(sip, plan){
 
     return amount;
 }
+
+
+
+function sumOfSip(sipAssetAllocation){
+    let sumValues = {
+        domesticEquity : 0,
+        usEquity : 0,
+        debt : 0,
+        gold : 0,
+        crypto : 0,
+        realEstate : 0,
+    }
+
+    for(let goal in sipAssetAllocation){
+        for(let asset in sipAssetAllocation[goal]){
+            sumValues[asset] += sipAssetAllocation[goal][asset];
+        }
+    }
+    return sumValues;
+}
