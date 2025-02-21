@@ -21,6 +21,10 @@ export default async function debtController(req,res){
         
         const { selection }= req.body; 
 
+        if(!selection){
+            return res.status(403).json({message : "Selection not provided"});
+        }
+
         const user = await User.findOne({_id : userId});
 
         const debtId = user.netWorth.debt;

@@ -54,7 +54,7 @@ const mutualFundSchema = zod.object({
 const sipEquitySchema = zod.object({
     sipName: zod.string(),
     category: zod.enum(["large cap", "mid cap", "small cap", "flexi cap", "multi cap"]),
-    currentValue: zod.number().nonnegative()
+    sip: zod.number().nonnegative()
 });
 
 const domesticEquitySchema = zod.object({
