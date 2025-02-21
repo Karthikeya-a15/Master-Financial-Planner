@@ -28,7 +28,7 @@ export default async function getFinancialGoalsController(req, res) {
         let debt = illiquid.governmentInvestments + liquid.fixedDeposit + liquid.debtFunds + liquid.liquidFunds;
         let gold = liquid.liquidGold + illiquid.sgb;
         let crypto = liquid.crypto;
-    
+            
         const currentInvestibleAssets = realEstate + domesticEquity + usEquity + debt + gold + crypto;
 
         return res.json(

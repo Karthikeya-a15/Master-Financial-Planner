@@ -33,7 +33,7 @@ export default async function getNetWorth(userid) {
             jewellery : gold.jewellery,
             sgb : gold.SGB,
             ulips : misc.otherInsuranceProducts,
-            governmentInvestments : debt.governmentInvestments.reduce((sum, item) => (item.currentValue || 0),0)
+            governmentInvestments : debt.governmentInvestments.reduce((sum, item) => (sum += item.currentValue || 0),0)
         }
 
         const liquid = {
@@ -44,7 +44,7 @@ export default async function getNetWorth(userid) {
             usEquity : foreignEquity.sAndp500 + foreignEquity.otherETF + foreignEquity.mutualFunds,
             smallCase : misc.smallCase,
             liquidFunds : debt.liquidFund.reduce((sum, item) => sum + (item.currentValue || 0),0),
-            liquidGold : gold.digitalGold + gold.goldETF,
+            liquidGold : gold.digitalGoldAndETF,
             crypto : cryptoCurrency.crypto,
             reits : realEstate.REITs
         }

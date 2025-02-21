@@ -29,8 +29,8 @@ export default async function financialGoalsController(req,res) {
             {_id : goalsId},
             {
                 $set : {
-                    "goals" : { ...userGoals.goals, ...goals},
-                    "sipAssestAllocation" : { ...userGoals.sipAssestAllocation, ...sipAssetAllocation}
+                    "goals" : goals,
+                    "sipAssestAllocation" : { ...userGoals.sipAssetAllocation, ...sipAssetAllocation}
                 }
             },
             {new  : true}
