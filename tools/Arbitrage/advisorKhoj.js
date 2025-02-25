@@ -3,9 +3,7 @@ import getRupeeVestFunds from "./rupeeVest.js";
 
 async function getRollingReturns(fullNamesArray) {
     const allResults = [];
-    
   
-    for (let i = 0; i < fullNamesArray.length; i++) {
   
       try {
         // Join fund names with comma for the API request
@@ -44,8 +42,7 @@ async function getRollingReturns(fullNamesArray) {
       } catch (error) {
         console.error('Error in fetchData:', error.message);
       }
-  
-    }
+
   
     return allResults;
   }
@@ -150,4 +147,4 @@ export default async function getArbitrageFunds(){
     return totalFunds;
 }
 
-getArbitrageFunds()
+// getArbitrageFunds()
