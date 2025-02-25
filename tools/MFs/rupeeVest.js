@@ -1,4 +1,4 @@
-const axios = require('axios');
+import  axios from 'axios';
 async function getFunds(schemeNo){
     const response = await axios.post("https://www.rupeevest.com/functionalities/asset_class_section",{
         "selected_schemes":[schemeNo],"selected_rating":[1,2,3,4,5,"Unrated"],"selected_amc":["all"],"selected_manager":["all"],"selected_index":["all"],"selected_fund_type":[1],"selected_from_date":0,"selected_to_date":0,"condn_type":"asset"
@@ -33,4 +33,4 @@ async function getACS(schemeNo){
    return filteredFunds;
 }
 
-module.exports = { getACS };
+export default getACS;

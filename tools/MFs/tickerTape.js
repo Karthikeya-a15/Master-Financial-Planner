@@ -1,5 +1,5 @@
-const { getACS } = require('./rupeeVest');
-const axios = require('axios');
+import  getACS   from './rupeeVest.js';
+import  axios from 'axios';
 
 async function getFunds(Category="Mid Cap Fund") {
     try {
@@ -82,6 +82,4 @@ async function getACES(schemeNo, Category) {
 
 // getACES();
 
-module.exports = {
-    getACES
-};
+export default getACES;

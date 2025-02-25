@@ -1,5 +1,5 @@
-const axios = require('axios')
-const { getACES, getFundName } = require('./tickerTape')
+import  axios from 'axios';
+import getACES  from './tickerTape.js';
 
 
 function getCategory(category){
@@ -206,4 +206,4 @@ function calculateRollingReturnsAndProbability(acesFunds, advisorkhojfunds) {
 
 // getBestFunds(5, "Small Cap Fund")
 
-module.exports = { getBestFunds };
+export default getBestFunds;

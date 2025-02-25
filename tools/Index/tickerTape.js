@@ -1,4 +1,4 @@
-const axios = require('axios')
+import axios from 'axios';
 
 async function getFunds(){
     const response = await axios.post("https://api.tickertape.in/mf-screener/query",{
@@ -39,4 +39,4 @@ async function getIndexFunds(){
 
 }
 
-module.exports = { getIndexFunds };
+export default getIndexFunds;

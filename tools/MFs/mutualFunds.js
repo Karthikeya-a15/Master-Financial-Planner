@@ -1,4 +1,4 @@
-const { getBestFunds } = require("./advisorkhoj");
+import  getBestFunds  from "./advisorkhoj.js";
 
 function rankByParameter(funds, parameter, isAscending = true) {
     const sortedFunds = [...funds].sort((a, b) => {
@@ -32,7 +32,7 @@ function rankByParameter(funds, parameter, isAscending = true) {
 
 
 // Function to calculate weighted scores and final ranking
-function calculateWeightedScores(funds) {
+function calculateWeightedScores(funds,weightage) {
     // Get individual rankings
     //Updated Field Names
     const expenseRatioRanks = rankByParameter(funds, 'expenseRatio', true);
@@ -43,12 +43,13 @@ function calculateWeightedScores(funds) {
     // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.15 * expenseRatioRanks[fund.name] +
-            0.25 * rollingReturnsRanks[fund.name] +
-            0.25 * greaterThan15Ranks[fund.name] +
-            0.35 * sortinoRatioRanks[fund.name];
+            weightage.expenseRatio * expenseRatioRanks[fund.name] +
+            weightage.rollingReturn * rollingReturnsRanks[fund.name] +
+            weightage.greaterThan15 * greaterThan15Ranks[fund.name] +
+            weightage.sortinoRatio * sortinoRatioRanks[fund.name];
             
         return {
+            ...fund,
             name: fund.name,
             weightedScore: Number(weightedScore.toFixed(2))
         };
@@ -76,15 +77,15 @@ function calculateWeightedScores(funds) {
     return rankedFunds;
 }
 
-async function getRankOfFunds(schemeNo, Category){
+async function getRankOfFunds(schemeNo, Category,weightage){
     const start = Date.now();
     const funds = await getBestFunds(schemeNo, Category);
     
     // Calculate and display the final rankings
-    const finalRankings = calculateWeightedScores(funds);
+    const finalRankings = calculateWeightedScores(funds,weightage);
     // console.log('\nFinal Rankings (Name - Weighted Score - Rank):');
     // finalRankings.forEach(fund => {
-    //     console.log(`${fund.name} - ${fund.weightedScore} - ${fund.rank}`);
+    //     console.log(fund);
     // });
 
     return finalRankings;
@@ -106,4 +107,4 @@ async function getRankOfFunds(schemeNo, Category){
     // console.log(Date.now() - start);
 }
 
-module.exports = { getRankOfFunds };
+export default getRankOfFunds;

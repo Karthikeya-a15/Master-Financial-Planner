@@ -1,4 +1,4 @@
-const { getIndexFunds } = require("./tickerTape");
+import getIndexFunds from "./tickerTape.js"
 
 function rankByParameter(funds, parameter, isAscending = true) {
     const sortedFunds = [...funds].sort((a, b) => {
@@ -31,7 +31,7 @@ function rankByParameter(funds, parameter, isAscending = true) {
 }
 
 
-function calculateWeightedScores(funds) {
+function calculateWeightedScores(funds, expenseRatio, trackingError) {
 
     const expenseRatioRanks = rankByParameter(funds, 'expRatio', true);
     const trackingErrorRanks = rankByParameter(funds, 'trackErr', true);
@@ -40,9 +40,10 @@ function calculateWeightedScores(funds) {
     // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.80 * expenseRatioRanks[fund.name] +
-            0.20 * trackingErrorRanks[fund.name]
+            expenseRatio * expenseRatioRanks[fund.name] +
+            trackingError * trackingErrorRanks[fund.name]
         return {
+            ...fund,
             name: fund.name,
             weightedScore: Number(weightedScore.toFixed(2))
         };
@@ -62,23 +63,23 @@ function calculateWeightedScores(funds) {
     return rankedFunds;
 }
 
-async function getRankOfFunds(){
+async function getRankOfFunds(expenseRatio, trackingError){
     const start = Date.now();
     const funds = await getIndexFunds();
     
     // Calculate and display the final rankings
-    const finalRankings = calculateWeightedScores(funds);
+    const finalRankings = calculateWeightedScores(funds, expenseRatio, trackingError);
     // console.log('\nFinal Rankings (Name - Weighted Score - Rank):');
     // finalRankings.forEach(fund => {
     //     console.log(`${fund.name} - ${fund.weightedScore} - ${fund.rank}`);
     // });
-    console.log(`\nBest Index Funds To Invest : \n`);
+    // console.log(`\nBest Index Funds To Invest : \n`);
     const nifty50 = finalRankings.find((fund) => fund.name.indexOf('Nifty 50') != -1)
     const niftyNext50 = finalRankings.find((fund) => fund.name.indexOf('Nifty Next 50') != -1)
 
-    console.log(`${nifty50.name} - ${nifty50.rank} \n`);
-    console.log(`${niftyNext50.name} - ${niftyNext50.rank} \n`);
+    
+    return {finalRankings, nifty50, niftyNext50};
     
 }
-getRankOfFunds();
-// module.exports = { getRankOfFunds };
+
+export default getRankOfFunds;
