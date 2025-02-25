@@ -166,10 +166,10 @@ async function getMorningStar(expectedInterestRateChange, subsector, tickerTapeF
 
 
 
-export default async function main(expectedInterestRateChange, subsector) {
+export default async function main(weightage, subsector) {
     const tickerTapeFunds = await getTickerTapeFunds(subsector);
 
-    const finalFunds = await getMorningStar(expectedInterestRateChange, subsector, tickerTapeFunds);
+    const finalFunds = await getMorningStar(weightage.expectedInterestRateChange, subsector, tickerTapeFunds);
 
     // console.log(finalFunds);
     return finalFunds;

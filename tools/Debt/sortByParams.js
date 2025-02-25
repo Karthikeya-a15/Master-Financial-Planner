@@ -22,18 +22,20 @@ function rankByParameter(funds, parameter, isAscending = true) {
     return ranks;
 }
 
-function calculateWeightedScores(funds){
+function calculateWeightedScores(funds, weightage){
     const cagrRanks = rankByParameter(funds, 'cagr', false);
     const volatilityRanks = rankByParameter(funds, 'volatility', true);
     const tenureRanks = rankByParameter(funds, 'fundManagerTenure', false);
     const expectedReturnsRanks = rankByParameter(funds, 'expectedReturns', false);
 
+    const {cagrRanksRatio, volatalityRankRatio, tenureRankRatio, sortinoRatio} = weightage;
+
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.10 * cagrRanks[fund.name] +
-            0.40 * volatilityRanks[fund.name] +
-            0.10 * tenureRanks[fund.name] +
-            0.40 * expectedReturnsRanks[fund.name];
+            cagrRanksRatio * cagrRanks[fund.name] +
+            volatalityRankRatio * volatilityRanks[fund.name] +
+            tenureRankRatio * tenureRanks[fund.name] +
+            sortinoRatio * expectedReturnsRanks[fund.name];
             
         return {
             ...fund,
@@ -63,9 +65,9 @@ function calculateWeightedScores(funds){
     return rankedFunds;
 }
 
-export default async function getFundRanks(expectedIntrestRateChange, subsector){
-    const debtFunds = await main(expectedIntrestRateChange, subsector);
-    const finalRankings = calculateWeightedScores(debtFunds);
+export default async function getFundRanks(weightage, subsector){
+    const debtFunds = await main(weightage, subsector);
+    const finalRankings = calculateWeightedScores(debtFunds, weightage);
 
     return finalRankings;
 }
