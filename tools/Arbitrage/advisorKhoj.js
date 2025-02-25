@@ -43,6 +43,7 @@ async function getRollingReturns(fullNamesArray) {
         console.error('Error in fetchData:', error.message);
       }
     }
+
   
   
 
@@ -146,4 +147,5 @@ export default async function getArbitrageFunds(){
     return totalFunds;
 }
 
+// getArbitrageFunds()
 // getArbitrageFunds()
