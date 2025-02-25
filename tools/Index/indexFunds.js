@@ -74,6 +74,7 @@ async function getRankOfFunds(expenseRatio, trackingError){
     //     console.log(`${fund.name} - ${fund.weightedScore} - ${fund.rank}`);
     // });
     // console.log(`\nBest Index Funds To Invest : \n`);
+    
     const nifty50 = finalRankings.find((fund) => fund.name.indexOf('Nifty 50') != -1)
     const niftyNext50 = finalRankings.find((fund) => fund.name.indexOf('Nifty Next 50') != -1)
 

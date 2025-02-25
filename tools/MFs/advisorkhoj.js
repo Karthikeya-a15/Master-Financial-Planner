@@ -46,11 +46,12 @@ async function getRollingReturns(fullNamesArray, Category = "Equity: Mid Cap") {
         }
 
       }
-
+      
+      return allResults;
+      
     } catch (error) {
       console.error('Error in fetchData:', error.message);
     }
-  return allResults;
 }
 const fetchMutualFundNames = async (firstNames, Category = "Equity: Mid Cap") => {
   const fullNamesArray = [];

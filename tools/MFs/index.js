@@ -27,7 +27,7 @@ async function main(weightage){
     //         console.log(`${fund.name} - ${fund.weightedScore} - ${fund.rank}`);
     //     });
     // })
-
+    
     // console.log(`\n ${Date.now() - start}`)
 }
 export default main;
