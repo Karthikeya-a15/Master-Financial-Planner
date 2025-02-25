@@ -1,4 +1,4 @@
-import main from "./morningStar.js";
+import getArbitrageFunds from "./advisorKhoj.js";
 
 function rankByParameter(funds, parameter, isAscending = true) {
     const sortedFunds = [...funds].sort((a, b) => {
@@ -10,30 +10,34 @@ function rankByParameter(funds, parameter, isAscending = true) {
     const ranks = {};
     let currentRank = 1;
 
+    // Assign rank to the first fund
     ranks[sortedFunds[0].name] = currentRank;
 
     for (let i = 1; i < sortedFunds.length; i++) {
-        const currentFund = sortedFunds[i];
-        currentRank = i + 1;
-        ranks[currentFund.name] = currentRank;
-        
-    }
+            const currentFund = sortedFunds[i];
+            currentRank = i + 1;
+            ranks[currentFund.name] = currentRank;
+        }
+    
 
     return ranks;
 }
 
-function calculateWeightedScores(funds){
-    const cagrRanks = rankByParameter(funds, 'cagr', false);
-    const volatilityRanks = rankByParameter(funds, 'volatility', true);
-    const tenureRanks = rankByParameter(funds, 'fundManagerTenure', false);
-    const expectedReturnsRanks = rankByParameter(funds, 'expectedReturns', false);
+// Function to calculate weighted scores and final ranking
+function calculateWeightedScores(funds) {
+    const expenseRatioRanks = rankByParameter(funds, 'expenseRatio', true);
+    const rollingReturnsRanks = rankByParameter(funds, 'OneYearAvgRollingReturns', false);
+    const aumRanks = rankByParameter(funds, 'AUM', false);
+    const exitLoadRanks = rankByParameter(funds, 'exitLoad', true)
 
+    
+    // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.10 * cagrRanks[fund.name] +
-            0.40 * volatilityRanks[fund.name] +
-            0.10 * tenureRanks[fund.name] +
-            0.40 * expectedReturnsRanks[fund.name];
+            0.25 * expenseRatioRanks[fund.name] +
+            0.40 * rollingReturnsRanks[fund.name] +
+            0.25 * aumRanks[fund.name] + 
+            0.10 * exitLoadRanks[fund.name]
             
         return {
             ...fund,
@@ -63,11 +67,15 @@ function calculateWeightedScores(funds){
     return rankedFunds;
 }
 
-export default async function getFundRanks(expectedIntrestRateChange, subsector){
-    const debtFunds = await main(expectedIntrestRateChange, subsector);
-    const finalRankings = calculateWeightedScores(debtFunds);
 
-    return finalRankings;
+
+async function main(){
+    const funds = await getArbitrageFunds();
+    
+    const sortedArbitrageFunds = calculateWeightedScores(funds);
+
+    return sortedArbitrageFunds;
+
 }
 
-// getFundRanks(-1);
+main().then((res)=>console.log(res))
