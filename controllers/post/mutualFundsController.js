@@ -1,5 +1,5 @@
-import User from "./../../models/User.js";
-import main from "./../../tools/MFs/index.js";
+import User from "../../models/User.js";
+import main from "../../tools/MFs/index.js";
 export default async function mutualFundsController(req, res){
     const userId = req.user;
 

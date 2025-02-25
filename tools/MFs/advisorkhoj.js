@@ -12,9 +12,6 @@ function getCategory(category){
 async function getRollingReturns(fullNamesArray, Category = "Equity: Mid Cap") {
   const allResults = [];
   
-
-  for (let i = 0; i < fullNamesArray.length; i++) {
-
     try {
       // Join fund names with comma for the API request
       const schemesString = fullNamesArray.join(',');
@@ -53,9 +50,6 @@ async function getRollingReturns(fullNamesArray, Category = "Equity: Mid Cap") {
     } catch (error) {
       console.error('Error in fetchData:', error.message);
     }
-
-  }
-
   return allResults;
 }
 const fetchMutualFundNames = async (firstNames, Category = "Equity: Mid Cap") => {
@@ -181,7 +175,7 @@ function calculateRollingReturnsAndProbability(acesFunds, advisorkhojfunds) {
       let greaterThan15Prob = 0;
       let avgRollingReturns = 0;
       for (let j = 0; j < matchingFund.data.length; j++) {
-        if (matchingFund.data[j].scheme_rolling_returns) greaterThan15Prob += 1;
+        if (matchingFund.data[j].scheme_rolling_returns >= 15) greaterThan15Prob += 1;
         avgRollingReturns += matchingFund.data[j].scheme_rolling_returns;
       }
       avgRollingReturns = (avgRollingReturns / matchingFund.data.length).toFixed(2);

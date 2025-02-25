@@ -24,20 +24,20 @@ function rankByParameter(funds, parameter, isAscending = true) {
 }
 
 // Function to calculate weighted scores and final ranking
-function calculateWeightedScores(funds) {
+function calculateWeightedScores(funds, weightage) {
     const expenseRatioRanks = rankByParameter(funds, 'expenseRatio', true);
     const rollingReturnsRanks = rankByParameter(funds, 'OneYearAvgRollingReturns', false);
     const aumRanks = rankByParameter(funds, 'AUM', false);
     const exitLoadRanks = rankByParameter(funds, 'exitLoad', true)
 
-    
+    const {expenseRatio, rollingReturns, aumRatio, exitLoadRatio} = weightage;
     // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.25 * expenseRatioRanks[fund.name] +
-            0.40 * rollingReturnsRanks[fund.name] +
-            0.25 * aumRanks[fund.name] + 
-            0.10 * exitLoadRanks[fund.name]
+            expenseRatio * expenseRatioRanks[fund.name] +
+            rollingReturns * rollingReturnsRanks[fund.name] +
+            aumRatio * aumRanks[fund.name] + 
+            exitLoadRatio * exitLoadRanks[fund.name]
             
         return {
             ...fund,
@@ -69,13 +69,14 @@ function calculateWeightedScores(funds) {
 
 
 
-async function main(){
+async function main(weightage){
     const funds = await getArbitrageFunds();
     
-    const sortedArbitrageFunds = calculateWeightedScores(funds);
+    const sortedArbitrageFunds = calculateWeightedScores(funds,weightage);
 
+    // console.log(sortedArbitrageFunds);
     return sortedArbitrageFunds;
 
 }
 
-main().then((res)=>console.log(res))
+export default main;

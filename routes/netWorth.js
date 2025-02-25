@@ -25,7 +25,7 @@ import getMiscellaneousController from '../controllers/get/getMiscellaneousContr
 import getDashBoardController from '../controllers/get/getDashBoardController.js';
 
 
-import bulkInputController from "../controllers/bulkInputController.js";
+import bulkInputController from "../controllers/post/bulkInputController.js";
 
 const router = express.Router();
 
