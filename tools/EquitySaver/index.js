@@ -23,21 +23,21 @@ function rankByParameter(funds, parameter, isAscending = true) {
     return ranks;
 }
 
-function calculateWeightedScores(funds) {
+function calculateWeightedScores(funds, weightage) {
     const expenseRatioRanks = rankByParameter(funds, 'expenseRatio', true);
     const rollingReturnsRanks = rankByParameter(funds, 'FiveYearAvgRollingReturns', false);
     const probabilityRanks = rankByParameter(funds, 'GreaterThan12Probability', false);
     const sortinoRanks = rankByParameter(funds, 'sortinoRatio', true)
 
-    
+    const {expenseRatio, rollingReturns, probabilityRatio, sortinoRatio} = weightage;
     // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            0.30 * expenseRatioRanks[fund.name] +
-            0.25 * rollingReturnsRanks[fund.name] +
-            0.05 * probabilityRanks[fund.name] + 
-            0.40 * sortinoRanks[fund.name]
-            
+            expenseRatio * expenseRatioRanks[fund.name] +
+            rollingReturns * rollingReturnsRanks[fund.name] +
+            probabilityRatio * probabilityRanks[fund.name] + 
+            sortinoRatio * sortinoRanks[fund.name]
+            // 0.30 0.25 0.05 0.40
         return {
             ...fund,
             weightedScore: Number(weightedScore.toFixed(2))
@@ -68,10 +68,10 @@ function calculateWeightedScores(funds) {
 
 
 
-export default async function main(){
+export default async function main(weightage){
     const funds = await getEquitySaverFunds();
     
-    const sortedEquitySaverFunds = calculateWeightedScores(funds);
+    const sortedEquitySaverFunds = calculateWeightedScores(funds,weightage);
 
     return sortedEquitySaverFunds;
 

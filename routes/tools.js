@@ -7,6 +7,7 @@ import indexFundsController from "../controllers/post/indexFundsController.js";
 import mutualFundsConroller from "../controllers/post/mutualFundsController.js";
 import debtFundsController from "../controllers/post/debtFundsController.js";
 import arbitrageController from "../controllers/post/arbitrageController.js";
+import equitySaverController from "../controllers/post/equitySaverController.js";
 
 const router = express.Router();
 
@@ -21,5 +22,7 @@ router.post("/mutualfunds",mutualFundsConroller);
 router.post("/debtfunds",debtFundsController);
 
 router.post("/arbitrage",arbitrageController);
+
+router.post("/equitysaver",equitySaverController);
 
 export default router;
