@@ -15,6 +15,7 @@ import miscellaneous from "../models/miscellaneous.js";
 import GoldModel from "../models/Gold.js";
 import Goals from "../models/Goals.js";
 import RAM from "../models/returnsAndAssets.js";
+import Result from "../models/ToolsResults.js";
 import mongoose from "mongoose";
 
 const router = express.Router();
@@ -49,6 +50,7 @@ router.post("/signup",async (req, res) => {
         const userRealEstate = await RealEstate.create({});
         const userGoals = await Goals.create({});
         const userReturnsAndAssets = await RAM.create({});
+        const userToolResults = await Result.create({});
         user.netWorth = {
             cashFlows : userCashFlows._id,
             domesticEquity : userDomesticEquity._id,
@@ -60,9 +62,10 @@ router.post("/signup",async (req, res) => {
             liabilities : userLiabilities._id,
             miscellaneous : userMisc._id
         };
-
+        
         user.goals = userGoals._id;
         user.ram = userReturnsAndAssets._id;
+        user.toolResult = userToolResults._id;
         
         await user.save();
         await session.commitTransaction();

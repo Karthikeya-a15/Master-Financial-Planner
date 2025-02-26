@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 const DebtSchema = new mongoose.Schema({
     name: { type: String,  },
@@ -48,8 +48,16 @@ const EquityFundSchema = new mongoose.Schema({
     rank: { type: Number }
 });
 
-const EquitySaverFundsSchema = new mongoose.Schema({
-    
+const EquitySaverFundSchema = new mongoose.Schema({
+    name: { type: String },
+    AUM: { type: Number },
+    cagr: { type: Number },
+    sortinoRatio: { type: Number },
+    expenseRatio: { type: Number },
+    FiveYearAvgRollingReturns: { type: Number },
+    GreaterThan12Probability: { type: Number },
+    weightedScore: { type: Number },
+    rank: { type: Number }
 });
 
 const toolResultsSchema = new mongoose.Schema({
@@ -62,9 +70,7 @@ const toolResultsSchema = new mongoose.Schema({
         CorporateBonds: { type : [DebtSchema], default : []}
     },
     arbitrageFunds : { type : [ArbitrageSchema], default : [] },
-    equitySaverFunds : {
-
-    },
+    equitySaverFunds: { type: [EquitySaverFundSchema], default: [] },
     mutualFunds : {
         LargeCapFund : { type : [EquityFundSchema], default : []},
         MultiCapFund: { type: [EquityFundSchema], default: [] },
@@ -73,3 +79,7 @@ const toolResultsSchema = new mongoose.Schema({
         SmallCapFund: { type: [EquityFundSchema], default: [] }
     }
 })
+
+const Result = mongoose.model("ToolResults", toolResultsSchema);
+
+export default Result;

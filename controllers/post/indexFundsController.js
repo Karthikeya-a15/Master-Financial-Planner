@@ -1,3 +1,4 @@
+import Result from "../../models/ToolsResults.js";
 import User from "../../models/User.js";
 // import Tools from "../../models/Tools.js";
 import getRankOfFunds from "../../tools/Index/indexFunds.js";
@@ -7,14 +8,25 @@ export default async function indexFundsController(req, res){
 
     try{
         const user = await User.findById(userId);
-        // const tools = await Tools.findById(user.tools);
+
+        const toolResultId = user.toolResult;
+
         const body = req.body;
         const {expenseRatio, trackingError } = body;
 
 
         const {finalRankings, nifty50, niftyNext50} = await getRankOfFunds(expenseRatio, trackingError);
 
-        return res.status(200).json({finalRankings,conclusion :  {nifty50, niftyNext50}});
+        await Result.updateOne(
+            {_id : toolResultId},
+            {
+                $set : {
+                    indexFunds : { nifty50, niftyNext50}
+                }
+            }
+        )
+
+        return res.status(200).json({finalRankings, conclusion :  {nifty50, niftyNext50}});
         
     }
     catch(err){

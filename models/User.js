@@ -64,6 +64,10 @@ const userSchema = new mongoose.Schema({
     ram : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'returnsAndAssets',
+    },
+    toolResult : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'ToolResults'
     }
 });
 

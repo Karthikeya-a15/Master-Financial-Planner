@@ -13,7 +13,7 @@ async function main(weightage){
     let funds = {};
     responses.forEach((response, index) => {
         if(response.status === 'fulfilled'){
-            funds[category[index]] = response.value;
+            funds[category[index].replaceAll(" ","")] = response.value;
             // console.log(response);
         }else{
             console.log(`Failed to fetch ${category[index]} data`);

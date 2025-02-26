@@ -17,8 +17,8 @@ async function DebtFunds(weightage) {
     // console.log(finalRankings[1].slice(0,10));
     // console.log(Date.now() - start);
 
-    return {"Final Ranking of Banking & PSU Debt Funds": finalRankings[0].slice(0,10),
-        "Final Ranking of Corporate Debt Funds" : finalRankings[1].slice(0,10)
+    return {"BankingAndPSU": finalRankings[0].slice(0,10),
+        "CorporateBonds" : finalRankings[1].slice(0,10)
     };
 }
 
