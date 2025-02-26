@@ -48,7 +48,7 @@ export default async function getRupeeVestFunds(){
                     name : currentFund.s_name1,
                     AUM : currentFund.aumtotal,
                     cagr : currentFund.returns_1year,
-                    year : currentFund.inception_date,
+                    inception_date : currentFund.inception_date,
                     exitLoad : currentFund.exitload
                 })
             }

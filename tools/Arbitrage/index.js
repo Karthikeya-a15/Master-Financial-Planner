@@ -79,4 +79,5 @@ async function main(weightage){
 
 }
 
+
 export default main;
