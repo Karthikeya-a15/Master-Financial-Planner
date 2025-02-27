@@ -172,28 +172,34 @@ function rdCalculator(req, res) {
 
 function cagrCaluculator(req, res){
     const {initialValue, finalValue, years} = req.body;
-    function yearlyCalculation(year){
-        const cagr = Math.pow(finalValue/initialValue, 1/year) - 1;
-        return cagr*100;
-    }
-    const cagrs = [];
-    for(let year = 1;year <= years; year++){
-        cagrs.push(yearlyCalculation(year));
-    }
-    return res.json(cagrs);
+    const cagr = Math.pow(finalValue/initialValue, 1/years) - 1;
+
+    const amounts = calculateCompoundInterest(initialValue, cagr, years);
+    return res.json(amounts);
 }
 
-cagrCaluculator({body : {initialValue: 10000, finalValue: 12000, years: 4}}, {json: console.log});
+// cagrCaluculator({body : {initialValue: 10000, finalValue: 12000, years: 4}}, {json: console.log});
 
 function lumpsumCalculator(req, res){
     const {lumpsumAmount, years, rateOfReturn} = req.body;
-    const futureValue = lumpsumAmount * Math.pow((1 + rateOfReturn/100), years);
-    const interest = futureValue - lumpsumAmount;
+    
+    let yearlyReport = [];
+    let currentInvestment = lumpsumAmount;
 
-    res.json({
-        futureValue: futureValue,
-        interest: interest
-    });
+    for (let year = 1; year <= years; year++) {
+        let futureValue = currentInvestment * (1 + rateOfReturn / 100);
+        let interest = futureValue - currentInvestment;
+
+        yearlyReport.push({
+            year: year,
+            interestEarned: interest.toFixed(2),
+            totalInvestment: futureValue.toFixed(2)
+        });
+
+        currentInvestment = futureValue;
+    }
+
+    res.json({ yearlyReport });
 }
 
 // lumpsumCalculator({body : {lumpsumAmount: 5000, years: 4, rateOfReturn: 12}},{json: console.log});
