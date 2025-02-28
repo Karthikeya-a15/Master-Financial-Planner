@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/Button";
-import dashboard2 from "../assets/dashboard2.jpg"
+import dashboard2 from "./assets/dashboard2.jpg"
 
 export default function Hero() {
   return (

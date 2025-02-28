@@ -9,6 +9,7 @@ import AssumptionsPage from './pages/financial-planner/AssumptionsPage'
 import GoalsPage from './pages/financial-planner/GoalsPage'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './pages/NotFound'
+import Landing from './pages/LandingPage'
 
 
 
@@ -21,9 +22,10 @@ function App() {
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
       <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/home" element={<Landing/>} />
       
       {/* Protected Routes */}
-      <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
+      <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       
       <Route path="/dashboard" element={
         <ProtectedRoute>

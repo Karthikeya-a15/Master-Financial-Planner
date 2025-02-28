@@ -19,13 +19,6 @@ export default function CallToAction() {
             <Button size="lg" variant="secondary">
               <Link to="/signup">Get Started for Free</Link>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-            >
-              <Link to="/contact">Schedule a Demo</Link>
-            </Button>
           </div>
         </div>
       </div>
