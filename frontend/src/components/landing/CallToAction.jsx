@@ -11,8 +11,8 @@ export default function CallToAction() {
               Ready to Take Control of Your Financial Future?
             </h2>
             <p className="mx-auto max-w-[700px] md:text-xl">
-              Join thousands of others who are on their path to financial freedom. Start your journey today with Master
-              Financial Planner.
+              Join thousands of others who are on their path to financial freedom. Start your journey today with our Master
+              Financial Planner Tool.
             </p>
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row">

@@ -12,7 +12,7 @@ export default function Navbar() {
         <Link to="/" className="font-bold text-xl flex items-center">
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReWkg8SEqeqAtwEi8KzlVLs8vVNkE5sOAtyw&s" alt="Darwinbox logo" className="max-w-[50px] h-auto rounded-lg object-cover" />
           <span className="text-primary mr-1"> 
-          Darw-Invest
+          DarwInvest
           </span> 
             
         </Link>

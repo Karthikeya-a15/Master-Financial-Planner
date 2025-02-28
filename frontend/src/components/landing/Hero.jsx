@@ -12,7 +12,7 @@ export default function Hero() {
               Your Path to Financial Freedom
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              Darw-Invest helps you take control of your finances, build wealth, and achieve freedom.
+              DarwInvest helps you take control of your finances, build wealth, and achieve financial freedom quickly 🚀.
             </p>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Link to="/signup">
