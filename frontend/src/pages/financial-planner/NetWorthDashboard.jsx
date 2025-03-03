@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import Navbar from '../../components/layout/Navbar'
 import { motion } from 'framer-motion'
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
+
 
 export default function NetWorthDashboard() {
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  useEffect(() => {
-    document.title = 'Net Worth Dashboard | Darw-Invest'
-    fetchDashboardData()
-  }, [])
+  const location = useLocation();
 
   const fetchDashboardData = async () => {
     try {
@@ -29,61 +27,32 @@ export default function NetWorthDashboard() {
     }
   }
 
+  //User makes changes and comes back to dashboard
+  useEffect(() => {
+    document.title = 'Net Worth Dashboard | DarwInvest'
+    fetchDashboardData()
+  }, [location.pathname])
+  
+  //User makes changes and switchs tabs to see the changes
+  useEffect(() => {
+    document.title = 'Net Worth Dashboard | DarwInvest'
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchDashboardData()
+      }
+    }
+  
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+  
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(amount)
-  }
-
-  // Mock data for development
-  const mockData = {
-    illiquid: {
-      home: 5000000,
-      otherRealEstate: 2000000,
-      jewellery: 1000000,
-      sgb: 500000,
-      ulips: 300000,
-      governmentInvestments: 200000
-    },
-    liquid: {
-      fixedDeposit: 1000000,
-      debtFunds: 500000,
-      domesticStockMarket: 1500000,
-      domesticEquityMutualFunds: 1000000,
-      usEquity: 800000,
-      smallCase: 200000,
-      liquidFunds: 300000,
-      liquidGold: 400000,
-      crypto: 100000,
-      reits: 300000
-    },
-    Liabilities: {
-      homeLoan: 2000000,
-      educationLoan: 500000,
-      carLoan: 300000,
-      personalLoan: 0,
-      creditCard: 50000,
-      other: 0
-    },
-    totalAssetSummary: {
-      realEstate: 7300000,
-      domesticEquity: 3000000,
-      usEquity: 800000,
-      debt: 2000000,
-      gold: 1900000,
-      crypto: 100000
-    },
-    currentInvestibleAssets: 15100000,
-    requiredInvestableAssetAllocation: {
-      debt: 1200000,
-      domesticEquity: 2500000,
-      usEquity: 600000,
-      gold: 400000,
-      crypto: 200000,
-      realEstate: 300000
-    }
   }
 
   if (loading) {
@@ -148,6 +117,7 @@ export default function NetWorthDashboard() {
               </Link>
             </div>
           </div>
+
           
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -178,7 +148,7 @@ export default function NetWorthDashboard() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               <h2 className="text-lg font-semibold text-secondary-900 mb-2">Assets</h2>
-              <p className="text-3xl font-bold text-secondary-900">{formatCurrency(totalAssets)}</p>
+              <p className="text-3xl font-bold text-secondary-900 text-green-900">{formatCurrency(totalAssets)}</p>
               <div className="mt-4 text-secondary-600">
                 <div className="flex justify-between">
                   <span>Liquid Assets</span>
@@ -211,6 +181,9 @@ export default function NetWorthDashboard() {
               </div>
             </motion.div>
           </div>
+
+          <AssetsNavBar/>
+
           
           {/* Asset Allocation */}
           <motion.div 
@@ -221,102 +194,209 @@ export default function NetWorthDashboard() {
           >
             <h2 className="text-xl font-bold text-secondary-900 mb-6">Asset Allocation</h2>
             
+              <div>
+                {AssetTable({data, totalAssets, formatCurrency})}
+              </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold text-secondary-900 mb-4">Current Allocation</h3>
-                <div className="space-y-4">
-                  {Object.entries(data.totalAssetSummary).map(([key, value]) => {
-                    const percentage = (value / totalAssets * 100).toFixed(1)
-                    let color
-                    
-                    switch(key) {
-                      case 'realEstate':
-                        color = 'bg-primary-600'
-                        break
-                      case 'domesticEquity':
-                        color = 'bg-success-600'
-                        break
-                      case 'usEquity':
-                        color = 'bg-warning-600'
-                        break
-                      case 'debt':
-                        color = 'bg-secondary-600'
-                        break
-                      case 'gold':
-                        color = 'bg-yellow-500'
-                        break
-                      case 'crypto':
-                        color = 'bg-purple-600'
-                        break
-                      default:
-                        color = 'bg-primary-600'
-                    }
-                    
-                    return (
-                      <div key={key}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-secondary-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                          <span className="text-secondary-900 font-medium">{formatCurrency(value)} ({percentage}%)</span>
-                        </div>
-                        <div className="w-full bg-secondary-200 rounded-full h-2">
-                          <div className={`${color} h-2 rounded-full`} style={{ width: `${percentage}%` }}></div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+              {CurrentAssetTable({data, formatCurrency})}
               
-              <div>
-                <h3 className="text-lg font-semibold text-secondary-900 mb-4">Recommended Allocation</h3>
-                <div className="space-y-4">
-                  {Object.entries(data.requiredInvestableAssetAllocation).map(([key, value]) => {
-                    const totalRecommended = Object.values(data.requiredInvestableAssetAllocation).reduce((sum, val) => sum + val, 0)
-                    const percentage = (value / totalRecommended * 100).toFixed(1)
-                    let color
-                    
-                    switch(key) {
-                      case 'realEstate':
-                        color = 'bg-primary-600'
-                        break
-                      case 'domesticEquity':
-                        color = 'bg-success-600'
-                        break
-                      case 'usEquity':
-                        color = 'bg-warning-600'
-                        break
-                      case 'debt':
-                        color = 'bg-secondary-600'
-                        break
-                      case 'gold':
-                        color = 'bg-yellow-500'
-                        break
-                      case 'crypto':
-                        color = 'bg-purple-600'
-                        break
-                      default:
-                        color = 'bg-primary-600'
-                    }
-                    
-                    return (
-                      <div key={key}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-secondary-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                          <span className="text-secondary-900 font-medium">{formatCurrency(value)} ({percentage}%)</span>
-                        </div>
-                        <div className="w-full bg-secondary-200 rounded-full h-2">
-                          <div className={`${color} h-2 rounded-full`} style={{ width: `${percentage}%` }}></div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
+              {RequiredAssetTable({data, formatCurrency})}
+              
             </div>
           </motion.div>
+
+          <hr className="w-full border-t border-gray-300 my-10" />
           
           {/* Asset Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {AssetDetails({data, formatCurrency, totalIlliquid, totalLiquid, totalLiabilities})}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+const AssetsNavBar = ()=>{
+  function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+  }
+  
+  const navigation = [
+    { name: 'Net Worth', href: '/financial-planner/net-worth' },
+    { name: 'Cashflows', href: '/'},
+    { name: 'Real Estate', href: '/' },
+    { name: 'Assumptions', href: '/financial-planner/assumptions' },
+  ]
+  return (
+    <>
+                <div className="flex p-4 bg-slate-100">
+                    <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        {navigation.map((item) => (
+                           <Link
+                           key={item.name}
+                           to={item.href}
+                           className={classNames(
+                             location.pathname === item.href 
+                               ? 'border-primary-500 text-secondary-900' 
+                               : 'border-transparent text-secondary-500 hover:border-secondary-300 hover:text-secondary-700',
+                             'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium'
+                           )}
+                           aria-current={location.pathname === item.href ? 'page' : undefined}
+                         >
+                           {item.name}
+                         </Link>
+                        ))}
+                      </div>
+                    </div>
+    </>
+  )
+}
+
+const AssetTable = ({ data, totalAssets, formatCurrency }) => {
+  return (
+    <div className="flex flex-col items-center">
+      <h3 className="text-lg font-semibold text-secondary-900 mb-4 text-center">Total Asset Summary</h3>
+      <table className="w-2/3 border-collapse border border-gray-300 text-left">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 px-4 py-2">Particular(s)</th>
+            <th className="border border-gray-300 px-4 py-2">Current Value</th>
+            <th className="border border-gray-300 px-4 py-2">Contribution (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(data.totalAssetSummary).map(([key, value]) => {
+            let percentage = ((value / totalAssets) * 100).toFixed(1);
+            const decimalPart = Number(percentage.split(".")[1]);
+            percentage = decimalPart < 5 ? Math.floor(percentage) : Math.ceil(percentage);
+            
+            return (
+              <tr key={key} className="border border-gray-300">
+                <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</td>
+                <td className="border border-gray-300 px-4 py-2 text-green-700">{formatCurrency(value)}</td>
+                <td className="border border-gray-300 px-4 py-2 text-green-700">{percentage}%</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <hr className="w-2/3 border-t border-gray-300 my-10" />
+    </div>
+  );
+};
+
+const formatLabel = (key) => key.replace(/([A-Z])/g, " $1").trim().replace(/^./, str => str.toUpperCase());
+
+const COLORS = {
+  realEstate: "#2563EB", // primary-600
+  domesticEquity: "#16A34A", // success-600
+  usEquity: "#F59E0B", // warning-600
+  debt: "#64748B", // secondary-600
+  gold: "#EAB308", // yellow-500
+  crypto: "#7C3AED", // purple-600
+  default: "#2563EB"
+};
+
+const CurrentAssetTable = ({ data, formatCurrency }) => {
+  const chartData = Object.entries(data.totalAssetSummary).map(([key, value]) => {
+    let finalValue = value;
+    if (key === "realEstate") {
+      finalValue -= data.illiquid.home;
+    } else if (key === "gold") {
+      finalValue -= data.illiquid.jewellery;
+    }
+    let percentage = ((finalValue / data.currentInvestibleAssets) * 100).toFixed(1);
+    const decimalPart = Number(percentage.split(".")[1]);
+    percentage = decimalPart < 5 ? Math.floor(percentage) : Math.ceil(percentage);
+    return { name: formatLabel(key), value: finalValue, percentage: Number(percentage), color: COLORS[key] || COLORS.default };
+  });
+
+  return (
+    <div>
+      <h3 className="text-lg font-semibold text-secondary-900 mb-4 text-center">Current Allocation</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie data={chartData} dataKey="percentage" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value) => `${value}%`} />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+      
+
+      
+      <table className="w-full border-collapse border border-gray-300 mt-4 text-left">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 px-4 py-2">Particular(s)</th>
+            <th className="border border-gray-300 px-4 py-2">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {chartData.map(({ name, value }) => (
+            <tr key={name} className="border border-gray-300">
+              <td className="border border-gray-300 px-4 py-2">{name}</td>
+              <td className="border border-gray-300 px-4 py-2 text-green-700">{formatCurrency(value)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+
+const RequiredAssetTable = ({ data, formatCurrency }) => {
+  const totalRecommended = Object.values(data.requiredInvestableAssetAllocation).reduce((sum, val) => sum + val, 0);
+  const chartData = Object.entries(data.requiredInvestableAssetAllocation).map(([key, value]) => {
+    let percentage = ((value / totalRecommended) * 100).toFixed(1);
+    const decimalPart = Number(percentage.split(".")[1]);
+    percentage = decimalPart < 5 ? Math.floor(percentage) : Math.ceil(percentage);
+    return { name: formatLabel(key), value, percentage: Number(percentage), color: COLORS[key] || COLORS.default };
+  });
+
+  return (
+    <div>
+      <h3 className="text-lg font-semibold text-secondary-900 mb-4 text-center">Recommended Allocation</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie data={chartData} dataKey="percentage" nameKey="name" cx="50%" cy="50%" outerRadius={100}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value) => `${value}%`} />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+      <table className="w-full border-collapse border border-gray-300 mt-4 text-left">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 px-4 py-2">Particular(s)</th>
+            <th className="border border-gray-300 px-4 py-2">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {chartData.map(({ name, value }) => (
+            <tr key={name} className="border border-gray-300">
+              <td className="border border-gray-300 px-4 py-2">{name}</td>
+              <td className="border border-gray-300 px-4 py-2 text-green-700">{formatCurrency(value)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+
+const AssetDetails = ({data, formatCurrency, totalIlliquid, totalLiquid, totalLiabilities}) => {
+  return (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* Liquid Assets */}
             <motion.div 
               className="card"
@@ -336,12 +416,6 @@ export default function NetWorthDashboard() {
                     <span className="text-secondary-900 font-medium">{formatCurrency(value)}</span>
                   </div>
                 ))}
-              </div>
-              
-              <div className="mt-4">
-                <Link to="#" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Edit Liquid Assets →
-                </Link>
               </div>
             </motion.div>
             
@@ -365,12 +439,7 @@ export default function NetWorthDashboard() {
                   </div>
                 ))}
               </div>
-              
-              <div className="mt-4">
-                <Link to="#" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Edit Illiquid Assets →
-                </Link>
-              </div>
+
             </motion.div>
             
             {/* Liabilities */}
@@ -394,11 +463,6 @@ export default function NetWorthDashboard() {
                 ))}
               </div>
               
-              <div className="mt-4">
-                <Link to="#" className="text-primary-600 hover:text-primary-700 font-medium text-sm">
-                  Edit Liabilities →
-                </Link>
-              </div>
             </motion.div>
             
             {/* Quick Actions */}
@@ -469,8 +533,6 @@ export default function NetWorthDashboard() {
               </div>
             </motion.div>
           </div>
-        </div>
-      </main>
-    </div>
+    </>
   )
 }
