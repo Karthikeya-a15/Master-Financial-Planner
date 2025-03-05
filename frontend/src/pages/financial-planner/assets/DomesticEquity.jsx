@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import DirectStocks from './equity/DirectStocks';
+import MutualFunds from "./equity/MutualFunds";
+import SipEquity from "./equity/SipEquity";
 
 const CATEGORY_OPTIONS = ["large cap", "mid cap", "small cap", "flexi/multi cap"];
 const COLORS = {
@@ -21,6 +23,7 @@ export default function DomesticEquity({ formatCurrency, refreshData }) {
     const [error, setError] = useState(null);
     const [editedData, setEditedData] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [selectedOption, setSelectedOption] = useState("Direct Stocks");
 
     useEffect(() => {
         async function fetchEquityData() {
@@ -39,14 +42,6 @@ export default function DomesticEquity({ formatCurrency, refreshData }) {
         fetchEquityData();
     }, []);
 
-    const handleChange = (section, index, key, value) => {
-        setEditedData((prev) => {
-            const updatedSection = [...prev[section]];
-            updatedSection[index] = { ...updatedSection[index], [key]: value };
-            return { ...prev, [section]: updatedSection };
-        });
-    };
-
 
     const handleSave = async (section) => {
         try {
@@ -64,26 +59,62 @@ export default function DomesticEquity({ formatCurrency, refreshData }) {
         }
     };
 
+
+    const renderComponent = () => {
+        switch (selectedOption) {
+            case "Direct Stocks":
+                return <DirectStocks
+                    formatCurrency = {formatCurrency}
+                    equityData = {equityData}
+                    editedData =  {editedData}
+                    setEditedData = {setEditedData}
+                    CATEGORY_OPTIONS = {CATEGORY_OPTIONS}
+                    COLORS = {COLORS}
+                    handleSave = {handleSave} />
+            case "Mutual Funds":
+                return <MutualFunds
+                formatCurrency = {formatCurrency}
+                equityData = {equityData}
+                editedData =  {editedData}
+                setEditedData = {setEditedData}
+                CATEGORY_OPTIONS = {CATEGORY_OPTIONS}
+                COLORS = {COLORS}
+                handleSave = {handleSave} />
+            case "SIP Equity":
+                return <SipEquity
+                formatCurrency = {formatCurrency}
+                equityData = {equityData}
+                editedData =  {editedData}
+                setEditedData = {setEditedData}
+                CATEGORY_OPTIONS = {CATEGORY_OPTIONS}
+                COLORS = {COLORS}
+                handleSave = {handleSave} />
+            default:
+                return null;
+        }
+    };
+
     if (loading) return <LoadingSpinner />;
     if (error) return <div className="text-danger-700 p-4 bg-danger-50 border border-danger-200 rounded-lg">{error}</div>;
 
     return (
         <motion.div className="card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
             <div className="p-6 bg-white rounded-lg shadow">
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Domestic Equity</h2>
+                <h2 className="text-xl font-bold text-secondary-900 mb-8">Domestic Equity</h2>
+                <div className="mb-4">
+                    <b >Selection : </b>
+                    <select
+                        className="p-2 border rounded-md"
+                        value={selectedOption}
+                        onChange={(e) => setSelectedOption(e.target.value)}
+                    >
+                        <option value="Direct Stocks">Direct Stocks</option>
+                        <option value="Mutual Funds">Mutual Funds</option>
+                        <option value="SIP Equity">SIP Equity</option>
+                    </select>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                    <DirectStocks
-                        formatCurrency={formatCurrency}
-                        equityData={equityData}
-                        editedData={editedData}
-                        setEditedData={setEditedData}
-                        isEditing={isEditing}
-                        setIsEditing={setIsEditing}
-                        CATEGORY_OPTIONS={CATEGORY_OPTIONS}
-                        COLORS={COLORS}
-                        handleSave={handleSave}
-                    />
-                    {/* Add other components like MutualFunds and SipEquity here */}
+                    {renderComponent()}
                 </div>
             </div>
         </motion.div>

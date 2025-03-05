@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
