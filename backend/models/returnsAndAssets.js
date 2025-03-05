@@ -32,6 +32,11 @@ const ramSchema = new mongoose.Schema({
             gold: { type: Number, default: 5 },
             crypto: { type: Number, default: 5 },
             realEstate: { type: Number, default: 5 },
+        },
+        effectiveReturns : {
+            shortTermReturns : {type : Number},
+            mediumTermReturns : {type : Number},
+            longTermReturns : {type : Number}
         }
 })
 

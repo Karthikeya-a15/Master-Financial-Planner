@@ -32,7 +32,7 @@ export default async function financialGoalsController(req,res) {
 
         const goalsId = user.goals;
 
-        console.log(sipAmountDistribution);
+        // console.log(sipAmountDistribution);
 
 
         const goalsUpdated = await Goals.findOneAndUpdate(
