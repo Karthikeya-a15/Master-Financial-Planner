@@ -111,5 +111,12 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
+router.get("/profile/:id", async (req, res) => {
+    const email = req.params.id;
+    const user = await User.findOne({
+        email
+    })
+    // console.log(user);
+    return res.status(200).json({"name" : user.name, "email" : user.email, "age" : user.age});
+})
 export default router;

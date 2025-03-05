@@ -18,6 +18,8 @@ import RdCalculator from "./components/calculators/RdCalculator"
 import CagrCalculator from "./components/calculators/CagrCalculator"
 import LumpsumCalculator from "./components/calculators/LumpSumpCalculator"
 import StepUpSipCalculator from "./components/calculators/StepUpSipCalculator"
+import Profile from './pages/profile/Profile'
+
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -36,6 +38,12 @@ function App() {
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
         </ProtectedRoute>
       } />
       
