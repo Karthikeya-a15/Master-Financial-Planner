@@ -891,7 +891,11 @@ export default function GoalsPage() {
                           return;
                         const totalSIP = Object.values(
                           goalsData.sipAssetAllocation
-                        ).reduce((sum, val) => sum + val, 0);
+                        ).reduce((sum, val) => {
+                          if(typeof(val) == "number")
+                          sum += val;
+                          return sum;
+                        });
                         const percentage =
                           totalSIP > 0  
                             ? ((value / totalSIP) * 100).toFixed(1)
