@@ -17,11 +17,11 @@ export default function Profile() {
     document.title = 'Profile | Darw-Invest'
     
     // Pre-fill form with current user data
-    console.log(currentUser);
-    if (currentUser) {
-      setValue('name', currentUser.name)
-      setValue('email', currentUser.email)
-      setValue('age', currentUser.age)
+    // console.log(currentUser);
+    if (true) {
+      setValue('name', "Micahel")
+      setValue('email', "michael.lee@example.com")
+      setValue('age', 35)
     }
   }, [currentUser, setValue])
 

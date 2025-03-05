@@ -195,7 +195,7 @@ export default function AssumptionsPage() {
                 </>
               ) : (
                 <>
-                  <Link to="/financial-planner/net-worth" className="btn btn-secondary">
+                  <Link to="/dashboard" className="btn btn-secondary">
                     Back to Dashboard
                   </Link>
                   <button 

@@ -6,7 +6,7 @@ export default async function getDebtController(req, res) {
 
     try{
         const user = await User.findById(userId);
-
+        
         const userDebt = await Debt.findById(user.netWorth.debt).select('-_id -__v');
 
         if(userDebt)
