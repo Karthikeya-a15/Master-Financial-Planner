@@ -1,22 +1,18 @@
-import { Fragment, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  BellIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
+import { Fragment, useState } from 'react'
+import { Link, useNavigate, useLocation} from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
+import { Disclosure, Menu, Transition } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon, BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
-  const { currentUser, logout } = useAuth();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
+  const { currentUser, logout } = useAuth()
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -26,20 +22,16 @@ export default function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     // Handle search functionality
-    console.log("Searching for:", searchQuery);
-    setSearchQuery("");
-  };
+    console.log('Searching for:', searchQuery)
+    setSearchQuery(e.target.value)
+  }
 
   const navigation = [
-    { name: "Dashboard", href: "/dashboard", current: true },
-    { name: "Net Worth", href: "/financial-planner/net-worth", current: false },
-    { name: "Goals", href: "/financial-planner/goals", current: false },
-    {
-      name: "Assumptions",
-      href: "/financial-planner/assumptions",
-      current: false,
-    },
-  ];
+    { name: 'Dashboard', href: '/dashboard'},
+    { name: 'Net Worth', href: '/financial-planner/net-worth' },
+    { name: 'Goals', href: '/financial-planner/goals' },
+    { name: 'Assumptions', href: '/financial-planner/assumptions' },
+  ]
 
   return (
     <Disclosure as="nav" className="bg-white shadow-sm">
@@ -69,19 +61,19 @@ export default function Navbar() {
                 </div>
                 <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                   {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={classNames(
-                        item.current
-                          ? "border-primary-500 text-secondary-900"
-                          : "border-transparent text-secondary-500 hover:border-secondary-300 hover:text-secondary-700",
-                        "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
-                      )}
-                      aria-current={item.current ? "page" : undefined}
-                    >
-                      {item.name}
-                    </Link>
+                     <Link
+                     key={item.name}
+                     to={item.href}
+                     className={classNames(
+                       location.pathname === item.href 
+                         ? 'border-primary-500 text-secondary-900' 
+                         : 'border-transparent text-secondary-500 hover:border-secondary-300 hover:text-secondary-700',
+                       'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium'
+                     )}
+                     aria-current={location.pathname === item.href ? 'page' : undefined}
+                   >
+                     {item.name}
+                   </Link>
                   ))}
                 </div>
               </div>

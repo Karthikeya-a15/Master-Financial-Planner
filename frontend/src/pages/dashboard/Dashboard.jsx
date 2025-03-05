@@ -6,7 +6,7 @@ import BlogSection from '../../components/dashboard/BlogSection'
 
 export default function Dashboard() {
   useEffect(() => {
-    document.title = 'Dashboard | Darw-Invest'
+    document.title = 'Dashboard | DarwInvest'
   }, [])
 
   return (

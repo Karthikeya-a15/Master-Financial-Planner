@@ -46,13 +46,13 @@ const directStockSchema = zod.object({
 
 const mutualFundSchema = zod.object({
     fundName: zod.string(),
-    category: zod.enum(["large cap", "mid cap", "small cap", "flexi cap", "multi cap"]),
+    category: zod.enum(["large cap", "mid cap", "small cap", "flexi/multi cap"]),
     currentValue: zod.number().nonnegative()
 });
 
 const sipEquitySchema = zod.object({
     sipName: zod.string(),
-    category: zod.enum(["large cap", "mid cap", "small cap", "flexi cap", "multi cap"]),
+    category: zod.enum(["large cap", "mid cap", "small cap", "flexi/multi cap"]),
     sip: zod.number().nonnegative()
 });
 
