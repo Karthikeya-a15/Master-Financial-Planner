@@ -19,10 +19,13 @@ import CagrCalculator from "./components/calculators/CagrCalculator"
 import LumpsumCalculator from "./components/calculators/LumpSumpCalculator"
 import StepUpSipCalculator from "./components/calculators/StepUpSipCalculator"
 import Profile from './pages/profile/Profile'
-import { GoalsProvider } from "./contexts/GoalsContext";
-
-
-
+import { GoalsProvider } from "./contexts/GoalsContext"
+import ToolsDashboard from './components/tools/ToolsDashboard'
+import IndexFunds from './components/tools/IndexFunds'
+import MutualFunds from './components/tools/MutualFunds'
+import DebtFunds from './components/tools/DebtFunds'
+import ArbitrageFunds from './components/tools/ArbitrageFunds'
+import EquitySaver from './components/tools/EquitySaver'
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -65,12 +68,45 @@ function App() {
         } />
         <Route path="goals" element={
           <ProtectedRoute>
-            <GoalsProvider>
               <GoalsPage />
-            </GoalsProvider>
           </ProtectedRoute>
         } />
       </Route>
+
+      <Route path="tools">
+        <Route path="" element={
+          <ProtectedRoute>
+            <ToolsDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="indexfunds" element={
+          <ProtectedRoute>
+            <IndexFunds />
+          </ProtectedRoute>
+        } />
+        <Route path="mutualfunds" element={
+          <ProtectedRoute>
+            <MutualFunds />
+          </ProtectedRoute>
+        } />
+        <Route path="debtfunds" element={
+          <ProtectedRoute>
+            <DebtFunds />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="arbitrage" element={
+          <ProtectedRoute>
+            <ArbitrageFunds />
+          </ProtectedRoute>
+        } /> 
+        <Route path="equitysaver" element={
+          <ProtectedRoute>
+            <EquitySaver />
+          </ProtectedRoute>
+        } />
+      </Route>
+
       <Route path="calculators">
         <Route path="" element={
           <ProtectedRoute>

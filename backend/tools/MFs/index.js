@@ -2,6 +2,8 @@ import  getRankOfFunds from './mutualFunds.js';
 
 const schemeNo = [1,3,50,4,5]
 const category = ["Large Cap Fund", "Multi Cap Fund", "Flexi Cap Fund" , "Mid Cap Fund" , "Small Cap Fund"]
+// const schemeNo = [1]
+// const category = ["Large Cap Fund"]
 async function main(){
     const results = []
     for(let i=0; i<schemeNo.length; i++){

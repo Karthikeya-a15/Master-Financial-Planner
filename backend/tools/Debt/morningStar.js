@@ -147,12 +147,12 @@ async function getMorningStar(subsector, tickerTapeFunds) {
             const managerTenure = Number(actualFund.managerTenure.toFixed(2));
             const modifiedDuration = await getModifiedDuration(actualFund.secId, accessToken) || 0;
             // const expectedReturns = Number(customRound(modifiedDuration * -1 * expectedInterestRateChange + fund.avgYTM - fund.expenseRatio));
-
+            const expectedReturns = modifiedDuration;
             return {
                 ...fund,
                 managerTenure,
                 modifiedDuration,
-                // expectedReturns
+                expectedReturns
             };
         }));
 

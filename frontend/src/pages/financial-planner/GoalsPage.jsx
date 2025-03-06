@@ -53,8 +53,7 @@ export default function GoalsPage() {
     try {
       setLoading(true);
       const response = await axios.get("/api/v1/planner/assumptions");
-      const { shortTermReturns, mediumTermReturns, longTermReturns } =
-        response.data.returnsAndAssets.effectiveReturns;
+      const { shortTermReturns, mediumTermReturns, longTermReturns } = response.data.returnsAndAssets.effectiveReturns;
       // console.log(ramReturns);
       setRamData({
         shortTerm: shortTermReturns,
@@ -63,10 +62,10 @@ export default function GoalsPage() {
       });
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching ram data", err);
-      setError("Failed to load ram data. Please try again later.");
+      console.error("Error fetching Returns & Assets data", err);
+      setError("Failed to load Returns & Assets data. Please try again later.");
       setLoading(false);
-      toast.error("Failed to load ram data");
+      toast.error("Failed to load Returns & Assets data");
     }
   };
 
@@ -246,6 +245,11 @@ export default function GoalsPage() {
     );
   }
 
+  const sumOfAmountAvailableToday = goalsData?.goals?.reduce(
+    (sum, goal) => sum + goal.amountAvailableToday,
+    0
+  ) || 0;
+
   if (error && !goalsData) {
     return (
       <div className="min-h-screen bg-secondary-50">
@@ -344,12 +348,12 @@ export default function GoalsPage() {
                     {formatCurrency(goalsData?.cashAvailable || 0)}
                   </span>
                 </div>
-                {/* <div className="flex justify-between mt-1">
+                <div className="flex justify-between mt-1">
                   <span>Surplus/Deficit</span>
                   <span className={`font-medium ${(goalsData?.cashAvailable || 0) >= (goalsData?.goals?.reduce((sum, goal) => sum + goal.sipRequired, 0) || 0) ? 'text-success-600' : 'text-danger-600'}`}>
                     {formatCurrency((goalsData?.cashAvailable || 0) - (goalsData?.goals?.reduce((sum, goal) => sum + goal.sipRequired, 0) || 0))}
                   </span>
-                </div> */}
+                </div>
               </div>
             </motion.div>
 
@@ -370,23 +374,16 @@ export default function GoalsPage() {
                   <span>Total Required Today</span>
                   <span className="font-medium">
                     {formatCurrency(
-                      goalsData?.goals?.reduce(
-                        (sum, goal) => sum + goal.amountRequiredToday,
-                        0
-                      ) || 0
+                      sumOfAmountAvailableToday
                     )}
                   </span>
                 </div>
-                <div className="flex justify-between mt-1">
-                  <span>Total Available Today</span>
-                  <span className="font-medium">
-                    {formatCurrency(
-                      goalsData?.goals?.reduce(
-                        (sum, goal) => sum + goal.amountAvailableToday,
-                        0
-                      ) || 0
-                    )}
-                  </span>
+                <div className="flex justify-between">
+                  {( goalsData?.currentInvestibleAssets - sumOfAmountAvailableToday > 0)? 
+                      <> Surplus <span className="text-md font-bold text-success-600">{ formatCurrency(goalsData?.currentInvestibleAssets - sumOfAmountAvailableToday) }</span> </>
+                      : 
+                      <></>}
+                 
                 </div>
               </div>
             </motion.div>
