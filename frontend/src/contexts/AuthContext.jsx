@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
       const response = await axios.get(`/api/v1/user/profile/${email}`)
       // console.log(response.data);
       setCurrentUser(response.data)
-      setCurrentUser({"name" : "hello"});
+      // setCurrentUser({"name" : "hello"});
     } catch (error) {
       console.error('Error fetching user data:', error)
       logout()
