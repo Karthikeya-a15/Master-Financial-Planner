@@ -2,27 +2,27 @@ import express from "express";
 
 import userAuth from "../middleware/userAuthMiddleware.js";
 
-import getToolsController from  "../controllers/get/getIndexFundsController.js";
-import indexFundsController from "../controllers/post/indexFundsController.js";
-import mutualFundsConroller from "../controllers/post/mutualFundsController.js";
-import debtFundsController from "../controllers/post/debtFundsController.js";
-import arbitrageController from "../controllers/post/arbitrageController.js";
-import equitySaverController from "../controllers/post/equitySaverController.js";
+
+import indexFundsController from "../controllers/get/indexFundsController.js";
+import debtFundsController from "../controllers/get/debtFundsController.js";
+import mutualFundsConroller from "../controllers/get/mutualFundsController.js";
+import arbitrageController from "../controllers/get/arbitrageController.js";
+import equitySaverController from "../controllers/get/equitySaverController.js";
 
 const router = express.Router();
 
 router.use(userAuth);
 
-router.get("/indexfunds",getToolsController);
+// router.get("/indexfunds",getToolsController);
 
-router.post("/indexfunds",indexFundsController);
+router.get("/indexfunds",indexFundsController);
 
-router.post("/mutualfunds",mutualFundsConroller);
+router.get("/mutualfunds",mutualFundsConroller);
 
-router.post("/debtfunds",debtFundsController);
+router.get("/debtfunds",debtFundsController);
 
-router.post("/arbitrage",arbitrageController);
+router.get("/arbitrage",arbitrageController);
 
-router.post("/equitysaver",equitySaverController);
+router.get("/equitysaver",equitySaverController);
 
 export default router;

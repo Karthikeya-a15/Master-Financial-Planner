@@ -1,5 +1,3 @@
-import getIndexFunds from "./tickerTape.js"
-
 function rankByParameter(funds, parameter, isAscending = true) {
     const sortedFunds = [...funds].sort((a, b) => {
         return isAscending 
@@ -63,24 +61,4 @@ function calculateWeightedScores(funds, expenseRatio, trackingError) {
     return rankedFunds;
 }
 
-async function getRankOfFunds(expenseRatio, trackingError){
-    const start = Date.now();
-    const funds = await getIndexFunds();
-    
-    // Calculate and display the final rankings
-    const finalRankings = calculateWeightedScores(funds, expenseRatio, trackingError);
-    // console.log('\nFinal Rankings (Name - Weighted Score - Rank):');
-    // finalRankings.forEach(fund => {
-    //     console.log(`${fund.name} - ${fund.weightedScore} - ${fund.rank}`);
-    // });
-    // console.log(`\nBest Index Funds To Invest : \n`);
-    
-    const nifty50 = finalRankings.find((fund) => fund.name.indexOf('Nifty 50') != -1)
-    const niftyNext50 = finalRankings.find((fund) => fund.name.indexOf('Nifty Next 50') != -1)
-
-    
-    return {finalRankings, nifty50, niftyNext50};
-    
-}
-
-export default getRankOfFunds;
+const { expenseRatio, trackingError} = weightage;

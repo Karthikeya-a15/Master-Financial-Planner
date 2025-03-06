@@ -13,7 +13,7 @@ async function getFunds(){
 }
 
 
-async function getIndexFunds(){
+async function  getIndexFunds(){
     const funds = await getFunds();
 
     const filteredFunds = funds.map((currentFund) => {

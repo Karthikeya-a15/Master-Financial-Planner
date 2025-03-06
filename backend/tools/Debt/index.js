@@ -1,11 +1,9 @@
-import getFundRanks from "./sortByParams.js";
-
-async function DebtFunds(weightage) {
-    const start = Date.now();
+import main from "./morningStar.js";
+async function DebtFunds() {
     const subsectors = ["Banking & PSU Fund","Corporate Bond Fund"];
 
     // Create an array of promises
-    const rankingPromises = subsectors.map(subsector => getFundRanks(weightage, subsector));
+    const rankingPromises = subsectors.map(subsector => main(subsector));
 
     // Wait for all promises to resolve
     const finalRankings = await Promise.all(rankingPromises);
