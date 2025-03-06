@@ -115,7 +115,7 @@ export default function MutualFunds({
                             formatter: (params) => `${params.label}: ${params.value}%`,
                         },
                     }}
-                    width={400}
+                    width={500}
                     height={250}
                 />
             </div>
@@ -315,7 +315,7 @@ export default function MutualFunds({
                                 ))}
                             </tbody>
                             </table>
-                        <button onClick={() => setShowAddFundForm(true)} className="btn btn-primary mt-4">Add Stock</button>
+                        <button onClick={() => setShowAddFundForm(true)} className="btn btn-primary mt-4">Add Mutual Fund</button>
                         {!showAddFundForm ? 
                         <button onClick={() => handleSave("mutualFunds")} className="btn btn-success m-4">Save</button>
                         :

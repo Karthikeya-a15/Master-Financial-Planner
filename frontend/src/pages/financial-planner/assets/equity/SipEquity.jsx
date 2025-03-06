@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
 import LoadingSpinner from '../../../../components/common/LoadingSpinner';
+import { useGoals } from '../../../../contexts/GoalsContext';
 
 export default function SipEquity({
     formatCurrency,
@@ -12,8 +13,11 @@ export default function SipEquity({
     CATEGORY_OPTIONS,
     COLORS,
     handleSave,
+    goalsData
 }) {
     const section = 'sipEquity';
+    const [domesticEquity, setDomesticEquity] = useState(goalsData?.sipAssetAllocation.domesticEquity || 0);
+
     const [showAddSipForm, setShowAddSipForm] = useState(false);
     const [newSip, setNewSip] = useState({
         sipName: '',
@@ -94,6 +98,10 @@ export default function SipEquity({
         color: COLORS[category] || COLORS.default,
     }));
 
+    const sumOfSips = editedData[section].reduce((acc, {sip}) => {
+        return acc + sip || 0;
+    }, 0)
+
     if (!equityData) return <LoadingSpinner />;
 
     return (
@@ -124,7 +132,7 @@ export default function SipEquity({
                             formatter: (params) => `${params.label}: ${params.value}%`,
                         },
                     }}
-                    width={400}
+                    width={500}
                     height={250}
                 />
             </div>
@@ -224,8 +232,15 @@ export default function SipEquity({
                     transition={{ duration: 0.5, delay: 0.3 }}
                 >
                     <h2 className="text-xl font-bold text-secondary-900 mb-6">Your SIPs</h2>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-secondary-200">
+                    <div className="overflow-x-auto ">
+                        <div className='float-right'>
+                            {sumOfSips > domesticEquity? <span className='text-red-600'>You Don't have Enough Money</span> : <></>}
+                        </div>
+                        <br />
+                        <div className='float-right'>
+                            <b>Max Amount :  {formatCurrency(domesticEquity) }</b>
+                        </div>
+                        <table className="min-w-full divide-y divide-secondary-200 ">
                             <thead>
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">

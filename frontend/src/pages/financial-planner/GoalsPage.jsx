@@ -4,10 +4,11 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import Navbar from '../../components/layout/Navbar'
 import { motion } from 'framer-motion'
+import { useGoals } from '../../contexts/GoalsContext'
 
 export default function GoalsPage() {
-  const [goalsData, setGoalsData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const {goalsData, setGoalsData} = useGoals(null)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editingGoalIndex, setEditingGoalIndex] = useState(null)
@@ -24,22 +25,7 @@ export default function GoalsPage() {
 
   useEffect(() => {
     document.title = 'Financial Goals | Darw-Invest'
-    fetchGoalsData()
   }, [])
-
-  const fetchGoalsData = async () => {
-    try {
-      setLoading(true)
-      const response = await axios.get('/api/v1/planner/financialGoals')
-      setGoalsData(response.data)
-      setLoading(false)
-    } catch (error) {
-      console.error('Error fetching goals data:', error)
-      setError('Failed to load goals data. Please try again later.')
-      setLoading(false)
-      toast.error('Failed to load goals data')
-    }
-  }
 
   const handleEditGoal = (index) => {
     setEditingGoalIndex(index)

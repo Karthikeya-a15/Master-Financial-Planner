@@ -10,6 +10,8 @@ import GoalsPage from './pages/financial-planner/GoalsPage'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './pages/NotFound'
 import Landing from './pages/LandingPage'
+import { GoalsProvider } from "./contexts/GoalsContext";
+
 
 
 
@@ -36,7 +38,9 @@ function App() {
       <Route path="/financial-planner">
         <Route path="net-worth" element={
           <ProtectedRoute>
-            <NetWorthDashboard />
+            <GoalsProvider>
+              <NetWorthDashboard />
+            </GoalsProvider>
           </ProtectedRoute>
         } />
         <Route path="assumptions" element={
@@ -46,7 +50,9 @@ function App() {
         } />
         <Route path="goals" element={
           <ProtectedRoute>
-            <GoalsPage />
+            <GoalsProvider>
+              <GoalsPage />
+            </GoalsProvider>
           </ProtectedRoute>
         } />
       </Route>
