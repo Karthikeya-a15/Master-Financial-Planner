@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
@@ -11,6 +11,14 @@ export default function AssumptionsPage() {
   const [error, setError] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(null)
+  const [expectedReturns, setExpectedReturns] = useState({
+    "shortTerm" : 0,
+    "mediumTerm" : 0,
+    "longTerm" : 0
+  })
+  const shortTermReturns = useRef(0);
+  const mediumTermReturns = useRef(0);
+  const longTermReturns = useRef(0);
 
   useEffect(() => {
     document.title = 'Returns & Asset Mix Assumptions | Darw-Invest'
@@ -35,45 +43,6 @@ export default function AssumptionsPage() {
       setError('Failed to load assumptions data. Please try again later.')
       setLoading(false)
       toast.error('Failed to load assumptions data')
-      
-      // Use mock data for development
-      const mockData = {
-        expectedReturns: {
-          domesticEquity: 12,
-          usEquity: 12,
-          debt: 6,
-          gold: 6,
-          crypto: 20,
-          realEstate: 10
-        },
-        shortTerm: {
-          domesticEquity: 0,
-          usEquity: 0,
-          debt: 100,
-          gold: 0,
-          crypto: 0,
-          realEstate: 0
-        },
-        mediumTerm: {
-          domesticEquity: 40,
-          usEquity: 0,
-          debt: 50,
-          gold: 10,
-          crypto: 0,
-          realEstate: 0
-        },
-        longTerm: {
-          domesticEquity: 60,
-          usEquity: 10,
-          debt: 15,
-          gold: 5,
-          crypto: 5,
-          realEstate: 5
-        }
-      }
-      
-      setAssumptions(mockData)
-      setFormData(mockData)
     }
   }
 
@@ -93,6 +62,25 @@ export default function AssumptionsPage() {
     const total = Object.values(formData[category]).reduce((sum, value) => sum + value, 0)
     return Math.abs(total - 100) < 0.01 // Allow for small floating point errors
   }
+  const calculateEffectiveReturns = (category) =>{
+    // console.log(formData);
+    const expectedReturns = Object.values(formData["expectedReturns"]);
+    const categoryReturns = Object.values(formData[category]);
+      //calculate
+    let ans= 0;
+    for(let i = 0; i < expectedReturns.length; i++){
+      ans += expectedReturns[i] * categoryReturns[i];
+    }
+    ans/=100;
+    // return ans;
+    // setExpectedReturns((prev) => {
+    //   return {
+    //     ...prev,
+    //     category : ans
+    //   }
+    // })
+    return ans;
+  }
 
   const handleSave = async () => {
     // Validate allocations sum to 100%
@@ -107,6 +95,21 @@ export default function AssumptionsPage() {
     
     try {
       setLoading(true)
+      // console.log(formData);
+      // console.log(shortTermReturns.current.innerText.slice(0, -1));
+      // formData.effectiveReturns.shortTermReturns = shortTermReturns.current.innerText.slice(0, -1)
+      const change =  parseFloat(shortTermReturns.current.innerText.slice(0,-1))
+      setFormData((prev) => {
+        return {
+          ...prev,
+          effectiveReturns : {
+            shortTermReturns : parseFloat(shortTermReturns.current.innerText.slice(0,-1)),
+            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)) * 0.4 + 0.6 * change,
+            longTermReturns : parseFloat(longTermReturns.current.innerText.slice(0,-1))
+          }
+        }
+      })
+      // console.log(formData);
       const response = await axios.put('/api/v1/planner/assumptions', formData)
       
       if (response.data.message) {
@@ -192,7 +195,7 @@ export default function AssumptionsPage() {
                 </>
               ) : (
                 <>
-                  <Link to="/financial-planner/net-worth" className="btn btn-secondary">
+                  <Link to="/dashboard" className="btn btn-secondary">
                     Back to Dashboard
                   </Link>
                   <button 
@@ -319,6 +322,10 @@ export default function AssumptionsPage() {
                     </div>
                   )
                 })}
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold">Effective Returns</h2>
+                  <p ref={shortTermReturns} className="text-lg font-bold text-green-700" >{calculateEffectiveReturns("shortTerm")}%</p>
+                </div>
                 
                 {isEditing && (
                   <div className="mt-4 text-sm">
@@ -394,6 +401,11 @@ export default function AssumptionsPage() {
                   )
                 })}
                 
+                <div className="flex justify-end">
+                  {/* <h2 className="text-lg font-semibold">Effective Returns</h2>*/}
+                  <p ref={mediumTermReturns} className="text-lg font-bold text-green-700">{calculateEffectiveReturns("mediumTerm")}%</p>
+                </div>
+
                 {isEditing && (
                   <div className="mt-4 text-sm">
                     <div className="flex justify-between font-medium">
@@ -467,6 +479,10 @@ export default function AssumptionsPage() {
                     </div>
                   )
                 })}
+                <div className="flex justify-end">
+                  {/* <h2 className="text-lg font-semibold">Effective Returns</h2> */}
+                  <p ref={longTermReturns} className="text-lg font-bold text-green-700">{calculateEffectiveReturns("longTerm")}%</p>
+                </div>
                 
                 {isEditing && (
                   <div className="mt-4 text-sm">

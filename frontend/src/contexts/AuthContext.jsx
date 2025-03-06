@@ -24,23 +24,19 @@ export function AuthProvider({ children }) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
       
       // Fetch user data
-      fetchUserData()
+      // fetchUserData()
+      setLoading(false)
     } else {
       setLoading(false)
     }
   }, [])
 
-  const fetchUserData = async () => {
+  const fetchUserData = async (email) => {
     try {
-      // This endpoint would typically return user data
-      // const response = await axios.get('/api/v1/user/profile')
-      // setCurrentUser(response.data.user)
-      
-      // For now, we'll just set a mock user
-      setCurrentUser({
-        name: 'John Doe',
-        email: 'john@example.com',
-      })
+      const response = await axios.get(`/api/v1/user/profile/${email}`)
+      // console.log(response.data);
+      setCurrentUser(response.data)
+      // setCurrentUser({"name" : "hello"});
     } catch (error) {
       console.error('Error fetching user data:', error)
       logout()
@@ -55,7 +51,7 @@ export function AuthProvider({ children }) {
       const response = await axios.post('/api/v1/user/login', { email, password })
       
       const { token } = response.data
-      
+      // console.log(response);
       // Save token to localStorage
       localStorage.setItem('token', token)
       setToken(token)
@@ -66,7 +62,7 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       
       // Fetch user data
-      await fetchUserData()
+      await fetchUserData(email);
       
       toast.success('Login successful!')
       return { success: true }

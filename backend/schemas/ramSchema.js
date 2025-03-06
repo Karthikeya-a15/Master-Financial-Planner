@@ -13,7 +13,12 @@ const ramSchema = zod.object({
     expectedReturns : commonSchema,
     shortTerm : commonSchema,
     mediumTerm : commonSchema,
-    longTerm : commonSchema
+    longTerm : commonSchema,
+    effectiveReturns : zod.object({
+        shortTermReturns : zod.number().nonnegative(),
+        mediumTermReturns : zod.number().nonnegative(),
+        longTermReturns : zod.number().nonnegative()
+    })
 });
 
 export default ramSchema;

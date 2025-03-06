@@ -16,7 +16,7 @@ export default async function (req, res){
     session.startTransaction();
 
     try{
-        const {expectedReturns, shortTerm, mediumTerm, longTerm} = body;
+        const {expectedReturns, shortTerm, mediumTerm, longTerm, effectiveReturns} = body;
         const userId = req.user;
 
         const user = await User.findOne({_id : userId});
@@ -31,7 +31,8 @@ export default async function (req, res){
                     "expectedReturns" : {...RAM.expectedReturns, ...expectedReturns},
                     "shortTerm" : {...RAM.shortTerm, ...shortTerm},
                     "mediumTerm" : {...RAM.mediumTerm, ...mediumTerm},
-                    "longTerm" : {...RAM.longTerm, ...longTerm}
+                    "longTerm" : {...RAM.longTerm, ...longTerm},
+                    "effectiveReturns" : effectiveReturns
                 }
             }
         )

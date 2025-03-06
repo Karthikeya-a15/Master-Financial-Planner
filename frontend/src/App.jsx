@@ -10,6 +10,15 @@ import GoalsPage from './pages/financial-planner/GoalsPage'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './pages/NotFound'
 import Landing from './pages/LandingPage'
+import CalculatorsDashboard from './components/calculators/calculatorsDashboard'
+import FireCalculator from "./components/calculators/FireCalculator"
+import SipCalculator from "./components/calculators/SipCalculator"
+import FdCalculator from "./components/calculators/FdCalculator"
+import RdCalculator from "./components/calculators/RdCalculator"
+import CagrCalculator from "./components/calculators/CagrCalculator"
+import LumpsumCalculator from "./components/calculators/LumpSumpCalculator"
+import StepUpSipCalculator from "./components/calculators/StepUpSipCalculator"
+import Profile from './pages/profile/Profile'
 import { GoalsProvider } from "./contexts/GoalsContext";
 
 
@@ -35,6 +44,12 @@ function App() {
         </ProtectedRoute>
       } />
       
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      } />
+      
       <Route path="/financial-planner">
         <Route path="net-worth" element={
           <ProtectedRoute>
@@ -56,7 +71,48 @@ function App() {
           </ProtectedRoute>
         } />
       </Route>
-      
+      <Route path="calculators">
+        <Route path="" element={
+          <ProtectedRoute>
+            <CalculatorsDashboard/>
+          </ProtectedRoute>
+        }/>
+        <Route path="fire" element={
+          <ProtectedRoute>
+            <FireCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="sip" element={
+          <ProtectedRoute>
+            <SipCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="fd" element={
+          <ProtectedRoute>
+            <FdCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="rd" element={
+          <ProtectedRoute>
+            <RdCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="cagr" element={
+          <ProtectedRoute>
+            <CagrCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="lumpsum" element={
+          <ProtectedRoute>
+            <LumpsumCalculator/>
+          </ProtectedRoute>
+        }/>
+        <Route path="step-sip" element={
+          <ProtectedRoute>
+            <StepUpSipCalculator/>
+          </ProtectedRoute>
+        }/>
+      </Route>
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>

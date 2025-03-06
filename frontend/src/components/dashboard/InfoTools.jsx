@@ -76,7 +76,7 @@ export default function InfoTools() {
       >
         <h2 className="text-xl font-bold text-secondary-900 mb-2">Quick Tools</h2>
         
-        <Link to="#" className="flex items-center p-3 rounded-lg hover:bg-secondary-50 transition-colors">
+        <Link to="./../calculators" className="flex items-center p-3 rounded-lg hover:bg-secondary-50 transition-colors">
           <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
@@ -88,7 +88,7 @@ export default function InfoTools() {
           </div>
         </Link>
         
-        <Link to="#" className="flex items-center p-3 rounded-lg hover:bg-secondary-50 transition-colors">
+        {/* <Link to="#" className="flex items-center p-3 rounded-lg hover:bg-secondary-50 transition-colors">
           <div className="w-10 h-10 rounded-full bg-success-100 flex items-center justify-center text-success-600">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clipRule="evenodd" />
@@ -98,7 +98,7 @@ export default function InfoTools() {
             <h3 className="font-medium text-secondary-900">Tools</h3>
             <p className="text-sm text-secondary-500">Special Tools for you</p>
           </div>
-        </Link>
+        </Link> */}
         
         <Link to="../tools" className="flex items-center p-3 rounded-lg hover:bg-secondary-50 transition-colors">
           <div className="w-10 h-10 rounded-full bg-warning-100 flex items-center justify-center text-warning-600">
