@@ -19,10 +19,15 @@ import CagrCalculator from "./components/calculators/CagrCalculator"
 import LumpsumCalculator from "./components/calculators/LumpSumpCalculator"
 import StepUpSipCalculator from "./components/calculators/StepUpSipCalculator"
 import Profile from './pages/profile/Profile'
-
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/Dashboard'
+import MutualFunds from './pages/admin/MutualFunds'
+import { useAdminAuth } from './pages/admin/AdminAuthContext'
+import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
 
 function App() {
   const { isAuthenticated } = useAuth()
+  const {isAdminAuthenticated} = useAdminAuth();
 
   return (
     <Routes>
@@ -31,7 +36,21 @@ function App() {
       <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/home" element={<Landing/>} />
-      
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={!isAdminAuthenticated? <AdminLogin /> : <Navigate to="/admin/dashboard"/> } />
+      {/* Admin Protected Routes */}
+      <Route path="/admin/dashboard" element={
+        <ProtectedAdminRoute>
+          <AdminDashboard/ >
+        </ProtectedAdminRoute>
+      } />
+      <Route path="/admin/mutualfunds" element={
+        <ProtectedAdminRoute>
+          <MutualFunds/>
+        </ProtectedAdminRoute>
+      } />
+
       {/* Protected Routes */}
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       

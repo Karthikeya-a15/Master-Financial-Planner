@@ -7,6 +7,7 @@ import userRouter from "./routes/user.js"
 import netWorthRouter from "./routes/netWorth.js"
 import plannerRouter from "./routes/planner.js"
 import toolsRouter from "./routes/tools.js"
+import adminRouter from "./routes/admin.js"
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use("/api/v1/user",userRouter);
 app.use("/api/v1/networth",netWorthRouter);
 app.use("/api/v1/planner", plannerRouter);
 app.use("/api/v1/tools",toolsRouter);
+app.use("/api/v1/admin", adminRouter);
 
 app.listen(process.env.PORT,() => {
     console.log(`The app is running on port ${process.env.PORT}`);
