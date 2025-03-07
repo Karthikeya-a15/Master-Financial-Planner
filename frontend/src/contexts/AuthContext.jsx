@@ -31,12 +31,10 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const fetchUserData = async (email) => {
+  const fetchUserData = async () => {
     try {
-      const response = await axios.get(`/api/v1/user/profile/${email}`)
-      // console.log(response.data);
+      const response = await axios.get(`/api/v1/user/me`)
       setCurrentUser(response.data)
-      // setCurrentUser({"name" : "hello"});
     } catch (error) {
       console.error('Error fetching user data:', error)
       logout()
@@ -62,7 +60,7 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       
       // Fetch user data
-      await fetchUserData(email);
+      await fetchUserData();
       
       toast.success('Login successful!')
       return { success: true }

@@ -18,6 +18,9 @@ import RAM from "../models/returnsAndAssets.js";
 import Result from "../models/ToolsResults.js";
 import mongoose from "mongoose";
 
+import { uploadImage } from "../controllers/post/uploadController.js";
+import upload from "../middleware/multerConfig.js";
+
 const router = express.Router();
 
 router.post("/signup",async (req, res) => {
@@ -111,12 +114,37 @@ router.post("/login", async (req, res) => {
     }
 });
 
-router.get("/profile/:id", async (req, res) => {
-    const email = req.params.id;
+router.post("/upload", userAuth, upload.single("image"), uploadImage);
+
+router.get("/me", userAuth, async(req, res)=>{
     const user = await User.findOne({
-        email
+        _id : req.user
     })
     // console.log(user);
-    return res.status(200).json({"name" : user.name, "email" : user.email, "age" : user.age});
+    return res.status(200).json({"name" : user.name, "email" : user.email, "age" : user.age, "imageURL" : user.imageURL});
 })
+
+
+router.put("/profile", userAuth, async (req, res) => {
+    const { name, age } = req.body;
+  
+    try {
+      const user = await User.findOneAndUpdate(
+        { _id: req.user }, 
+        { $set: { name, age } },
+        { new: true, fields: { name: 1, age: 1, email : 1 } } // `new: true` returns the updated user
+      ).select("-_id");
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      return res.json({ message: "Profile updated successfully", user });
+    } catch (e) {
+      console.error("Profile update error:", e);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+
 export default router;
