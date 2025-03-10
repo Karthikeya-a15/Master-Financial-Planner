@@ -39,7 +39,7 @@ export default function GoalsPage() {
       setLoading(true);
       const response = await axios.get("/api/v1/planner/financialGoals");
       setGoalsData(response.data);
-      // console.log(goalsData);
+      // console.log(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching goals data:", error);
@@ -226,6 +226,7 @@ export default function GoalsPage() {
     }
     const { amountAvailableToday, amountRequiredToday, goalInflation, time } =
       goal;
+    if(amountAvailableToday === amountRequiredToday) return 0;
     let futureValue =
       amountRequiredToday * Math.pow(1 + goalInflation / 100, time);
     let returnsFutureValue = amountAvailableToday * Math.pow(1 + effectiveReturnsRatio / 100, time);
@@ -863,6 +864,60 @@ export default function GoalsPage() {
               </button>
             )}
           </div>
+
+          {/* SIP Amount Distribution */}
+          {goalsData?.goals?.length > 0 && goalsData?.sipAmountDistribution && (
+            <motion.div
+            className="card"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <h2 className="text-xl font-bold text-secondary-900 mb-6">
+              SIP Amount Distribution
+            </h2>
+      
+            <div className="overflow-x-auto flex justify-center">
+              <table className="w-3/4 border-collapse border border-secondary-300 table-fixed">
+                <thead>
+                  <tr className="bg-secondary-100">
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Goal Name</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Real Estate</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Domestic Equity</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">US Equity</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Debt</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Gold</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Crypto</th>
+                    <th className="border border-secondary-300 p-2 text-left w-1/8">Total SIP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {goalsData?.sipAmountDistribution.map((distribution, index) => {
+                    const totalSIP = Object.values(distribution).reduce((sum, val) => {
+                      if (typeof val === "number") sum += val;
+                      return sum;
+                    }, 0);
+      
+                    return (
+                      <tr key={distribution._id} className="border border-secondary-300">
+                        <td className="border border-secondary-300 p-2">
+                          {goalsData?.goals?.[index]?.goalName || `Goal ${index + 1}`}
+                        </td>
+                        <td className="border border-secondary-300 p-2">{distribution.realEstate || 0}</td>
+                        <td className="border border-secondary-300 p-2">{distribution.domesticEquity || 0}</td>
+                        <td className="border border-secondary-300 p-2">{distribution.usEquity || 0}</td>
+                        <td className="border border-secondary-300 p-2">{distribution.debt || 0}</td>
+                        <td className="border border-secondary-300 p-2">{distribution.gold || 0}</td>
+                        <td className="border border-secondary-300 p-2">{distribution.crypto || 0}</td>
+                        <td className="border border-secondary-300 p-2 font-bold">{totalSIP}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+          )}
           {/* SIP Asset Allocation */}
           {goalsData?.goals?.length > 0 && goalsData?.sipAssetAllocation && (
             <motion.div

@@ -11,6 +11,7 @@ import toolsRouter from "./routes/tools.js"
 import { Socket } from "socket.io";
 import { createServer } from "http";
 
+import adminRouter from "./routes/admin.js"
 
 const app = express();
 const server = createServer(app);
@@ -32,6 +33,7 @@ app.use("/api/v1/user",userRouter);
 app.use("/api/v1/networth",netWorthRouter);
 app.use("/api/v1/planner", plannerRouter);
 app.use("/api/v1/tools",toolsRouter);
+app.use("/api/v1/admin", adminRouter);
 
 app.listen(process.env.PORT,() => {
     console.log(`The app is running on port ${process.env.PORT}`);

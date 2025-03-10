@@ -41,11 +41,18 @@ export default function SipCalculator() {
       const futureValue = monthlyInvestment * ((Math.pow((1 + monthlyRateOfReturn / 100), months) - 1) / (monthlyRateOfReturn / 100)) * (1 + monthlyRateOfReturn / 100)
       const estimatedReturns = futureValue - investedAmount
 
+      const p = monthlyInvestment;
+      const r = rateOfReturn/100;
+      const t = year;
+      const rp = Math.pow(1 + r, 1/12);
+
+      const fv = p * ((1 - (1 + (1 + r) ** (1 / 12) - 1) ** (12 * t + 1)) / (1 - (1 + (1 + r) ** (1 / 12) - 1)) - 1);
+
       yearlyResults.push({
         year,
         investedAmount: Math.round(investedAmount),
-        estimatedReturns: Math.round(estimatedReturns),
-        futureValue: Math.round(futureValue)
+        estimatedReturns: Math.round(fv - investedAmount),
+        futureValue: Math.round(fv)
       })
     }
     setResults(yearlyResults)

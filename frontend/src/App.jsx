@@ -26,9 +26,17 @@ import MutualFunds from './components/tools/MutualFunds'
 import DebtFunds from './components/tools/DebtFunds'
 import ArbitrageFunds from './components/tools/ArbitrageFunds'
 import EquitySaver from './components/tools/EquitySaver'
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/Dashboard'
+import MutualFunds from './pages/admin/MutualFunds'
+import { useAdminAuth } from './pages/admin/AdminAuthContext'
+import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
+import UserEngagement from './pages/admin/UserEngagement'
+import GoalChart from './pages/admin/GoalsAnalytics'
 
 function App() {
   const { isAuthenticated } = useAuth()
+  const {isAdminAuthenticated} = useAdminAuth();
 
   return (
     <Routes>
@@ -37,7 +45,30 @@ function App() {
       <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/home" element={<Landing/>} />
-      
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={!isAdminAuthenticated? <AdminLogin /> : <Navigate to="/admin/dashboard"/> } />
+      {/* Admin Protected Routes */}
+      <Route path="/admin/dashboard" element={
+        <ProtectedAdminRoute>
+          <AdminDashboard/ >
+        </ProtectedAdminRoute>
+      } />
+      <Route path="/admin/mutualfunds" element={
+        <ProtectedAdminRoute>
+          <MutualFunds/>
+        </ProtectedAdminRoute>
+      } />
+      <Route path="/admin/analytics/user-engagement" element={
+        <ProtectedAdminRoute>
+          <UserEngagement/>
+        </ProtectedAdminRoute>
+      }/>
+      <Route path="/admin/analytics/goals" element= {
+        <ProtectedAdminRoute>
+          <GoalChart/>
+        </ProtectedAdminRoute>
+      }/>
       {/* Protected Routes */}
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       

@@ -36,29 +36,22 @@ export default function StepUpSipCalculator() {
   const calculateStepUpSIP = () => {
     const yearlyResults = []
     for (let year = 1; year <= years; year++) {
-      const P = monthlyInvestment
-      const s = incrementRate / 100
+      const p = monthlyInvestment
+      const i = incrementRate / 100
       const r = rateOfReturn / 100
-      const totalMonths = year * 12
-      const stepUpFrequency = 12
-      let totalInvestment = (12 * monthlyInvestment * (Math.pow((1 + s), year) - 1)) / s
+      const t = year;
+      let totalInvestment = (12 * monthlyInvestment * (Math.pow((1 + i), year) - 1)) / i
 
-      let monthlyRate = r / 12
-      let futureValue = 0
-      let currentPrincipal = P
-      for (let month = 0; month < totalMonths; month++) {
-        if (month > 0 && month % stepUpFrequency === 0) {
-          currentPrincipal *= (1 + s)
-        }
-        let monthsRemaining = totalMonths - month
-        futureValue += currentPrincipal * Math.pow(1 + monthlyRate, monthsRemaining)
-      }
-
+      let e = (1 + r) ** (1 / 12) - 1
+      , a = (1 + r) ** (t - 1)
+      , l = 1 - ((1 + i) / (1 + r)) ** t
+      , s = 1 - (1 + i) * 1 / (1 + r);
+      const fv = parseFloat((p * ((1 - (1 + e) ** 13) / (1 - (1 + e)) - 1) * a * l / s).toFixed(2))
       yearlyResults.push({
         year,
         totalInvestment: Math.round(totalInvestment),
-        futureValue: Math.round(futureValue),
-        estimatedReturns: Math.round(futureValue - totalInvestment)
+        futureValue: Math.round(fv),
+        estimatedReturns: Math.round(fv - totalInvestment)
       })
     }
     setResults(yearlyResults)
