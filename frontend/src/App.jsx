@@ -24,6 +24,8 @@ import AdminDashboard from './pages/admin/Dashboard'
 import MutualFunds from './pages/admin/MutualFunds'
 import { useAdminAuth } from './pages/admin/AdminAuthContext'
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
+import UserEngagement from './pages/admin/UserEngagement'
+import GoalChart from './pages/admin/GoalsAnalytics'
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -50,7 +52,16 @@ function App() {
           <MutualFunds/>
         </ProtectedAdminRoute>
       } />
-
+      <Route path="/admin/analytics/user-engagement" element={
+        <ProtectedAdminRoute>
+          <UserEngagement/>
+        </ProtectedAdminRoute>
+      }/>
+      <Route path="/admin/analytics/goals" element= {
+        <ProtectedAdminRoute>
+          <GoalChart/>
+        </ProtectedAdminRoute>
+      }/>
       {/* Protected Routes */}
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       

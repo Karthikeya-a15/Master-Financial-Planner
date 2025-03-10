@@ -31,12 +31,14 @@ export default function AdminDashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userEngagementData, setUserEngagementData] = useState(null);
   const navigate = useNavigate();
   const {logout} = useAdminAuth();
 
   useEffect(() => {
     document.title = 'Dashboard | DarwInvest'
     fetchDashboardData();
+    fetchUserEnagementData();
   }, [])
 
   const fetchDashboardData = async () => {
@@ -52,6 +54,20 @@ export default function AdminDashboard() {
       toast.error("Failed to load dashboard data");
     }
   };
+
+  const fetchUserEnagementData = async () => {
+    try{
+      const response = await axios.get("/api/v1/admin/analytics/user-engagement");
+      // console.log(response.data);
+      setUserEngagementData(response.data);
+      setLoading(false);
+    }catch(error){
+      console.error("Error fetching user engagement data: ",error);
+      setError("Failed to load user engagement data");
+      setLoading(false);
+      toast.error("Failed to load user engagement data");
+    }
+  }
 
   if (loading) {
     return (

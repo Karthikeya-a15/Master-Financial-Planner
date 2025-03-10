@@ -98,13 +98,22 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    setToken(null)
-    setCurrentUser(null)
-    setIsAuthenticated(false)
-    delete axios.defaults.headers.common['Authorization']
-    toast.info('You have been logged out')
+  const logout = async () => {
+    try{
+      const response = await axios.post('api/v1/user/logout');
+      localStorage.removeItem('token')
+      setToken(null)
+      setCurrentUser(null)
+      setIsAuthenticated(false)
+      delete axios.defaults.headers.common['Authorization']
+      toast.info('You have been logged out')
+    }catch(error){
+      console.error("Sign out error");
+      console.error('Signup error:', error)
+      const errorMessage = error.response?.data?.message || 'Sign out failed. Please try again.'
+      toast.error(errorMessage)
+      return { success: false, error: errorMessage }
+    }
   }
 
   const forgotPassword = async (email) => {

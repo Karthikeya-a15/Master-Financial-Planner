@@ -10,7 +10,7 @@ const mutualFunds = () => {
   useEffect(() => {
     const fetchmutualFundsData = async () => {
       try {
-        const response = await axios.get("/api/v1/admin/midcap-analysis", {
+        const response = await axios.get("/api/v1/admin/mutualfunds", {
             headers : {
                 "Authorization" : `Bearer ${localStorage.getItem("adminToken")}`
             }

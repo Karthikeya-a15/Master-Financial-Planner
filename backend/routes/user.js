@@ -100,7 +100,12 @@ router.post("/login", async (req, res) => {
         const isUserExist = await user.validatePassword(password);
 
         if(isUserExist){
-            const token = await jwt.sign({id : user._id},process.env.JWT_SECRET);
+            user.userEngagement.loginFrequency += 1;
+            user.userEngagement.lastLogin = new Date();
+            const token = await jwt.sign({id : user._id},process.env.JWT_SECRET,{
+                expiresIn: "1d",
+            });
+            await user.save();
             return res.status(200).json({message : "Login Successful", token});
         }else{
             return res.status(403).json({message : "Username or Password is wrong"});
@@ -110,6 +115,27 @@ router.post("/login", async (req, res) => {
         return res.status(500).json({message : "Internal error"});
     }
 });
+
+router.post("/logout", userAuth, async (req, res) => {
+    const userId = req.user;
+    try{
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(500).json({message : "User not found"});
+        }
+        const lastLogin = new Date(user.userEngagement.lastLogin);
+        const currentTime = new Date();
+        const sessionDuration = Math.floor((currentTime - lastLogin) / 60000);
+
+        user.userEngagement.timeSpent += sessionDuration;
+        await user.save();
+
+        return res.json({ message: "User logged out successfully" });
+    }catch(error){
+        return res.status(500).json({message : error.message});
+    }
+
+})
 
 router.get("/profile/:id", async (req, res) => {
     const email = req.params.id;

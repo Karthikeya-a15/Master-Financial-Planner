@@ -68,6 +68,28 @@ const userSchema = new mongoose.Schema({
     toolResult : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'ToolResults'
+    },
+    userEngagement: {
+        loginFrequency: {
+            type: Number,
+            default: 0 
+        },
+        timeSpent: {
+            type: Number,
+            default: 0 
+        },
+        actionsPerformed: {
+            type: Number,
+            default: 0 
+        },
+        lastLogin: {
+            type: Date,
+            default: Date.now 
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now 
+        }
     }
 });
 
