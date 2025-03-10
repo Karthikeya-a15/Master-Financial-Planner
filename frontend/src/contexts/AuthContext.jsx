@@ -70,7 +70,6 @@ export function AuthProvider({ children }) {
       
       // Fetch user data
       await fetchUserData();
-      console.log(currentUser);
       
       toast.success('Login successful!')
       return { success: true }

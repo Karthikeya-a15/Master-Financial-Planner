@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 import Navbar from "../../components/layout/Navbar";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { FiEdit } from "react-icons/fi";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Profile() {
+  const {updateUser} = useAuth();
   const [currentUser, setCurrentUser] = useState({ name: "", age: 0, email: "", imageURL: "" });
   const { logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -41,6 +42,7 @@ export default function Profile() {
       setLoading(true);
       const response = await axios.put("/api/v1/user/profile", currentUser);
       setCurrentUser(response.data.user);
+      updateUser(response.data.user);
       setIsEditing(false);
       toast.success("Profile updated successfully");
     } catch (error) {

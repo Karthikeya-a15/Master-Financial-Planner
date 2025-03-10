@@ -8,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 
 export default function FireCalculator() {
+  const {updateUser} = useAuth();
   const [monthlyExpenses, setMonthlyExpenses] = useState(50000)
   const [age, setAge] = useState(30)
   const [retirementAge, setRetirementAge] = useState(45)
@@ -56,6 +57,7 @@ export default function FireCalculator() {
     try {
       const response = await axios.get(`/api/v1/user/me`);
       setFire(response.data.fire);
+      updateUser(response.data)
     } catch (error) {
       console.error("Error fetching user data:", error);
     }

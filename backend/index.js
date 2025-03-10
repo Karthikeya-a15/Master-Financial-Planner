@@ -2,15 +2,23 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import cors from "cors";
 import connectDB from "./db/index.js";
 import userRouter from "./routes/user.js"
 import netWorthRouter from "./routes/netWorth.js"
 import plannerRouter from "./routes/planner.js"
 import toolsRouter from "./routes/tools.js"
+import { Socket } from "socket.io";
+import { createServer } from "http";
+
 
 const app = express();
+const server = createServer(app);
+const io = Socket(server, {cors : {origin : "*"}})
 
 connectDB();
+
+app.use(cors());
 
 app.use(express.json());
 
