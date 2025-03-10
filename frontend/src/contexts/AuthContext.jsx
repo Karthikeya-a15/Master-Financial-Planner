@@ -9,8 +9,12 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentUser, setCurrentUser] = useState(() => {
+    return localStorage.getItem('currentUser') 
+      ? JSON.parse(localStorage.getItem('currentUser')) 
+      : null
+  })  
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(localStorage.getItem('token') || null)
 
@@ -22,14 +26,19 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       // Set axios default header
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-      
-      // Fetch user data
-      // fetchUserData()
+      fetchUserData();
+
       setLoading(false)
     } else {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser))
+    }
+  }, [currentUser])
 
   const fetchUserData = async () => {
     try {
@@ -61,6 +70,7 @@ export function AuthProvider({ children }) {
       
       // Fetch user data
       await fetchUserData();
+      console.log(currentUser);
       
       toast.success('Login successful!')
       return { success: true }
@@ -72,6 +82,10 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const updateUser = (updatedUser) => {
+    setCurrentUser(updatedUser) // 🔹 This will trigger `useEffect` and update localStorage
   }
 
   const signup = async (name, email, password, age) => {
@@ -134,7 +148,8 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
-    forgotPassword
+    forgotPassword,
+    updateUser
   }
 
   return (

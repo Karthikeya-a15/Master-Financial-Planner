@@ -121,7 +121,7 @@ router.get("/me", userAuth, async(req, res)=>{
         _id : req.user
     })
     // console.log(user);
-    return res.status(200).json({"name" : user.name, "email" : user.email, "age" : user.age, "imageURL" : user.imageURL});
+    return res.status(200).json({"name" : user.name, "email" : user.email, "age" : user.age, "imageURL" : user.imageURL, fire : user.fireNumber});
 })
 
 
@@ -145,6 +145,29 @@ router.put("/profile", userAuth, async (req, res) => {
       return res.status(500).json({ message: "Internal server error" });
     }
   });
+
+
+  router.put("/save-fire-number", userAuth , async(req, res)=>{
+    const id = req.user;
+    const fireNumber = req.body.fireNumber;
+
+    try {
+        const user = await User.findOneAndUpdate(
+          { _id: id }, 
+          { $set: { fireNumber } },
+          { new: true, fields: { fireNumber } } // `new: true` returns the updated user
+        ).select("-_id");
+    
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        return res.json({ message: "Fire Number updated successfully" });
+      } catch (e) {
+        console.error("update error:", e);
+        return res.status(500).json({ message: "Internal server error" });
+      }
+  })
   
 
 export default router;

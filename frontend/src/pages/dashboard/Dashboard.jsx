@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import Navbar from '../../components/layout/Navbar'
-import FireCalculator from '../../components/dashboard/FireCalculator'
 import InfoTools from '../../components/dashboard/InfoTools'
 import BlogSection from '../../components/dashboard/BlogSection'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Dashboard() {
+  const { currentUser } = useAuth();
   useEffect(() => {
     document.title = 'Dashboard | DarwInvest'
+    console.log(currentUser)
   }, [])
 
   return (
@@ -20,11 +22,10 @@ export default function Dashboard() {
             <p className="mt-1 text-secondary-600">Your personal financial planning dashboard</p>
           </div>
           
-          <FireCalculator />
-          
+
           <InfoTools />
           
-          <BlogSection />
+          {/* <BlogSection /> */}
         </div>
       </main>
     </div>

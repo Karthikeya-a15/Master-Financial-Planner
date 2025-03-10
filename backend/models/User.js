@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     imageURL : {
         type : String
     },
+    fireNumber : {
+        type : Number,
+        default : 0
+    },
     netWorth : {
         cashFlows : {
                 type: mongoose.Schema.Types.ObjectId,
