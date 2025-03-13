@@ -1,6 +1,7 @@
 import DomesticEquity from "../../models/DomesticEquity.js";
 import User from "../../models/User.js";
 
+
 export default async function getDomesticEquityController(req, res) {
     const userId = req.user;
 

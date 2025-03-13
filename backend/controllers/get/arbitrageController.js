@@ -12,24 +12,8 @@ export default async function arbitrageController(req, res){
             return res.status(403).json({message : "User not found"});
         }        
 
-        const toolResultId = user.toolResult;
+        const funds = await main();
 
-        const body = req.body;
-
-        const {expenseRatio, rollingReturns, aumRatio, exitLoadRatio} = body;
-
-        const weightage = {expenseRatio, rollingReturns, aumRatio, exitLoadRatio};
-
-        const funds = await main(weightage);
-
-        await Result.updateOne(
-            {_id : toolResultId},
-            {
-                $set : {
-                    arbitrageFunds : funds
-                }
-            }
-        )
         return res.status(200).json(funds);
     }catch(err){
         return res.json(500).json({message : "Internal Server Error", err : err.message});

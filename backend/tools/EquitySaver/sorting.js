@@ -1,5 +1,3 @@
-import main from "./morningStar.js";
-
 function rankByParameter(funds, parameter, isAscending = true) {
     const sortedFunds = [...funds].sort((a, b) => {
         return isAscending 
@@ -10,33 +8,34 @@ function rankByParameter(funds, parameter, isAscending = true) {
     const ranks = {};
     let currentRank = 1;
 
+    // Assign rank to the first fund
     ranks[sortedFunds[0].name] = currentRank;
 
     for (let i = 1; i < sortedFunds.length; i++) {
-        const currentFund = sortedFunds[i];
-        currentRank = i + 1;
-        ranks[currentFund.name] = currentRank;
-        
-    }
+            const currentFund = sortedFunds[i];
+            currentRank = i + 1;
+            ranks[currentFund.name] = currentRank;
+        }
+    
 
     return ranks;
 }
 
-function calculateWeightedScores(funds, weightage){
-    const cagrRanks = rankByParameter(funds, 'cagr', false);
-    const volatilityRanks = rankByParameter(funds, 'volatility', true);
-    const tenureRanks = rankByParameter(funds, 'fundManagerTenure', false);
-    const expectedReturnsRanks = rankByParameter(funds, 'expectedReturns', false);
+function calculateWeightedScores(funds, weightage) {
+    const expenseRatioRanks = rankByParameter(funds, 'expenseRatio', true);
+    const rollingReturnsRanks = rankByParameter(funds, 'FiveYearAvgRollingReturns', false);
+    const probabilityRanks = rankByParameter(funds, 'GreaterThan12Probability', false);
+    const sortinoRanks = rankByParameter(funds, 'sortinoRatio', true)
 
-    const {cagrRanksRatio, volatalityRankRatio, tenureRankRatio, sortinoRatio} = weightage;
-
+    const {expenseRatio, rollingReturns, probabilityRatio, sortinoRatio} = weightage;
+    // Calculate weighted scores
     const weightedScores = funds.map(fund => {
         const weightedScore = 
-            cagrRanksRatio * cagrRanks[fund.name] +
-            volatalityRankRatio * volatilityRanks[fund.name] +
-            tenureRankRatio * tenureRanks[fund.name] +
-            sortinoRatio * expectedReturnsRanks[fund.name];
-            
+            expenseRatio * expenseRatioRanks[fund.name] +
+            rollingReturns * rollingReturnsRanks[fund.name] +
+            probabilityRatio * probabilityRanks[fund.name] + 
+            sortinoRatio * sortinoRanks[fund.name]
+            // 0.30 0.25 0.05 0.40
         return {
             ...fund,
             weightedScore: Number(weightedScore.toFixed(2))
@@ -65,11 +64,4 @@ function calculateWeightedScores(funds, weightage){
     return rankedFunds;
 }
 
-export default async function getFundRanks(weightage, subsector){
-    const debtFunds = await main(weightage, subsector);
-    const finalRankings = calculateWeightedScores(debtFunds, weightage);
-
-    return finalRankings;
-}
-
-// getFundRanks(-1);
+const {expenseRatio, rollingReturns, probabilityRatio, sortinoRatio} = weightage;

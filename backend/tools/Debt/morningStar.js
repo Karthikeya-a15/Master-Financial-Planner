@@ -120,7 +120,7 @@ function customRound(num) {
     }
 }
 
-async function getMorningStar(expectedInterestRateChange, subsector, tickerTapeFunds) {
+async function getMorningStar(subsector, tickerTapeFunds) {
     try {
         const msFunds = await getSectorFunds(subsector);
 
@@ -146,8 +146,8 @@ async function getMorningStar(expectedInterestRateChange, subsector, tickerTapeF
 
             const managerTenure = Number(actualFund.managerTenure.toFixed(2));
             const modifiedDuration = await getModifiedDuration(actualFund.secId, accessToken) || 0;
-            const expectedReturns = Number(customRound(modifiedDuration * -1 * expectedInterestRateChange + fund.avgYTM - fund.expenseRatio));
-
+            // const expectedReturns = Number(customRound(modifiedDuration * -1 * expectedInterestRateChange + fund.avgYTM - fund.expenseRatio));
+            const expectedReturns = modifiedDuration;
             return {
                 ...fund,
                 managerTenure,
@@ -166,10 +166,10 @@ async function getMorningStar(expectedInterestRateChange, subsector, tickerTapeF
 
 
 
-export default async function main(weightage, subsector) {
+export default async function main(subsector) {
     const tickerTapeFunds = await getTickerTapeFunds(subsector);
 
-    const finalFunds = await getMorningStar(weightage.expectedInterestRateChange, subsector, tickerTapeFunds);
+    const finalFunds = await getMorningStar(subsector, tickerTapeFunds);
 
     // console.log(finalFunds);
     return finalFunds;

@@ -19,13 +19,21 @@ import CagrCalculator from "./components/calculators/CagrCalculator"
 import LumpsumCalculator from "./components/calculators/LumpSumpCalculator"
 import StepUpSipCalculator from "./components/calculators/StepUpSipCalculator"
 import Profile from './pages/profile/Profile'
+import { GoalsProvider } from "./contexts/GoalsContext"
+import ToolsDashboard from './components/tools/ToolsDashboard'
+import IndexFunds from './components/tools/IndexFunds'
+import MutualFunds from './components/tools/MutualFunds'
+import DebtFunds from './components/tools/DebtFunds'
+import ArbitrageFunds from './components/tools/ArbitrageFunds'
+import EquitySaver from './components/tools/EquitySaver'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/Dashboard'
-import MutualFunds from './pages/admin/MutualFunds'
+import MutualFundsAdmin from './pages/admin/MutualFunds'
 import { useAdminAuth } from './pages/admin/AdminAuthContext'
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
 import UserEngagement from './pages/admin/UserEngagement'
 import GoalChart from './pages/admin/GoalsAnalytics'
+import Rooms from './components/chat-app/Rooms'
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -49,7 +57,7 @@ function App() {
       } />
       <Route path="/admin/mutualfunds" element={
         <ProtectedAdminRoute>
-          <MutualFunds/>
+          <MutualFundsAdmin/>
         </ProtectedAdminRoute>
       } />
       <Route path="/admin/analytics/user-engagement" element={
@@ -62,7 +70,9 @@ function App() {
           <GoalChart/>
         </ProtectedAdminRoute>
       }/>
-      {/* Protected Routes */}
+
+      
+      {/* User Protected Routes */}
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       
       <Route path="/dashboard" element={
@@ -80,7 +90,9 @@ function App() {
       <Route path="/financial-planner">
         <Route path="net-worth" element={
           <ProtectedRoute>
-            <NetWorthDashboard />
+            <GoalsProvider>
+              <NetWorthDashboard />
+            </GoalsProvider>
           </ProtectedRoute>
         } />
         <Route path="assumptions" element={
@@ -90,10 +102,45 @@ function App() {
         } />
         <Route path="goals" element={
           <ProtectedRoute>
-            <GoalsPage />
+              <GoalsPage />
           </ProtectedRoute>
         } />
       </Route>
+
+      <Route path="tools">
+        <Route path="" element={
+          <ProtectedRoute>
+            <ToolsDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="indexfunds" element={
+          <ProtectedRoute>
+            <IndexFunds />
+          </ProtectedRoute>
+        } />
+        <Route path="mutualfunds" element={
+          <ProtectedRoute>
+            <MutualFunds />
+          </ProtectedRoute>
+        } />
+        <Route path="debtfunds" element={
+          <ProtectedRoute>
+            <DebtFunds />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="arbitrage" element={
+          <ProtectedRoute>
+            <ArbitrageFunds />
+          </ProtectedRoute>
+        } /> 
+        <Route path="equitysaver" element={
+          <ProtectedRoute>
+            <EquitySaver />
+          </ProtectedRoute>
+        } />
+      </Route>
+
       <Route path="calculators">
         <Route path="" element={
           <ProtectedRoute>
@@ -135,7 +182,18 @@ function App() {
             <StepUpSipCalculator/>
           </ProtectedRoute>
         }/>
+
       </Route>
+
+
+      <Route path="chat">
+        <Route path="rooms"  element = {<ProtectedRoute>
+            <Rooms></Rooms>
+          </ProtectedRoute> } 
+          />
+      </Route>
+         
+
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>

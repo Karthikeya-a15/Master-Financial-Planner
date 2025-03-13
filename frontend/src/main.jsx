@@ -12,7 +12,6 @@ import 'react-toastify/dist/ReactToastify.css'
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <BrowserRouter>
       <AdminAuthProvider>
       <AuthProvider>
@@ -21,5 +20,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </AuthProvider>
       </AdminAuthProvider>
     </BrowserRouter>
-  </React.StrictMode>,
 )

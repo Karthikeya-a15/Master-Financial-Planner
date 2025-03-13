@@ -1,8 +1,9 @@
 import { Fragment, useState } from 'react'
-import { Link, useNavigate, useLocation} from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -11,20 +12,12 @@ function classNames(...classes) {
 export default function Navbar() {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Handle search functionality
-    console.log('Searching for:', searchQuery)
-    setSearchQuery(e.target.value)
-  }
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard'},
@@ -77,33 +70,16 @@ export default function Navbar() {
                   ))}
                 </div>
               </div>
+                
+               
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="relative mr-4">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <MagnifyingGlassIcon
-                      className="h-5 w-5 text-secondary-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-secondary-900 ring-1 ring-inset ring-secondary-300 placeholder:text-secondary-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </form>
-
-                {/* Notification bell */}
-                <button
-                  type="button"
-                  className="relative rounded-full bg-white p-1 text-secondary-400 hover:text-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                {/* Message Icon */}
+                <Link
+                  to="/chat/rooms" // Replace with your messaging route
+                  className="p-2 text-secondary-500 hover:text-secondary-700"
                 >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
+                  <ChatBubbleOvalLeftEllipsisIcon className="h-6 w-6" aria-hidden="true" />
+                </Link>
 
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
@@ -183,7 +159,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-
+                  
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
               {navigation.map((item) => (
@@ -218,14 +194,6 @@ export default function Navbar() {
                     {currentUser?.email || "user@example.com"}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className="relative ml-auto flex-shrink-0 rounded-full bg-white p-1 text-secondary-400 hover:text-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-                >
-                  <span className="absolute -inset-1.5" />
-                  <span className="sr-only">View notifications</span>
-                  <BellIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
               </div>
               <div className="mt-3 space-y-1">
                 <Disclosure.Button

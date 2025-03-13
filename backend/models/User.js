@@ -19,6 +19,13 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    imageURL : {
+        type : String
+    },
+    fireNumber : {
+        type : Number,
+        default : 0
+    },
     netWorth : {
         cashFlows : {
                 type: mongoose.Schema.Types.ObjectId,

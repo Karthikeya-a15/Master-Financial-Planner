@@ -2,13 +2,19 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar'
 import { motion } from 'framer-motion'
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext';
+
 
 export default function FireCalculator() {
+  const {updateUser} = useAuth();
   const [monthlyExpenses, setMonthlyExpenses] = useState(50000)
   const [age, setAge] = useState(30)
   const [retirementAge, setRetirementAge] = useState(45)
   const [inflation, setInflation] = useState(6)
   const [coastAge, setCoastAge] = useState(35)
+  const [fire, setFire] = useState(0);
   
   const [results, setResults] = useState({
     yearlyExpensesRetirement: 0,
@@ -17,6 +23,10 @@ export default function FireCalculator() {
     fatFireNumber: 0,
     coastFireNumber: 0
   })
+
+  useEffect(() => {
+    fetchUserData();
+  },[])
 
   useEffect(() => {
     calculateFire()
@@ -43,12 +53,40 @@ export default function FireCalculator() {
     })
   }
 
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`/api/v1/user/me`);
+      setFire(response.data.fire);
+      updateUser(response.data)
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR',
       maximumFractionDigits: 0
     }).format(amount)
+  }
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.put('/api/v1/user/save-fire-number', 
+        { fireNumber: results.fireNumber }, 
+        { headers: { 'Content-Type': 'application/json' } } // Ensure JSON content type
+      )
+  
+      if (response.status === 200) {
+        fetchUserData();
+        toast.success('FIRE Number saved successfully!', { position: 'top-right', autoClose: 2000 })
+      } else {
+        toast.error('Failed to save FIRE Number', { position: 'top-right', autoClose: 2000 })
+      }
+    } catch (error) {
+      toast.error('Error saving FIRE Number', { position: 'top-right', autoClose: 2000 })
+    }
   }
 
   return (
@@ -73,6 +111,9 @@ export default function FireCalculator() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
+          <div className="mb-4 font-bold text-2xl">
+            Saved FIRE NUMBER : <span className='text-blue-500'>{formatCurrency(fire)}</span>
+          </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
@@ -213,6 +254,14 @@ export default function FireCalculator() {
                 </div>
               </div>
             </div>
+             <div className="flex justify-center">
+            <button 
+              onClick={handleSave} 
+              className="bg-primary-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-primary-700 transition"
+            >
+              Save FIRE Number
+            </button>
+          </div>
           </motion.div>
         </div>
       </main>

@@ -14,6 +14,7 @@ import Miscellaneous from './assets/Miscellaneous'
 import Liabilities from './assets/Liabilities'
 import DomesticEquity from './assets/DomesticEquity'
 import Debt from './assets/Debt'
+import { useGoals } from '../../contexts/GoalsContext'
 
 
 export default function NetWorthDashboard() {
@@ -22,6 +23,8 @@ export default function NetWorthDashboard() {
   const [error, setError] = useState(null)
   const location = useLocation();
   const [refreshTrigger, setRefreshTrigger] = useState(false);
+  const { goalsData } = useGoals();
+
 
   const fetchDashboardData = async () => {
     try {
@@ -103,9 +106,9 @@ export default function NetWorthDashboard() {
     },
     { name: "Cashflows", component: <CashFlows formatCurrency={formatCurrency} refreshData={refreshData}/>},
     { name: "Real Estate", component: <RealEstate formatCurrency = {formatCurrency} refreshData={refreshData}/> },
-    {name : "Domestic Equity", component : <DomesticEquity formatCurrency = {formatCurrency} refreshData={refreshData} />},
+    {name : "Domestic Equity", component : <DomesticEquity formatCurrency = {formatCurrency} refreshData={refreshData} goalsData={goalsData}/>},
     { name: "US Equity", component: <ForeignEquity formatCurrency = {formatCurrency} refreshData={refreshData}/> },
-    { name: "Debt", component: <Debt formatCurrency = {formatCurrency} refreshData={refreshData}/> },
+    { name: "Debt", component: <Debt formatCurrency = {formatCurrency} refreshData={refreshData} goalsData={goalsData}/> },
     { name: "Gold", component: <Gold formatCurrency = {formatCurrency} refreshData={refreshData}/> },
     { name: "Crypto", component: <Cryptocurrency formatCurrency = {formatCurrency} refreshData={refreshData}/> },
     { name: "Miscellaneous" , component : <Miscellaneous formatCurrency = {formatCurrency} refreshData={refreshData}/>},

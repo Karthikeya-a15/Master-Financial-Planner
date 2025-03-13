@@ -27,7 +27,7 @@ async function getFunds(Category="Mid Cap Fund") {
         throw error;
     }
 }
-function getFundName(fname, c1="Mid Cap", c2="Midcap"){
+function getFundName(fname, c1, c2){
     const Cap = fname.indexOf(c1);
     const cap = fname.indexOf(c2);
 
@@ -37,7 +37,7 @@ function getFundName(fname, c1="Mid Cap", c2="Midcap"){
     }else if(cap != -1){
         cutOff = cap;
     }else{
-        cutOff = fname.length;
+        cutOff = fname.indexOf("Fund");
     }
 
     return fname.substring(0,cutOff);

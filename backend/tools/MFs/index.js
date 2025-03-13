@@ -2,11 +2,12 @@ import  getRankOfFunds from './mutualFunds.js';
 
 const schemeNo = [1,3,50,4,5]
 const category = ["Large Cap Fund", "Multi Cap Fund", "Flexi Cap Fund" , "Mid Cap Fund" , "Small Cap Fund"]
-async function main(weightage){
-    const start = Date.now()
+// const schemeNo = [1]
+// const category = ["Large Cap Fund"]
+async function main(){
     const results = []
     for(let i=0; i<schemeNo.length; i++){
-        results.push(getRankOfFunds(schemeNo[i], category[i],weightage));
+        results.push(getRankOfFunds(schemeNo[i], category[i]));
     }
 
     const responses = await Promise.allSettled(results);

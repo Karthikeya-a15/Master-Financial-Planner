@@ -6,18 +6,18 @@ import LoadingSpinner from "../../../components/common/LoadingSpinner";
 import DirectStocks from './equity/DirectStocks';
 import MutualFunds from "./equity/MutualFunds";
 import SipEquity from "./equity/SipEquity";
+import { GoalsProvider } from "../../../contexts/GoalsContext";
 
 const CATEGORY_OPTIONS = ["large cap", "mid cap", "small cap", "flexi/multi cap"];
 const COLORS = {
     "large cap": "#0088FE",
     "mid cap": "#00C49F",
     "small cap": "#FFBB28",
-    "flexi cap": "#FF8042",
-    "multi cap": "#A28DFF",
+    "flexi/multi cap": "#FF8042",
     default: "#DDDDDD",
 };
 
-export default function DomesticEquity({ formatCurrency, refreshData }) {
+export default function DomesticEquity({ formatCurrency, refreshData , goalsData}) {
     const [equityData, setEquityData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -88,7 +88,9 @@ export default function DomesticEquity({ formatCurrency, refreshData }) {
                 setEditedData = {setEditedData}
                 CATEGORY_OPTIONS = {CATEGORY_OPTIONS}
                 COLORS = {COLORS}
-                handleSave = {handleSave} />
+                handleSave = {handleSave} 
+                goalsData = {goalsData}
+                />
             default:
                 return null;
         }

@@ -20,14 +20,26 @@
   },
   "homepage": "https://github.com/Karthikeya-a15/Master-Financial-Planner#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/credential-providers": "^3.758.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1",
+    "nse-api-package": "^2.3.0",
+    "path": "^0.12.7",
+    "socket.io": "^4.8.1",
+    "url": "^0.11.4",
+    "xml2js": "^0.6.2",
+    "yahoo-finance2": "^2.13.3",
     "zod": "^3.24.2"
   }
 }

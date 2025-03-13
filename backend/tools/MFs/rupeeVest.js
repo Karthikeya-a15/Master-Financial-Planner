@@ -14,6 +14,7 @@ async function getFunds(schemeNo){
 
 async function getACS(schemeNo){
     const funds = await getFunds(schemeNo);
+    // console.log(funds)
 
    const filteredFunds = [];
 
@@ -25,12 +26,14 @@ async function getACS(schemeNo){
                 name : currentFund.s_name1,
                 AUM : currentFund.aumtotal,
                 FiveYearCAGR : currentFund.returns_5year,
-                SortinoRatio : currentFund.sotinox_returns
+                SortinoRatio : currentFund.sotinox_returns,
+                expenseRatio : currentFund.expenceratio
             })
         }
    }
 
    return filteredFunds;
 }
+
 
 export default getACS;

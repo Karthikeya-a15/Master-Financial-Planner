@@ -196,7 +196,14 @@ function calculateRollingReturnsAndProbability(acesFunds, advisorkhojfunds) {
 
   // Return the updated `acesFunds` array
   // console.log(UpdatedFunds);
-  return UpdatedFunds;
+  const nameChangedFunds = UpdatedFunds.map((fund) => {
+    return {
+      ...fund,
+      name : fund.name.substring(0, fund.name.indexOf("Fund"))
+    }
+  })
+
+  return nameChangedFunds
 }
 
 // getBestFunds(5, "Small Cap Fund")

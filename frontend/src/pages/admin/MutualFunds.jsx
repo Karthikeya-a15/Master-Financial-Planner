@@ -3,8 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, PieC
 import axios from "axios";
 import AdminNavbar from "./AdminNavbar";
 
-const MutualFunds = () => {
-  const [mutualFundsData, setMutualFundsData] = useState([]);
+const mutualFundsAdmin = () => {
+  const [mutualFundsData, setmutualFundsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState("totalInvestment");
@@ -202,4 +202,4 @@ const MutualFunds = () => {
   );
 };
 
-export default MutualFunds;
+export default mutualFundsAdmin;

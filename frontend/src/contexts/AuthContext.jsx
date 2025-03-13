@@ -9,8 +9,12 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentUser, setCurrentUser] = useState(() => {
+    return localStorage.getItem('currentUser') 
+      ? JSON.parse(localStorage.getItem('currentUser')) 
+      : null
+  })  
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'))
   const [loading, setLoading] = useState(true)
   const [token, setToken] = useState(localStorage.getItem('token') || null)
 
@@ -22,21 +26,24 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       // Set axios default header
       axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-      
-      // Fetch user data
-      // fetchUserData()
+      fetchUserData();
+
       setLoading(false)
     } else {
       setLoading(false)
     }
   }, [])
 
-  const fetchUserData = async (email) => {
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser))
+    }
+  }, [currentUser])
+
+  const fetchUserData = async () => {
     try {
-      const response = await axios.get(`/api/v1/user/profile/${email}`)
-      // console.log(response.data);
+      const response = await axios.get(`/api/v1/user/me`)
       setCurrentUser(response.data)
-      // setCurrentUser({"name" : "hello"});
     } catch (error) {
       console.error('Error fetching user data:', error)
       logout()
@@ -62,7 +69,7 @@ export function AuthProvider({ children }) {
       setIsAuthenticated(true)
       
       // Fetch user data
-      await fetchUserData(email);
+      await fetchUserData();
       
       toast.success('Login successful!')
       return { success: true }
@@ -74,6 +81,10 @@ export function AuthProvider({ children }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const updateUser = (updatedUser) => {
+    setCurrentUser(updatedUser) // 🔹 This will trigger `useEffect` and update localStorage
   }
 
   const signup = async (name, email, password, age) => {
@@ -100,8 +111,8 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try{
-      const response = await axios.post('api/v1/user/logout');
       localStorage.removeItem('token')
+      const response = await axios.post('api/v1/user/logout');
       setToken(null)
       setCurrentUser(null)
       setIsAuthenticated(false)
@@ -145,7 +156,8 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
-    forgotPassword
+    forgotPassword,
+    updateUser
   }
 
   return (

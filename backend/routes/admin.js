@@ -8,6 +8,7 @@ import UserActivity from "../models/UserActivity.js";
 import NewsUpdate from "../models/NewsUpdate.js";
 import DomesticEquity from "./../models/DomesticEquity.js"
 import Goals from "../models/Goals.js";
+import ChatRoom from "../models/chat-app/ChatRoom.js";
 
 const router = express.Router();
 
@@ -313,6 +314,17 @@ router.get('/analytics/goals', adminAuth, async (req, res) => {
         
     }catch(error){
         return res.status(500).json({message: "Internal Server Error", error : error.message});
+    }
+})
+
+router.post("/rooms", adminAuth, async (req, res)=>{
+    try{
+        const { name, description } = req.body;
+        const room = await ChatRoom.create({name, description});
+
+        return res.json({room});
+    }catch(err){
+        return res.status(500).json({error : err.message})
     }
 })
 export default router;
