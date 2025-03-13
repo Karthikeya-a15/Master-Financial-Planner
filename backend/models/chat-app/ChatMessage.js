@@ -11,8 +11,16 @@ const ChatMessageSchema = new mongoose.Schema({
         ref : "User",
         required : true
     },
+    senderName : {
+        type : String
+    },
     message : {
         type : String
+    },
+    attachment : {
+        url: {type : String},
+        filename: {type : String},
+        type: {type : String}
     },
     createdAt : {
         type : Date,

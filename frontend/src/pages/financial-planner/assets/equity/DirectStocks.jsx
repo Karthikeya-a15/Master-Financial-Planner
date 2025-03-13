@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
+import axios from "axios";
 import LoadingSpinner from '../../../../components/common/LoadingSpinner';
 
 export default function DirectStocks({
@@ -21,6 +22,8 @@ export default function DirectStocks({
         currentValue: 0,
     });
     const [editingStockIndex, setEditingStockIndex] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
 
     const handleAddStock = useCallback(() => {
         setEditedData((prev) => ({
@@ -46,41 +49,77 @@ export default function DirectStocks({
     const handleChange = (index, field, value) => {
         setEditedData((prevData) => {
             const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy to avoid mutation issues
-            
+
             // Ensure the value is properly parsed for numerical fields
             const parsedValue = field === 'currentValue' ? parseFloat(value) || 0 : value;
-    
+
             newData[section][index] = {
                 ...newData[section][index],
                 [field]: parsedValue,
             };
-            
+
             return newData;
         });
     };
 
+    const autoSuggest = async (value) => {
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+
+        const newTimeout = setTimeout(async () => {
+            if (value.trim() === "") {
+                setSuggestions([]);
+                return;
+            }
+            try {
+                const response = await axios.get(`/api/v1/realtime/autoSuggestionStocks?name=${value}`);
+                setSuggestions(response.data.suggestions || []); // Ensure it's always an array
+                console.log(suggestions.suggestions);
+            } catch (error) {
+                console.error("Error fetching suggestions:", error);
+            }
+        }, 1500);
+
+        setDebounceTimeout(newTimeout);
+    };
+
+    const handleInputChange = (index, e) => {
+        const value = e.target.value;
+        handleChange(index, "stockName", value);
+        autoSuggest(value);
+    };
+
+    const handleSelect = (index, selectedStock) => {
+        setSuggestions([]);
+        handleChange(index, "stockName", selectedStock);
+    };
+
+
     const handleStockSave = (index) => {
         setEditedData((prevData) => {
             const updatedStocks = [...prevData[section]];
-            
+
             updatedStocks[index] = { ...editedData[section][index] };
-            
+
             return {
                 ...prevData,
                 [section]: updatedStocks,
             };
-        });  
+        });
         setEditingStockIndex(false);
         toast.success('Stock Updated successfully');
     };
-    
-    
+
+
     const handleCancelEdit = () => {
         setEditingStockIndex(null);
         setShowAddStockForm(false);
         setEditedData(equityData);
         setNewStock({ stockName: '', category: CATEGORY_OPTIONS[0], currentValue: 0 });
     };
+
+    function capitalizeWords(str) {
+        return str.replace(/\b\w/g, (char) => char.toUpperCase());
+    }
 
     const summaryData = editedData[section].reduce((acc, { category, currentValue }) => {
         acc[category] = (acc[category] || 0) + currentValue;
@@ -101,30 +140,6 @@ export default function DirectStocks({
         <div key={section} className="space-y-8">
             <h3 className="text-lg font-semibold text-secondary-700 capitalize">Direct Stocks</h3>
 
-            {/* Summary Cards */}
-            {/* <div className='flex justify-center'>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <motion.div
-                    className="card bg-gradient-to-br from-primary-600 to-primary-700 text-white"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <h2 className="text-lg font-semibold mb-2">Total Stocks</h2>
-                    <p className="text-3xl font-bold">{editedData[section].length}</p>
-                </motion.div>
-
-                <motion.div
-                    className="card"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                    <h2 className="text-lg font-semibold text-secondary-900 mb-2">Total Value</h2>
-                    <p className="text-3xl font-bold text-secondary-900">{formatCurrency(totalValue)}</p>
-                </motion.div>
-            </div>
-            </div> */}
 
             {/* Pie Chart */}
             <div className="flex flex-row items-center">
@@ -182,7 +197,7 @@ export default function DirectStocks({
             {/* Add Stock Form */}
             {showAddStockForm && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                    <motion.div 
+                    <motion.div
                         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -271,23 +286,38 @@ export default function DirectStocks({
                             <tbody className="bg-white divide-y divide-secondary-200">
                                 {editedData[section].map((stock, index) => (
                                     <tr key={index} className={editingStockIndex === index ? 'bg-primary-50' : ''}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap relative">
                                             {editingStockIndex === index ? (
-                                                <input
-                                                    type="text"
-                                                    className="input"
-                                                    value={stock.stockName}
-                                                    onChange={(e) => handleChange(index, 'stockName', e.target.value)}
-                                                />
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        className="input w-full"
+                                                        value={capitalizeWords(stock.stockName) || ""}
+                                                        onChange={(e) => handleInputChange(index, e)}
+                                                    />
+                                                    {suggestions.length > 0 && (
+                                                        <ul className="absolute z-10 bg-white border border-gray-300 mt-1 w-full shadow-lg rounded-md">
+                                                            {suggestions.map((suggestion, i) => (
+                                                                <li
+                                                                    key={i}
+                                                                    className="p-2 cursor-pointer hover:bg-gray-100"
+                                                                    onClick={() => handleSelect(index, suggestion)}
+                                                                >
+                                                                    {suggestion}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    )}
+                                                </div>
                                             ) : (
-                                                <div className="text-sm font-medium text-secondary-900">{stock.stockName}</div>
+                                                <div className="text-sm font-medium text-secondary-900">{capitalizeWords(stock.stockName)}</div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
                                             {editingStockIndex === index ? (
                                                 <select
                                                     className="input"
-                                                    value={stock.category}
+                                                    value={stock.category} //stock is state .category send to autosuggestion
                                                     onChange={(e) => handleChange(index, 'category', e.target.value)}
                                                 >
                                                     {CATEGORY_OPTIONS.map((option) => (
@@ -318,7 +348,7 @@ export default function DirectStocks({
                                             {editingStockIndex === index ? (
                                                 <div className="flex space-x-2 justify-end">
                                                     <button
-                                                        onClick={()=>handleStockSave(index)}
+                                                        onClick={() => handleStockSave(index)}
                                                         className="text-primary-600 hover:text-primary-900"
                                                     >
                                                         Save
@@ -352,9 +382,9 @@ export default function DirectStocks({
                             </tbody>
                         </table>
                         <button onClick={() => setShowAddStockForm(true)} className="btn btn-primary mt-4">Add Stock</button>
-                        {!showAddStockForm ? 
-                        <button onClick={() => handleSave("directStocks")} className="btn btn-success m-4">Save</button>
-                        :
+                        {!showAddStockForm ?
+                            <button onClick={() => handleSave("directStocks")} className="btn btn-success m-4">Save</button>
+                            :
                             <></>
                         }
 

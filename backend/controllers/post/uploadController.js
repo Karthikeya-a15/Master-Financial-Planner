@@ -4,9 +4,9 @@ import User from "../../models/User.js";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 // Configure AWS S3
 const s3Client = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: fromEnv()
-  });
+  region: process.env.AWS_REGION,
+  credentials: fromEnv()
+});
   
 
 // Upload buffer directly to S3
@@ -33,10 +33,8 @@ export const uploadImage = async (req, res) => {
   try {
     const id = req.user;
     const user= await User.findById(id).select("imageURL");
-    console.log(user)
     if(user.imageURL){
         const oldFileName = user.imageURL.split(".amazonaws.com/")[1].replaceAll(" ","+");
-        console.log(oldFileName)
         if(oldFileName){
             await s3Client.send(
                 new DeleteObjectCommand({

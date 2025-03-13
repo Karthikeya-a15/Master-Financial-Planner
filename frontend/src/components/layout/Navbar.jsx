@@ -1,8 +1,9 @@
 import { Fragment, useState } from 'react'
-import { Link, useNavigate, useLocation} from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import { Bars3Icon, XMarkIcon, BellIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/solid";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -69,7 +70,17 @@ export default function Navbar() {
                   ))}
                 </div>
               </div>
+                
+               
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                {/* Message Icon */}
+                <Link
+                  to="/chat/rooms" // Replace with your messaging route
+                  className="p-2 text-secondary-500 hover:text-secondary-700"
+                >
+                  <ChatBubbleOvalLeftEllipsisIcon className="h-6 w-6" aria-hidden="true" />
+                </Link>
+
                 {/* Profile dropdown */}
                 <Menu as="div" className="relative ml-3">
                   <div>
@@ -148,7 +159,7 @@ export default function Navbar() {
               </div>
             </div>
           </div>
-
+                  
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
               {navigation.map((item) => (

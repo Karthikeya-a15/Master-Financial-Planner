@@ -8,14 +8,13 @@ import userRouter from "./routes/user.js"
 import netWorthRouter from "./routes/netWorth.js"
 import plannerRouter from "./routes/planner.js"
 import toolsRouter from "./routes/tools.js"
-import { Socket } from "socket.io";
-import { createServer } from "http";
-
 import adminRouter from "./routes/admin.js"
+import realTimeRouter from "./routes/realtime.js";
+
+import http from "http";
+import initializeSocket from "./socket.js";
 
 const app = express();
-const server = createServer(app);
-const io = Socket(server, {cors : {origin : "*"}})
 
 connectDB();
 
@@ -23,18 +22,22 @@ app.use(cors());
 
 app.use(express.json());
 
+const server = http.createServer(app);
+
+initializeSocket(server);
+
 app.use((req, res, next) => {
     console.log(`Received ${req.method} request for ${req.url}`);
     next(); 
 });
 
-
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/networth",netWorthRouter);
+app.use("/api/v1/realtime", realTimeRouter);
 app.use("/api/v1/planner", plannerRouter);
 app.use("/api/v1/tools",toolsRouter);
 app.use("/api/v1/admin", adminRouter);
 
-app.listen(process.env.PORT,() => {
+server.listen(process.env.PORT,() => {
     console.log(`The app is running on port ${process.env.PORT}`);
 });

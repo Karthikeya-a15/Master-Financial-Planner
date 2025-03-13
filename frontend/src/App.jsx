@@ -28,11 +28,12 @@ import ArbitrageFunds from './components/tools/ArbitrageFunds'
 import EquitySaver from './components/tools/EquitySaver'
 import AdminLogin from './pages/admin/AdminLogin'
 import AdminDashboard from './pages/admin/Dashboard'
-import MutualFunds from './pages/admin/MutualFunds'
+import MutualFundsAdmin from './pages/admin/MutualFunds'
 import { useAdminAuth } from './pages/admin/AdminAuthContext'
 import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
 import UserEngagement from './pages/admin/UserEngagement'
 import GoalChart from './pages/admin/GoalsAnalytics'
+import Rooms from './components/chat-app/Rooms'
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -56,7 +57,7 @@ function App() {
       } />
       <Route path="/admin/mutualfunds" element={
         <ProtectedAdminRoute>
-          <MutualFunds/>
+          <MutualFundsAdmin/>
         </ProtectedAdminRoute>
       } />
       <Route path="/admin/analytics/user-engagement" element={
@@ -69,7 +70,9 @@ function App() {
           <GoalChart/>
         </ProtectedAdminRoute>
       }/>
-      {/* Protected Routes */}
+
+      
+      {/* User Protected Routes */}
       <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/home"} />} />
       
       <Route path="/dashboard" element={
@@ -179,7 +182,18 @@ function App() {
             <StepUpSipCalculator/>
           </ProtectedRoute>
         }/>
+
       </Route>
+
+
+      <Route path="chat">
+        <Route path="rooms"  element = {<ProtectedRoute>
+            <Rooms></Rooms>
+          </ProtectedRoute> } 
+          />
+      </Route>
+         
+
       {/* 404 Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>

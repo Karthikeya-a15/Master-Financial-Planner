@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import axios from "axios";
 
-const mutualFunds = () => {
+const mutualFundsAdmin = () => {
   const [mutualFundsData, setmutualFundsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,4 +69,4 @@ const mutualFunds = () => {
   );
 };
 
-export default mutualFunds;
+export default mutualFundsAdmin;

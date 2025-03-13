@@ -111,8 +111,8 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try{
-      const response = await axios.post('api/v1/user/logout');
       localStorage.removeItem('token')
+      const response = await axios.post('api/v1/user/logout');
       setToken(null)
       setCurrentUser(null)
       setIsAuthenticated(false)
