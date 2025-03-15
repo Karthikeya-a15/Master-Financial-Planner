@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
@@ -24,6 +24,37 @@ export default function DirectStocks({
     const [editingStockIndex, setEditingStockIndex] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [stockPrices, setStockPrices] = useState([]);
+
+    // Function to fetch stock prices
+    const fetchStockPrice = async (stockName) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/v1/realtime/stockPrice?name=${stockName}`);
+            return response.data.price || "Not Found";
+        } catch (error) {
+            console.error(`Error fetching price for ${stockName}:`, error);
+            return "Not Found";
+        }
+    };
+
+    // Fetch stock prices when stock names change
+    useEffect(() => {
+        const updatePrices = async () => {
+            const newPrices = new Array(editedData[section].length);
+            await Promise.all(
+                editedData[section].map(async (stock, index) => {
+                    if (stock.stockName) {
+                        const value = await fetchStockPrice(stock.stockName);
+                        newPrices[index] = value;
+                    }
+                })
+            );
+            setStockPrices(newPrices);
+        };
+
+        updatePrices();
+    }, []);
+
 
     const handleAddStock = useCallback(() => {
         setEditedData((prev) => ({
@@ -73,7 +104,6 @@ export default function DirectStocks({
             try {
                 const response = await axios.get(`/api/v1/realtime/autoSuggestionStocks?name=${value}`);
                 setSuggestions(response.data.suggestions || []); // Ensure it's always an array
-                console.log(suggestions.suggestions);
             } catch (error) {
                 console.error("Error fetching suggestions:", error);
             }
@@ -84,13 +114,25 @@ export default function DirectStocks({
 
     const handleInputChange = (index, e) => {
         const value = e.target.value;
+        if (index === -1) {
+            setNewStock({ ...newStock, stockName: value });
+            autoSuggest(value);
+            return;
+        }
+
         handleChange(index, "stockName", value);
         autoSuggest(value);
     };
 
-    const handleSelect = (index, selectedStock) => {
+    const handleSelect = async (index, selectedStock) => {
         setSuggestions([]);
+        if(index === -1){
+            setNewStock({...newStock , stockName: selectedStock});
+            stockPrices.push(await fetchStockPrice(selectedStock));
+            return;
+        }
         handleChange(index, "stockName", selectedStock);
+        stockPrices[index] = await fetchStockPrice(selectedStock);
     };
 
 
@@ -121,6 +163,8 @@ export default function DirectStocks({
         return str.replace(/\b\w/g, (char) => char.toUpperCase());
     }
 
+
+
     const summaryData = editedData[section].reduce((acc, { category, currentValue }) => {
         acc[category] = (acc[category] || 0) + currentValue;
         return acc;
@@ -133,6 +177,7 @@ export default function DirectStocks({
         contribution: Number(((value / totalValue) * 100).toFixed(1)),
         color: COLORS[category] || COLORS.default,
     }));
+
 
     if (!equityData) return <LoadingSpinner />;
 
@@ -211,10 +256,23 @@ export default function DirectStocks({
                                     type="text"
                                     id="stockName"
                                     className="input"
-                                    value={newStock.stockName}
-                                    onChange={(e) => setNewStock({ ...newStock, stockName: e.target.value })}
+                                    value={capitalizeWords(newStock.stockName) || ""}
+                                    onChange={(e) => handleInputChange(-1, e)}
                                     placeholder="e.g., Apple, Tesla"
                                 />
+                                {suggestions.length > 0 && (
+                                    <ul className="absolute z-10 bg-white border border-gray-300 mt-1 max-w-150px shadow-lg rounded-md max-h-40 overflow-y-auto">
+                                        {suggestions.map((suggestion, i) => (
+                                            <li
+                                                key={i}
+                                                className="p-2 cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSelect(-1, suggestion)}
+                                            >
+                                                {suggestion}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="category" className="form-label">Category</label>
@@ -276,7 +334,10 @@ export default function DirectStocks({
                                         Category
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 uppercase tracking-wider">
-                                        Current Value
+                                        Value
+                                    </th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                                        Market Value
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 uppercase tracking-wider">
                                         Actions
@@ -296,7 +357,7 @@ export default function DirectStocks({
                                                         onChange={(e) => handleInputChange(index, e)}
                                                     />
                                                     {suggestions.length > 0 && (
-                                                        <ul className="absolute z-10 bg-white border border-gray-300 mt-1 w-full shadow-lg rounded-md">
+                                                        <ul className="absolute z-10 bg-white border border-gray-300 mt-1 w-full shadow-lg rounded-md max-h-40 overflow-y-auto">
                                                             {suggestions.map((suggestion, i) => (
                                                                 <li
                                                                     key={i}
@@ -308,6 +369,7 @@ export default function DirectStocks({
                                                             ))}
                                                         </ul>
                                                     )}
+
                                                 </div>
                                             ) : (
                                                 <div className="text-sm font-medium text-secondary-900">{capitalizeWords(stock.stockName)}</div>
@@ -344,6 +406,16 @@ export default function DirectStocks({
                                                 <div className="text-sm text-secondary-900">{formatCurrency(stock.currentValue)}</div>
                                             )}
                                         </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            {editingStockIndex === index ? (
+                                                <div className="text-sm text-secondary-900">NULL</div>
+                                            ) : stockPrices[index] !== undefined ? (
+                                                <div className="text-sm text-green-700 font-bold">{`${stockPrices[index]} / U`}</div>
+                                            ) : (
+                                                <div className="text-sm">Not Found</div>
+                                            )}
+                                        </td>
+
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             {editingStockIndex === index ? (
                                                 <div className="flex space-x-2 justify-end">

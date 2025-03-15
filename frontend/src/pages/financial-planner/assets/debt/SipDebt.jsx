@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
@@ -22,7 +22,31 @@ export default function SipDebt({
     goalsData
 }) {
     const section = 'sipDebt';
-    const [debt, setDomesticDebt] = useState(goalsData?.sipAssetAllocation.debt || 0);
+    const debtTotal = goalsData?.sipAssetAllocation.debt || 0;
+
+    const debtAmounts = goalsData?.sipAmountDistribution || [];
+    const timePeriods = goalsData?.goals.map((goal) => goal.time);
+
+    const requiredContribution = useMemo(() => {
+        const contribution = {
+            "FD/RD/Arbitrage": 0,
+            "Banking PSU/Corporate funds": 0,
+            "Government Securities/Equity Saver": 0
+        };
+
+        for (let i = 0; i < debtAmounts.length; i++) {
+            const time = timePeriods[i];
+            if (time < 3) {
+                contribution["FD/RD/Arbitrage"] += debtAmounts[i].debt;
+            } else if (time < 7) {
+                contribution["Banking PSU/Corporate funds"] += debtAmounts[i].debt;
+            } else {
+                contribution["Government Securities/Equity Saver"] += debtAmounts[i].debt;
+            }
+        }
+
+        return contribution;
+    }, [debtAmounts, timePeriods]);
 
     const [showAddSipForm, setShowAddSipForm] = useState(false);
     const [newSip, setNewSip] = useState({
@@ -101,10 +125,12 @@ export default function SipDebt({
         duration: duration.replace(/\b(\w)/g, (c) => c.toUpperCase()),
         value,
         contribution: Number(((value / totalValue) * 100).toFixed(1)),
+        RequiredContribution: Number(((requiredContribution[duration] / debtTotal) * 100).toFixed(1)),
         color: COLORS[duration] || COLORS.default,
     }));
 
-    console.log(JSON.stringify(chartData))
+    console.log(Object.entries(chartData))
+    console.log(requiredContribution["FD/RD/Arbitrage"])
 
     const sumOfSips = editedData[section].reduce((acc, { currentValue }) => {
         return acc + currentValue || 0;
@@ -150,21 +176,24 @@ export default function SipDebt({
                 <table className="w-1/2 text-sm border-collapse border border-gray-200 mt-2">
                     <thead>
                         <tr className="bg-gray-100 text-secondary-800">
-                            <th className="border px-2 py-1">Duration</th>
-                            <th className="border px-2 py-1">Value</th>
-                            <th className="border px-2 py-1">Contribution (%)</th>
+                            <th className="border px-2 py-1 w-3/6">Duration</th>
+                            <th className="border px-4 py-1 w-2/6">Value</th>
+                            <th className="border px-2 py-1 w-1/6 text-right">Contribution (%)</th>
+                            <th className="border px-2 py-1 w-1/6 text-right">Required Contribution (%)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {chartData.map(({ duration, value, contribution }, index) => (
+                        {chartData.map(({ duration, value, contribution, RequiredContribution }, index) => (
                             <tr key={index} className="border border-gray-200">
                                 <td className="border px-2 py-1">{duration}</td>
-                                <td className="border px-2 py-1 text-green-700">{formatCurrency(value)}</td>
-                                <td className="border px-2 py-1 text-green-700">{contribution}%</td>
+                                <td className="border px-4 py-1 text-green-700 w-2/6">{formatCurrency(value)}</td>
+                                <td className="border px-2 py-1 text-green-700 text-right w-1/6">{contribution}%</td>
+                                <td className="border px-2 py-1 text-green-700 text-right w-1/6">{RequiredContribution}%</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
             </div>
 
             <hr className="w-full border-t border-gray-300 my-10" />
@@ -242,11 +271,11 @@ export default function SipDebt({
                     <h2 className="text-xl font-bold text-secondary-900 mb-6">Your SIP Debts</h2>
                     <div className="overflow-x-auto">
                         <div className='float-right'>
-                            {sumOfSips > debt ? <span className='text-red-600'>You Don't have Enough Money</span> : <></>}
+                            {sumOfSips > debtTotal ? <span className='text-red-600'>You Don't have Enough Money</span> : <></>}
                         </div>
                         <br />
                         <div className='float-right'>
-                            <b>Max Amount: {formatCurrency(debt)}</b>
+                            <b>Max Amount: {formatCurrency(debtTotal)}</b>
                         </div>
                         <table className="min-w-full divide-y divide-secondary-200">
                             <thead>

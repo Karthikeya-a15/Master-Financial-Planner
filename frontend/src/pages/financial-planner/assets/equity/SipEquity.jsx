@@ -142,17 +142,17 @@ export default function SipEquity({
                 <table className="w-1/2 text-sm border-collapse border border-gray-200 mt-2">
                     <thead>
                         <tr className="bg-gray-100 text-secondary-800">
-                            <th className="border px-2 py-1">Category</th>
-                            <th className="border px-2 py-1">Value</th>
-                            <th className="border px-2 py-1">Contribution (%)</th>
+                            <th className="border px-2 py-1 w-3/6">Category</th>
+                            <th className="border px-2 py-1 w-2/6">Value</th>
+                            <th className="border px-2 py-1 w-1/6 text-right">Contribution (%)</th>
                         </tr>
                     </thead>
                     <tbody>
                         {chartData.map(({ category, value, contribution }, index) => (
                             <tr key={index} className="border border-gray-200">
-                                <td className="border px-2 py-1">{category}</td>
-                                <td className="border px-2 py-1 text-green-700">{formatCurrency(value)}</td>
-                                <td className="border px-2 py-1 text-green-700">{contribution}%</td>
+                                <td className="border px-2 py-1 w-3/6">{category}</td>
+                                <td className="border px-2 py-1 text-green-700 w-2/6">{formatCurrency(value)}</td>
+                                <td className="border px-2 py-1 text-green-700 w-1/6 text-right">{contribution}%</td>
                             </tr>
                         ))}
                     </tbody>

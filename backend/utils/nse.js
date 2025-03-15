@@ -48,9 +48,10 @@ export async function getStockPriceByName(stockName) {
     const price = await getStockPrice(symbol);
     // console.log(`Stock Price for ${stockName} (${symbol}): \n${price}`);
     return price;
-  } else {
-    console.log(`Stock ${stockName} not found.`);
-  }
+  } 
+  // else {
+  //   // console.log(`Stock ${stockName} not found.`);
+  // }
 }
 
 // getStockPriceByName("tata elxsi limited")
