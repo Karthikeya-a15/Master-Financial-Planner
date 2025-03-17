@@ -36,13 +36,13 @@ export default function Dashboard() {
 
           {/* FIRE Number Display Section */}
 
-          {currentUser?.fire && (
+          {(
             <Link to="/calculators/fire" className="block transform transition-all duration-300 hover:scale-105 hover:brightness-110">
               <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-6 md:p-8 rounded-xl shadow-lg flex justify-between items-center text-white border border-white/30 backdrop-blur-md bg-opacity-90 cursor-pointer">
                 <div className="text-2xl md:text-3xl font-semibold tracking-wide">🔥 FIRE NUMBER:</div>
                 <div className="flex items-center gap-4 text-3xl md:text-4xl font-extrabold">
                   <FaFire className="text-yellow-400 text-5xl animate-pulse" />
-                  {formatFireNumber(currentUser.fire)}
+                  {formatFireNumber(currentUser?.fire || 0)}
                 </div>
               </div>
             </Link>
