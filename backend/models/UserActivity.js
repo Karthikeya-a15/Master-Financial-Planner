@@ -18,8 +18,18 @@ const userActivitySchema = new mongoose.Schema({
     timestamp: {
         type: Date,
         default: Date.now
+    },
+    sessionDuration: {
+        type: Number,
+        default: 0
+    },
+    details: {
+        type: mongoose.Schema.Types.Mixed
     }
 });
+
+userActivitySchema.index({ userId: 1, timestamp: -1 });
+userActivitySchema.index({ component: 1, timestamp: -1 });
 
 const UserActivity = mongoose.model('UserActivity', userActivitySchema);
 
