@@ -1,0 +1,114 @@
+import mongoose from "mongoose";
+import bcrypt from 'bcrypt';
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    age: {
+        type: Number,
+        required: true
+    },
+    imageURL : {
+        type : String
+    },
+    fireNumber : {
+        type : Number,
+        default : 0
+    },
+    netWorth : {
+        cashFlows : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CashFlows',
+            },
+            domesticEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'DomesticEquity',
+            },
+            debt : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Debt',
+            },
+            realEstate : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'RealEstate',
+            },
+            foreignEquity : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'ForeignEquity',
+            },
+            cryptocurrency : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'CryptoCurrency',
+            },
+            gold : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Gold',
+            },
+            liabilities : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Liabilities',
+            },
+            miscellaneous : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Miscellaneous',
+            }
+    },
+    goals : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Goals',
+    },
+    ram : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'returnsAndAssets',
+    },
+    toolResult : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'ToolResults'
+    },
+    userEngagement: {
+        loginFrequency: {
+            type: Number,
+            default: 0 
+        },
+        timeSpent: {
+            type: Number,
+            default: 0 
+        },
+        actionsPerformed: {
+            type: Number,
+            default: 0 
+        },
+        lastLogin: {
+            type: Date,
+            default: Date.now 
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now 
+        }
+    }
+});
+
+userSchema.methods.hashPassword = async function(){
+    const SALT_ROUNDS = Number(process.env.SALT_ROUNDS);
+    return await bcrypt.hash(this.password, SALT_ROUNDS);
+}
+
+userSchema.methods.validatePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+const User = mongoose.model('User', userSchema);
+
+export default User;
