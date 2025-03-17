@@ -96,9 +96,6 @@ router.get("/mutualfunds", adminAuth, async (req, res) => {
                 $unwind: "$mutualFunds"
             },
             {
-                // $match: {
-                //     "mutualFunds.category": "mid cap"
-                // }
                 $group : {
                     _id : "$mutualFunds.category",
                     totalInvestment: { $sum: "$mutualFunds.currentValue" },

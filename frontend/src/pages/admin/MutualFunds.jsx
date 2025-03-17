@@ -4,7 +4,7 @@ import axios from "axios";
 import AdminNavbar from "./AdminNavbar";
 
 const mutualFundsAdmin = () => {
-  const [mutualFundsData, setmutualFundsData] = useState([]);
+  const [mutualFundsData, setMutualFundsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState("totalInvestment");
