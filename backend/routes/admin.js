@@ -5,7 +5,6 @@ import { loginSchema } from "../schemas/adminSchema.js";
 import adminAuth from "../middleware/adminAuthMiddleware.js";
 import User from "../models/User.js";
 import UserActivity from "../models/UserActivity.js";
-import NewsUpdate from "../models/NewsUpdate.js";
 import DomesticEquity from "./../models/DomesticEquity.js"
 import Goals from "../models/Goals.js";
 import ChatRoom from "../models/chat-app/ChatRoom.js";
@@ -117,40 +116,6 @@ router.get("/mutualfunds", adminAuth, async (req, res) => {
     }
 });
 
-router.post("/news", adminAuth, async (req, res) => {
-    try {
-        const { title, content, category, priority } = req.body;
-        
-        const newsUpdate = new NewsUpdate({
-            title,
-            content,
-            category,
-            priority,
-            publishedBy: req.admin
-        });
-        
-        await newsUpdate.save();
-        
-        return res.json({
-            message: "News update published successfully",
-            newsUpdate
-        });
-    } catch(err) {
-        return res.status(500).json({message: "Internal error", error: err.message});
-    }
-});
-
-router.get("/news", adminAuth, async (req, res) => {
-    try {
-        const news = await NewsUpdate.find()
-            .sort({ publishedAt: -1 })
-            .populate('publishedBy', 'email');
-            
-        return res.json({ news });
-    } catch(err) {
-        return res.status(500).json({message: "Internal error", error: err.message});
-    }
-});
 
 router.get('/analytics/user-engagement', adminAuth, async (req, res) => {
     // console.log(req);

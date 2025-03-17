@@ -206,7 +206,6 @@ export default function AdminDashboard() {
             </motion.div>
           </div>
 
-          {/* Add more sections for mid-cap analysis and news management */}
         </div>
       </div>
     </div>
