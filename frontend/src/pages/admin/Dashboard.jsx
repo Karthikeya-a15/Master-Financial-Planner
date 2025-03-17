@@ -16,6 +16,8 @@ import {
 import { Bar, Pie } from "react-chartjs-2";
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useAdminAuth } from "./AdminAuthContext";
+import AdminNavbar from "./AdminNavbar";
+
 
 ChartJS.register(
   CategoryScale,
@@ -38,7 +40,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     document.title = 'Dashboard | DarwInvest'
     fetchDashboardData();
-    fetchUserEnagementData();
+    // fetchUserEnagementData();
   }, [])
 
   const fetchDashboardData = async () => {
@@ -134,6 +136,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-secondary-50">
+      <AdminNavbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Header */}
@@ -146,15 +149,6 @@ export default function AdminDashboard() {
                 Monitor user activity and investment trends
               </p>
             </div>
-            <button
-              onClick={() => {
-                logout();
-                navigate("/admin/login");
-              }}
-              className="btn btn-secondary"
-            >
-              Sign Out
-            </button>
           </div>
 
           {/* Stats Cards */}
@@ -205,7 +199,28 @@ export default function AdminDashboard() {
               />
             </motion.div>
           </div>
-
+          
+          {/* Navigation Links */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button
+              onClick={() => navigate("/admin/analytics/user-engagement")}
+              className="btn btn-primary w-full"
+            >
+              User Engagement
+            </button>
+            <button
+              onClick={() => navigate("/admin/analytics/goals")}
+              className="btn btn-primary w-full"
+            >
+              Goals
+            </button>
+            <button
+              onClick={() => navigate("/admin/mutualfunds")}
+              className="btn btn-primary w-full"
+            >
+              Mutual Funds
+            </button>
+          </div>
         </div>
       </div>
     </div>

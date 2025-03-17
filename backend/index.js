@@ -9,12 +9,20 @@ import netWorthRouter from "./routes/netWorth.js"
 import plannerRouter from "./routes/planner.js"
 import toolsRouter from "./routes/tools.js"
 import adminRouter from "./routes/admin.js"
+import  cors from 'cors';
 import realTimeRouter from "./routes/realtime.js";
 import http from "http";
 import initializeSocket from "./socket.js";
 
 const app = express();
 
+app.use(
+    cors({
+      origin: "http://localhost:5173/",
+      methods: "GET,POST,PUT,DELETE",
+      allowedHeaders: "Content-Type,Authorization",
+    })
+  );
 connectDB();
 
 app.use(cors());

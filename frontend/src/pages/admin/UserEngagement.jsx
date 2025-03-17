@@ -4,6 +4,7 @@ import { Box, Typography, CircularProgress, Paper, Card, CardContent } from "@mu
 import { BarChart } from "@mui/x-charts/BarChart";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AdminNavbar from "./AdminNavbar";
 
 export default function UserEngagementChart() {
   const [userEngagementData, setUserEngagementData] = useState(null);
@@ -35,6 +36,7 @@ export default function UserEngagementChart() {
 
   return (
     <>
+      <AdminNavbar/>
       {/* User Engagement Metrics */}
       <Paper elevation={3} sx={{ p: 3, maxWidth: 600, margin: "auto", mt: 4 }}>
         <Typography variant="h5" gutterBottom>
