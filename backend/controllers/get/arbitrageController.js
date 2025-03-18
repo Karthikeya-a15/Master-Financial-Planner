@@ -1,7 +1,5 @@
-import Result from "../../models/ToolsResults.js";
 import User from "../../models/User.js";
 import main from "../../tools/Arbitrage/index.js";
-
 
 export default async function arbitrageController(req, res){
     const userId = req.user;
@@ -16,6 +14,6 @@ export default async function arbitrageController(req, res){
 
         return res.status(200).json(funds);
     }catch(err){
-        return res.json(500).json({message : "Internal Server Error", err : err.message});
+        return res.status(500).json({message : "Internal Server Error", err : err.message});
     }
 }

@@ -1,0 +1,1633 @@
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/arbitrageController.js
+import User from "../../models/User.js";
+import main from "../../tools/Arbitrage/index.js";
+
+
+export default async function arbitrageController(req, res){
+    const userId = req.user;
+    
+    try{
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(403).json({message : "User not found"});
+        }        
+
+        const funds = await main();
+
+        return res.status(200).json(funds);
+    }catch(err){
+        return res.json(500).json({message : "Internal Server Error", err : err.message});
+    }
+}
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/autoSuggestionMFController.js
+import axios from 'axios';
+
+var allFunds = null;
+
+const fetchFunds = async () => {
+    const response = await axios.post("https://api.tickertape.in/mf-screener/query",{
+        "match":{"option":["Growth"],"subsector":["Flexi Cap Fund","Large Cap Fund","Small Cap Fund","Mid Cap Fund","Multi Cap Fund"]},"sortBy":"aum","sortOrder":-1,"project":["subsector","option","navClose"],"offset":0,"count":500,"mfIds":[]
+    })
+
+    const funds = response.data.data.result;
+
+
+
+    allFunds = funds.map((item) => {
+        const subsectorObj = item.values.find(v => v.filter === "subsector");
+        let categoryVal = subsectorObj ? subsectorObj.strVal : null;
+        if(categoryVal === "Flexi Cap Fund" || categoryVal === "Multi Cap Fund"){
+            categoryVal = "Flexi/Multi Cap Fund";
+        }
+        const navObj = item.values.find(v => v.filter === "navClose");
+
+        let fundName = item.name;
+        if(item.name.indexOf("Plan") !== -1){
+            fundName = item.name.substring(0, item.name.indexOf("Plan"));
+        }
+        return {
+            name: fundName,
+            category: categoryVal,
+            nav : navObj ? navObj.doubleVal : null
+        };
+    });
+}
+
+
+export default async function autoSuggestionMFController(req, res){
+    const { name, category } = req.query;
+
+    if(!allFunds){
+        await fetchFunds();
+    
+        // Set up a daily update
+        const id = setInterval(async () => {
+            console.log("Fetching funds...");
+            await fetchFunds();
+        }, 1000 * 60 * 60 * 24);
+    }
+
+    const categoryFunds = allFunds.filter(fund => fund.category.toLowerCase() === category.toLowerCase()+" fund");
+
+    const filteredFunds = categoryFunds.filter(fund => fund.name.toLowerCase().includes(name.toLowerCase()));
+
+
+    return res.json(filteredFunds);
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/autoSuggestionStockController.js
+import { loadStockMapping } from "../../utils/nse.js";
+
+var stocks;
+var stockNames;
+
+export default async function autoSuggestionStockController(req, res){
+    if (!stocks) {
+        stocks = await loadStockMapping();
+        stockNames = Object.keys(stocks);
+    }
+    
+    const { name } = req.query;
+        
+    // Filter stock names that include the search term (case-insensitive)
+    const suggestions = stockNames.filter(stockName => stockName.toLowerCase().includes(name.toLowerCase()));
+    
+    return res.json({ suggestions });
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/debtFundsController.js
+import User from "../../models/User.js";
+import DebtFunds from "../../tools/Debt/index.js";
+
+export default async function debtFundsController(req, res){
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(403).json({message : "user Not Found"});
+        }
+
+        const funds = await DebtFunds();
+
+        return res.status(200).json(funds);
+    }catch(err){
+        return res.status(500).json({message : "Internal Server Error", error : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/equitySaverController.js
+import User from "../../models/User.js";
+import main from "../../tools/EquitySaver/index.js";
+
+export default async function equitySaverController(req, res){
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        if(!user){
+            return res.status(403).json({message : "User not found"});
+        }
+
+        const funds = await main();
+
+        return res.status(200).json(funds);
+    }catch(err){
+        return res.status(500).json({message : "Internal Server Error", error : err.message});
+    }
+}
+
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getAssumptionController.js
+import RAM from "../../models/returnsAndAssets.js";
+import User from "../../models/User.js";
+
+export default async function getAssumptionController (req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const ram = await RAM.findById(user.ram).select('-_id -__v');
+
+        if(ram)
+            return res.json({returnsAndAssets : ram});
+        else
+            return res.json({message : "Error while Fetching Returns & Assets Mix Assumption "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getCashFlowsController.js
+import CashFlows from "../../models/CashFlows.js";
+import User from "../../models/User.js";
+
+
+export default async function getCashFlowsController(req, res) {
+    const userId = req.user;
+    
+    try{
+        const user = await User.findById(userId);
+
+        const userCashFlows = await CashFlows.findById(user.netWorth.cashFlows).select('-_id -__v');
+
+        if(userCashFlows)
+            return res.json({cashFlows : userCashFlows});
+        else 
+            return res.json({message : "Error while Fetching Cash Flows "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getCryptoController.js
+import CryptoCurrency from "../../models/CryptoCurrency.js";
+import User from "../../models/User.js";
+
+
+export default async function getCryptoController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+        
+        const userCrypto = await CryptoCurrency.findById(user.netWorth.cryptocurrency).select('-_id -__v');
+        
+        if(userCrypto)
+            return res.json({cryptoCurrency : userCrypto });
+        else
+            return res.json({message : "Error while Fetching Cryptocurrency "});
+
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getDashBoardController.js
+import liabilities from "../../models/Liabilities.js";
+import User from "../../models/User.js";
+import Goals from "../../models/Goals.js";
+import RAM from "../../models/returnsAndAssets.js";
+import getCurrentInvestibleAssets from "../../common/currentInvestibleAssets.js";
+
+export default async function getDashBoardController(req, res){
+    try{
+        const userid = req.user;
+        const user = await User.findById(userid);
+        const { illiquid, liquid, currentInvestibleAssets , message } = await getCurrentInvestibleAssets(userid);
+        if(message){
+            return res.status(500).json({message}); 
+        }
+
+        const liability = await liabilities.findById(user.netWorth.liabilities);
+        const Liabilities = {
+            homeLoan : liability.homeLoan,
+            educationLoan : liability.educationLoan,
+            carLoan : liability.carLoan,
+            personalLoan : liability.personalLoan,
+            creditCard : liability.creditCard,
+            other : liability.other
+        }
+
+        const totalAssetSummary = getTotalSum(illiquid, liquid);
+
+        const ans = await requiredInvestableAssetAllocation(user);
+
+        return res.status(200).json({illiquid, liquid, Liabilities, totalAssetSummary, currentInvestibleAssets, requiredInvestableAssetAllocation : ans});
+    }
+    catch(err){
+        return res.status(500).json({message : err.message});
+    }
+
+}
+
+function getTotalSum(illiquid, liquid){
+    const realEstate = illiquid.home + illiquid.otherRealEstate + liquid.reits;
+    const domesticEquity = illiquid.ulips + liquid.domesticStockMarket + liquid.domesticEquityMutualFunds + liquid.smallCase;
+    const usEquity = liquid.usEquity;
+    const debt = illiquid.governmentInvestments + liquid.fixedDeposit + liquid.debtFunds + liquid.liquidFunds;
+    const gold = illiquid.jewellery + liquid.liquidGold + illiquid.sgb;
+    const crypto = liquid.crypto;
+
+    return {realEstate, domesticEquity, usEquity, debt, gold, crypto};
+}
+
+
+async function requiredInvestableAssetAllocation(user){
+    try{
+        const userGoals = await Goals.findById(user.goals);
+        const goals = userGoals.goals;
+
+        const { shortTerm, mediumTerm, longTerm } = await RAM.findById(user.ram);
+
+        
+        var riaa = {
+            "debt" : 0,
+            "domesticEquity" : 0,
+            "usEquity" : 0,
+            "gold" : 0,
+            "crypto" : 0,
+            "realEstate" : 0,
+        }
+
+        
+
+        for(let i=0; i<goals.length; i++){
+            const currentGoal = goals[i];
+
+            const amountAvailable = currentGoal.amountAvailableToday;
+            const timePeriod = currentGoal.time;
+
+            if(timePeriod < 3){          
+                riaa = getValue(shortTerm, riaa, amountAvailable);
+            }
+            else if(timePeriod < 7){
+                riaa = getValue(mediumTerm, riaa, amountAvailable);
+            }
+            else{
+                riaa = getValue(longTerm, riaa, amountAvailable);
+            }
+        }
+
+        return riaa;
+    }catch(e){
+        console.log(e.message);
+    }
+}
+
+function getValue(plan, riaa, amountAvailable){
+    const keys = Object.keys(plan);
+    const values = Object.values(plan);
+    
+    
+    for(let i=0;i<values.length;i++){
+        if (values[i] !== 0) {
+            const key = keys[i];
+            let compute = 0;
+            compute += (values[i] / 100) * amountAvailable ;
+            riaa[key] += compute;
+        }
+    }
+    
+    return riaa;
+
+}
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getDebtController.js
+import Debt from "../../models/Debt.js";
+import User from "../../models/User.js";
+
+export default async function getDebtController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+        
+        const userDebt = await Debt.findById(user.netWorth.debt).select('-_id -__v');
+
+        if(userDebt)
+            return res.json({debt : userDebt});
+        else 
+            return res.json({message : "Error while Fetching Debt "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+    
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getDomesticEquityController.js
+import DomesticEquity from "../../models/DomesticEquity.js";
+import User from "../../models/User.js";
+
+
+export default async function getDomesticEquityController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const userDomesticEquity = await DomesticEquity.findById(user.netWorth.domesticEquity).select('-_id -__v');
+
+        if(userDomesticEquity)
+            return res.json({domesticEquity : userDomesticEquity});
+        else 
+            return res.json({message : "Error while Fetching Domestic Equity "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getFinancialGoalsController.js
+import Goals from "../../models/Goals.js";
+import User from "../../models/User.js";
+import RAM from "../../models/returnsAndAssets.js";
+import CashFlows from "../../models/CashFlows.js";
+import getCurrentInvestibleAssets from "../../common/currentInvestibleAssets.js";
+
+export default async function getFinancialGoalsController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findOne({_id : userId});
+
+        const userGoals  = await Goals.findOne({_id : user.goals})
+
+        const ram = await RAM.findOne({_id : user.ram});
+
+        const userCashFlows = await CashFlows.findOne({_id : user.netWorth.cashFlows});
+
+        const sum = (obj) => Object.values(obj).reduce((acc, val) => acc + val, 0);
+
+        const cashAvailable = sum(userCashFlows.inflows) - sum(userCashFlows.outflows);
+
+        const { currentInvestibleAssets } = await getCurrentInvestibleAssets(userId); 
+
+        return res.json(
+            {
+                goals : userGoals.goals,
+                returnsAndAssets : ram,
+                cashAvailable,
+                currentInvestibleAssets,
+                sipAmountDistribution : userGoals.sipAmountDistribution,
+                sipAssetAllocation : userGoals.sipAssetAllocation
+            }
+        );
+
+
+    }catch(err){
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getForeignEquityController.js
+import ForeignEquity from "../../models/ForeignEquity.js";
+import User from "../../models/User.js";
+
+export default async function getForeignEquityController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const userForeignEquity = await ForeignEquity.findById(user.netWorth.foreignEquity).select('-_id -__v');
+
+        if(userForeignEquity)
+            return res.json({foreignEquity : userForeignEquity});
+        else 
+            return res.json({message : "Error while Fetching Foreign Equity "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getGoldController.js
+import GoldModel from "../../models/Gold.js";
+import User from "../../models/User.js";
+
+
+export default async function getGoldController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const userGold = await GoldModel.findById(user.netWorth.gold).select('-_id -__v');
+
+        if(userGold)
+            return res.json({gold : userGold});
+        else
+            return res.json({message : "Error while Fetching Gold "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }    
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getLiabilitiesController.js
+import liabilities from "../../models/Liabilities.js";
+import User from "../../models/User.js";
+
+export default async function getLiabilitiesController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const userLiability = await liabilities.findById(user.netWorth.liabilities).select('-_id -__v');
+
+        if(userLiability)
+            return res.json({liabilities : userLiability});
+        else 
+            return res.json({message : "Error while Fetching liabilities "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+    
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getMiscellaneousController.js
+import miscellaneous from "../../models/miscellaneous.js";
+import User from "../../models/User.js";
+
+
+export default async function getMiscellaneousController(req, res) {
+    const userId = req.user;
+
+    try{
+
+        const user = await User.findById(userId);
+
+        const userMisc = await miscellaneous.findById(user.netWorth.miscellaneous).select('-_id -__v');
+
+        if(userMisc)
+            return res.json({miscellaneous : userMisc});
+        else
+        return res.json({message : "Error while Fetching liabilities "});
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getRealEstateController.js
+import RealEstate from "../../models/RealEstate.js";
+import User from "../../models/User.js";
+
+export default async function getRealEstateController(req, res) {
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+
+        const userRealEstate = await RealEstate.findById(user.netWorth.realEstate).select('-_id -__v');
+
+        if(userRealEstate)
+            return res.json({realEstate : userRealEstate});
+        else
+            return res.json({message : "Error while Fetching Real Estate "});
+
+    }catch(e){
+        return res.status(500).json({message : "Internal Server error" , err : e.message});
+    }
+    
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/getStockPriceController.js
+import { getStockPriceByName } from "../../utils/nse.js";
+
+
+export default async function getStockPriceController(req, res) {
+    const { name } = req.query;
+
+    const price = await getStockPriceByName(name.toLowerCase()) || 0;
+
+    return res.json({price});
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/indexFundsController.js
+import User from "../../models/User.js";
+import getRankOfFunds from "../../tools/Index/index.js";
+
+export default async function indexFundsController(req, res){
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(403).json({message : "user Not Found"});
+        }
+
+        const funds = await getRankOfFunds();
+
+        return res.status(200).json({funds});
+        
+    }
+    catch(err){
+        return res.status(500).json({message : "Internal Server Error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/get/mutualFundsController.js
+import User from "../../models/User.js";
+import main from "../../tools/MFs/index.js";
+
+export default async function mutualFundsController(req, res){
+    const userId = req.user;
+
+    try{
+        const user = await User.findById(userId);
+        
+        if(!user){
+            return res.status(403).json({message : "User not found"});
+        }
+
+        const funds = await main();
+
+        return res.status(200).json({funds});
+    }   
+    catch(err){
+        return res.status(500).json({message : "Internal Server Error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/post/bulkInputController.js
+import express from "express";
+import CashFlows from "../../models/CashFlows.js";
+import RealEstate from "../../models/RealEstate.js";
+import Miscellaneous from "../../models/miscellaneous.js";
+import Liabilities from "../../models/Liabilities.js";
+import Gold from "../../models/Gold.js";
+import Goals from "../../models/Goals.js";
+import ForeignEquity from "../../models/ForeignEquity.js";
+import DomesticEquity from "../../models/DomesticEquity.js";
+import Debt from "../../models/Debt.js";
+import CryptoCurrency from "../../models/CryptoCurrency.js";
+import User from "../../models/User.js";
+import RAM from "../../models/returnsAndAssets.js";
+
+const router = express.Router();
+
+export default async function bulkInputController(req, res) {
+    try {
+        const userId = req.user;
+        const {
+            cashFlows,
+            ramSchema,
+            realEstate,
+            miscellaneous,
+            liabilities,
+            gold,
+            goalSchema,
+            foreignEquity,
+            domesticEquity,
+            debt,
+            cryptoCurrency
+        } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Helper function to update or create a document
+        const updateDocument = async (Model, id, data) => {
+            if (id) {
+                return await Model.findByIdAndUpdate(id, { $set: data }, { new: true, upsert: true });
+            } else {
+                const newDoc = new Model(data);
+                await newDoc.save();
+                return newDoc;
+            }
+        };
+
+        // Updating documents (wrapping arrays inside objects)
+        const updatedCashFlows = await updateDocument(CashFlows, user.netWorth.cashFlows, cashFlows);
+        const updatedReturnsAndAssets = await updateDocument(RAM, user.ram, ramSchema);
+        const updatedRealEstate = await updateDocument(RealEstate, user.netWorth.realEstate, realEstate);
+        const updatedMiscellaneous = await updateDocument(Miscellaneous, user.netWorth.miscellaneous, miscellaneous);
+        const updatedLiabilities = await updateDocument(Liabilities, user.netWorth.liabilities, liabilities);
+        const updatedGold = await updateDocument(Gold, user.netWorth.gold, gold);
+        const updatedGoals = await updateDocument(Goals, user.goals, { 
+            goals: goalSchema.goals, 
+            sipAssetAllocation: goalSchema.sipAssetAllocation 
+        });
+        const updatedForeignEquity = await updateDocument(ForeignEquity, user.netWorth.foreignEquity, foreignEquity);
+        const updatedDomesticEquity = await updateDocument(DomesticEquity, user.netWorth.domesticEquity, { ...domesticEquity });
+        const updatedDebt = await updateDocument(Debt, user.netWorth.debt, { ...debt });
+        const updatedCryptoCurrency = await updateDocument(CryptoCurrency, user.netWorth.cryptocurrency, cryptoCurrency);
+
+        // Updating user's net worth references
+        user.netWorth.cashFlows = updatedCashFlows._id;
+        user.ram = updatedReturnsAndAssets._id;
+        user.netWorth.realEstate = updatedRealEstate._id;
+        user.netWorth.miscellaneous = updatedMiscellaneous._id;
+        user.netWorth.liabilities = updatedLiabilities._id;
+        user.netWorth.gold = updatedGold._id;
+        user.goals = updatedGoals._id;
+        user.netWorth.foreignEquity = updatedForeignEquity._id;
+        user.netWorth.domesticEquity = updatedDomesticEquity._id;
+        user.netWorth.debt = updatedDebt._id;
+        user.netWorth.cryptocurrency = updatedCryptoCurrency._id;
+
+        await user.save();
+
+        res.status(201).json({
+            message: "Net worth data updated successfully",
+            data: {
+                cashFlows: updatedCashFlows,
+                returnsAndAssets: updatedReturnsAndAssets,
+                realEstate: updatedRealEstate,
+                miscellaneous: updatedMiscellaneous,
+                liabilities: updatedLiabilities,
+                gold: updatedGold,
+                goals: updatedGoals,
+                foreignEquity: updatedForeignEquity,
+                domesticEquity: updatedDomesticEquity,
+                debt: updatedDebt,
+                cryptoCurrency: updatedCryptoCurrency
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error updating net worth data", error: error.message });
+    }
+}
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/post/chatUploadController.js
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { fromEnv } from "@aws-sdk/credential-providers";
+
+
+const s3Client = new S3Client({
+    region: process.env.AWS_REGION,
+    credentials: fromEnv()
+});
+
+const uploadToS3 = async (buffer, fileName, mimeType) => {
+    const time = Date.now();
+    const key = `chat/${time}_${fileName.replaceAll(" ", "+")}`;
+
+    const params = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: mimeType,
+    };
+
+    await s3Client.send(new PutObjectCommand(params));
+
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+};
+
+const chatUploadController = async (req, res) => {
+    try {
+        const { roomId } = req.body;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const fileUrl = await uploadToS3(file.buffer, file.originalname, file.mimetype);
+
+        res.status(200).json({
+            message: "File uploaded successfully",
+            fileUrl,
+            roomId
+        });
+    } catch (error) {
+        console.error("Upload failed:", error);
+        res.status(500).json({ error: "File upload failed" });
+    }
+};
+
+export default chatUploadController;
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/post/uploadController.js
+import { S3Client, PutObjectCommand} from "@aws-sdk/client-s3";
+import { fromEnv } from "@aws-sdk/credential-providers";
+import User from "../../models/User.js";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+// Configure AWS S3
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: fromEnv()
+});
+  
+
+// Upload buffer directly to S3
+const uploadToS3 = async (buffer, fileName, mimeType) => {
+    const time = Date.now();
+    const params = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `profile-images/${time}_${fileName}`,
+      Body: buffer,
+      ContentType: mimeType,
+    };
+  
+    const command = new PutObjectCommand(params);
+    await s3Client.send(command);
+  
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-images/${time}_${fileName.replaceAll(" ","+")}`;
+  };
+// Controller function
+export const uploadImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded or invalid file type" });
+  }
+
+  try {
+    const id = req.user;
+    const user= await User.findById(id).select("imageURL");
+    if(user.imageURL){
+        const oldFileName = user.imageURL.split(".amazonaws.com/")[1].replaceAll(" ","+");
+        if(oldFileName){
+            await s3Client.send(
+                new DeleteObjectCommand({
+                    Bucket:process.env.AWS_BUCKET_NAME,
+                    Key:oldFileName,
+                })
+            );
+        }
+    }
+    const imageUrl = await uploadToS3(req.file.buffer, req.file.originalname, req.file.mimetype);
+    await User.findOneAndUpdate(
+        {_id : id},
+        {
+            $set : {
+                imageURL : imageUrl
+            }
+        }
+    )
+    res.json({ message: "Profile-Image uploaded successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "File upload failed", details: error.message });
+  }
+};
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/assumptionController.js
+import mongoose from "mongoose";
+import User from "../../models/User.js";
+import RAM from "../../models/returnsAndAssets.js";
+import ramSchema from "../../schemas/ramSchema.js";
+
+export default async function (req, res){
+    const body = req.body;
+
+    let {success, error} = ramSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Inputs are incorrect", err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const {expectedReturns, shortTerm, mediumTerm, longTerm, effectiveReturns} = body;
+        const userId = req.user;
+
+        const user = await User.findOne({_id : userId});
+
+        const ramId = user.ram;
+
+        const ram = await RAM.findOne({_id : ramId});
+
+        const userRetruns  = await RAM.findOneAndUpdate({_id : ramId},
+            {
+                $set : {
+                    "expectedReturns" : {...RAM.expectedReturns, ...expectedReturns},
+                    "shortTerm" : {...RAM.shortTerm, ...shortTerm},
+                    "mediumTerm" : {...RAM.mediumTerm, ...mediumTerm},
+                    "longTerm" : {...RAM.longTerm, ...longTerm},
+                    "effectiveReturns" : effectiveReturns
+                }
+            }
+        )
+
+        await session.commitTransaction();
+        session.endSession();
+        
+        if(userRetruns){
+            return res.json({message : "Returns & Assets Mix Assumptions are set"});
+        }else{
+            return res.status(403).json({message : "Returns & Assets Mix Assumptions are NOT set"})
+        }
+    }
+    catch(err){
+        await session.abortTransaction();
+        session.endSession();
+
+        return res.status(401).json({error : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/cashFlowsController.js
+import mongoose from "mongoose";
+import CashFlows from "../../models/CashFlows.js";
+import User from "../../models/User.js";
+import { cashFlowsSchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function cashFlowsController(req, res) {
+    const body = req.body;
+
+    let { success, error } = cashFlowsSchema.safeParse(body);
+
+    if (!success) {
+        return res.status(403).json({ message: "Cash-Flow inputs are wrong", err: error.format() });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const userId = req.user;
+        const { inflows, outflows } = body;
+
+        const user = await User.findOne({_id : userId });
+
+        const cashFlowId = user.netWorth.cashFlows;
+
+        const existingCashFlow = await CashFlows.findOne({ _id: cashFlowId });
+
+        const userCashFlows = await CashFlows.findOneAndUpdate(
+            { _id: cashFlowId },
+            {
+                $set: {
+                    "inflows": { ...existingCashFlow.inflows, ...inflows },
+                    "outflows": { ...existingCashFlow.outflows, ...outflows }
+                }
+            },
+            { new: true }
+        );
+        
+        await session.commitTransaction();
+        session.endSession();
+
+        if (userCashFlows) {
+            return res.status(200).json({ message: "Cash-Flows Updated successfully" });
+        } else {
+            return res.status(403).json({ message: "Cash-Flows not updated" });
+        }
+
+    } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({ message: "Internal error", err: err.message });
+    }
+
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/cryptoController.js
+import mongoose from "mongoose";
+import CryptoCurrency from "../../models/CryptoCurrency.js";
+import User from "../../models/User.js";
+import { cryptoSchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function cryptoController(req,res){
+    const body = req.body;
+
+    let {success, error} = cryptoSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Crypto inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const { crypto } = req.body;
+        
+        const user = await User.findOne({_id : userId});
+
+        const cryptoId = user.netWorth.cryptocurrency;
+
+        const existingCrypto = await CryptoCurrency.findOne({_id : cryptoId});
+
+        const userCrypto = await CryptoCurrency.findOneAndUpdate(
+            {_id : cryptoId},
+            {
+                crypto
+            },
+            {new : true}
+        )
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if(userCrypto){
+            return res.status(200).json({message : "Crypto updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Crypto not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/debtController.js
+import mongoose from "mongoose";
+import Debt from "../../models/Debt.js";
+import User from "../../models/User.js";
+import { debtSchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function debtController(req,res){
+    const {liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt} = req.body;
+
+    const { success, error } = debtSchema.safeParse({liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt});
+
+    if(!success){
+        return res.status(403).json({message : "Debt inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
+
+    try{
+        const userId = req.user;
+        
+        const { selection }= req.body; 
+
+        if(!selection){
+            return res.status(403).json({message : "Selection not provided"});
+        }
+
+        if(!selection)
+            return res.status(403).json({message : "Selection not provided"});
+
+        const user = await User.findOne({_id : userId});
+
+        const debtId = user.netWorth.debt;
+
+        const updateField = {
+            liquidFund : { liquidFund },
+            fixedDeposit : { fixedDeposit },
+            debtFunds : { debtFunds },
+            governmentInvestments : { governmentInvestments },
+            sipDebt : { sipDebt }
+        }[selection] || { sipDebt }
+
+
+        const userDebt = await Debt.findOneAndUpdate(
+            {_id : debtId}, 
+            {
+                $set : updateField
+            }, 
+            {new : true});
+        
+        await session.commitTransaction();
+        session.endSession();
+        
+        if(userDebt){
+            return res.status(200).json({message : "Debt updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Debt not added"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/domesticEquityController.js
+import mongoose from "mongoose";
+import DomesticEquity from "../../models/DomesticEquity.js";
+import User from "../../models/User.js";
+import { domesticEquitySchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function domesticEquityController(req, res) {
+    const {directStocks, mutualFunds, sipEquity } = req.body;
+
+    let { success, error } = domesticEquitySchema.safeParse({directStocks, mutualFunds, sipEquity });
+
+    if (!success) {
+        return res.status(403).json({ message: "Domestic Equity inputs are wrong", err: error.format() });
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const userId = req.user;
+
+        const { selection } = req.body;
+
+        if(!selection)
+                return res.status(403).json({message : "Selection not provided"});
+
+        const user = await User.findOne({ _id: userId });
+        // console.log(user);
+
+        const domesticEquityId = user.netWorth.domesticEquity;
+
+        let userDomesticEquity;
+
+        const updateField = {
+            directStocks : { directStocks },
+            mutualFunds : { mutualFunds },
+            sipEquity : { sipEquity }
+        }[selection] || { sipEquity }
+
+        userDomesticEquity = await DomesticEquity.findOneAndUpdate(
+            {_id : domesticEquityId},
+            {
+                $set : updateField
+            },
+            {new : true}
+        )
+
+        await session.commitTransaction();
+        session.endSession();
+
+        if (userDomesticEquity) {
+            return res.status(200).json({ message: "Domestic Equity updated successfully to Networth" });
+        } else {
+            return res.status(403).json({ message: "Domestic Equity not updated" });
+        }
+
+    } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({ message: "Internal error", err: err.message });
+    }
+};
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/financialGoalsController.js
+import User from "../../models/User.js";
+import Goals from "../../models/Goals.js";
+import goalSchema from "../../schemas/goalSchema.js";
+import mongoose from "mongoose";
+import RAM from "../../models/returnsAndAssets.js";
+
+
+export default async function financialGoalsController(req,res) {
+    const { goals  } = req.body;
+
+    const { success , error } = goalSchema.safeParse({ goals });
+
+    if(!success){
+        return res.status(403).json({message : "Financial Goals input are Wrong" , error : error.format()});
+    }
+    
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const user = await User.findOne({_id : userId});
+        
+        const ramId = user.ram; 
+
+        const returnsAndAssets = await RAM.findById(ramId);
+
+        const sipAmountDistribution = getSipAmountDistribution(goals, returnsAndAssets);
+
+        const sipAssetAllocation = sumOfSip(sipAmountDistribution);
+
+        const goalsId = user.goals;
+
+        // console.log(sipAmountDistribution);
+
+
+        const goalsUpdated = await Goals.findOneAndUpdate(
+            {_id : goalsId},
+            {
+                $set : {
+                    "goals" : goals,
+                    "sipAmountDistribution" : sipAmountDistribution,
+                    "sipAssetAllocation" : sipAssetAllocation
+                }
+            },
+            {new  : true}
+        );
+        // console.log(goalsUpdated);
+        await session.commitTransaction();
+        session.endSession();
+
+        if(goalsUpdated){
+            return res.json({message : "User Goals are Updated"});
+        }else{
+            return res.status(403).json({message : "User Goals are NOT Updated"});
+        }
+
+    }catch(e){
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+
+
+}
+
+function getSipAmountDistribution(goals, returnsAndAssets){
+    const { shortTerm, mediumTerm, longTerm } = returnsAndAssets;
+
+    const sipAmounts = [];
+
+    for(let i=0;i<goals.length;i++){
+        const currentGoal = goals[i];
+
+        const sipRequired = currentGoal.sipRequired;
+        const time = currentGoal.time;
+
+        if(time < 3){
+            sipAmounts.push(getAmountDistribution(sipRequired, shortTerm));
+        }
+        else if(time < 7){
+            sipAmounts.push(getAmountDistribution(sipRequired, mediumTerm));
+        }
+        else{
+            sipAmounts.push(getAmountDistribution(sipRequired, longTerm));
+        }
+    }
+
+    return sipAmounts;
+}
+
+function getAmountDistribution(sip, plan){
+    let amount = {
+        domesticEquity : 0,
+        usEquity : 0,
+        debt : 0,
+        gold : 0,
+        crypto : 0,
+        realEstate : 0
+    }
+
+    const keys = Object.keys(plan);
+    const values = Object.values(plan);
+
+    for(let i=0;i<values.length;i++){
+        if(values[i]!=0){
+            const key = keys[i];
+
+            amount[key] += (values[i]/100) * sip;
+        }
+    }
+
+    return amount;
+}
+
+
+function sumOfSip(sipAmountDistribution){
+    let sumValues = {
+        domesticEquity : 0,
+        usEquity : 0,
+        debt : 0,
+        gold : 0,
+        crypto : 0,
+        realEstate : 0,
+    }
+
+    for(let goal in sipAmountDistribution){
+        for(let asset in sipAmountDistribution[goal]){
+            sumValues[asset] += sipAmountDistribution[goal][asset];
+        }
+    }
+    return sumValues;
+}
+
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/foreignEquityController.js
+import mongoose from "mongoose";
+import ForeignEquity from "../../models/ForeignEquity.js";
+import User from "../../models/User.js";
+import { foreignEquitySchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function foreignEquityController(req,res){
+    const body = req.body;
+
+    let {success, error} = foreignEquitySchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "ForeignEquity inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const { sAndp500,  otherETF, mutualFunds } = req.body;
+
+        const user = await User.findOne({_id : userId});
+
+        const ForeignEquityId = user.netWorth.foreignEquity;
+
+        const existingForeignEquity = await ForeignEquity.findOne({_id : ForeignEquityId});
+
+        const userForeignEquity = await ForeignEquity.findOneAndUpdate(
+            {_id : ForeignEquityId}, 
+            {
+                ...existingForeignEquity.toObject(),
+                sAndp500,
+                otherETF,
+                mutualFunds
+            }, 
+            {new : true});
+        
+        await session.commitTransaction();
+        session.endSession();
+
+        if(userForeignEquity){
+            return res.status(200).json({message : "ForeignEquity updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "ForeignEquity not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/goldController.js
+import mongoose from "mongoose";
+import GoldModel from "../../models/Gold.js";
+import User from "../../models/User.js";
+import { goldSchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function goldController (req,res) {
+    const body = req.body;
+
+    let {success, error} = goldSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Gold inputs are wrong",err : error.format()});
+    }
+    
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const {jewellery, SGB, digitalGoldAndETF } = body;
+
+        const user = await User.findOne({_id : userId});
+
+        const goldId = user.netWorth.gold;
+
+        const existingGold = await GoldModel.findOne({_id : goldId});
+
+        const userGold = await GoldModel.findOneAndUpdate(
+            {_id : goldId}, 
+            {
+                ...existingGold.toObject(),
+                jewellery,
+                SGB,
+                digitalGoldAndETF,
+                
+            }, 
+            {new : true});
+        
+        await session.commitTransaction();
+        session.endSession();
+
+        if(userGold){
+            return res.status(200).json({message : "Gold updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Gold not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/liabilitiesController.js
+import mongoose from "mongoose";
+import liabilities from "../../models/Liabilities.js";
+import User from "../../models/User.js";
+import { liabilitiesSchema } from "../../schemas/netWorthSchemas.js";
+
+
+export default async function liabilitiesController(req,res){
+    const body = req.body;
+
+    const { success, error } = liabilitiesSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Liabilities inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const {homeLoan, educationLoan, carLoan, personalLoan, creditCard, other} = body;
+
+        const user = await User.findOne({_id : userId});
+
+        const liabilitiesId = user.netWorth.liabilities;
+
+        const existingLiability = await liabilities.findOne({_id : liabilitiesId});
+
+        const userLiabilities = await liabilities.findOneAndUpdate(
+            { _id : liabilitiesId }, 
+            { 
+                ...existingLiability.toObject(),
+                homeLoan,
+                educationLoan,
+                carLoan,
+                personalLoan,
+                creditCard,
+                other
+            }, 
+            { new: true }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+
+        if(userLiabilities){
+            return res.status(200).json({message : "Liabilities updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Liabilities not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/miscellaneousController.js
+import mongoose from "mongoose";
+import miscellaneous from "../../models/miscellaneous.js";
+import User from "../../models/User.js";
+import { miscellaneousSchema } from "../../schemas/netWorthSchemas.js";
+
+export default async function miscellaneousController(req,res){
+    const body = req.body;
+
+    const {success, error} = miscellaneousSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Miscellaneous inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const {otherInsuranceProducts, smallCase} = body;
+
+        const user = await User.findOne({_id : userId});
+        
+        const miscId = user.netWorth.miscellaneous;
+
+        const existingMisc = await miscellaneous.findOne({_id : miscId});
+
+        const userMisc = await miscellaneous.findOneAndUpdate(
+            { _id : miscId }, 
+            { 
+                ...existingMisc.toObject(),
+                otherInsuranceProducts,
+                smallCase
+             }, 
+            { new: true }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+
+        if(userMisc){
+            return res.status(200).json({message : "Miscellaneous updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Miscellaneous not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/realEstateController.js
+import RealEstate from '../../models/RealEstate.js';
+import { realEstateSchema } from '../../schemas/netWorthSchemas.js';
+import User from '../../models/User.js';
+import mongoose from 'mongoose';
+
+export default async  function realEstatesController (req,res){
+    const body = req.body;
+
+    let {success, error} = realEstateSchema.safeParse(body);
+
+    if(!success){
+        return res.status(403).json({message : "Real-Estate inputs are wrong",err : error.format()});
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const userId = req.user;
+
+        const {home, otherRealEstate, REITs} = body;
+
+        const user = await User.findOne({_id : userId});
+
+        const realEstateId = user.netWorth.realEstate;
+
+        const existingRealEstate = await RealEstate.findOne({_id : realEstateId});
+
+        const userRealEstate = await RealEstate.findOneAndUpdate(
+            { _id : realEstateId }, 
+            {
+                ...existingRealEstate.toObject(),
+                home,
+                otherRealEstate,
+                REITs
+            }, 
+            { new: true }
+        );
+
+        await session.commitTransaction();
+        session.endSession();
+
+
+        if(userRealEstate){
+            return res.status(200).json({message : "Real-Estate updated successfully to Networth"});
+        }else{
+            return res.status(403).json({message : "Real-Estate not updated"});
+        }
+
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({message : "Internal error", err : err.message});
+    }
+}
+
+// File: /home/karthikeya.a/Desktop/Project/Master-Financial-Planner/backend/controllers/put/sip.js
+const sipAmountDistribution = [
+
+    {
+  
+      "domesticEquity": 0,
+  
+      "usEquity": 0,
+  
+      "debt": 0,
+  
+      "gold": 0,
+  
+      "crypto": 0,
+  
+      "realEstate": 0
+  
+    },
+  
+    {
+  
+      "domesticEquity": 0,
+  
+      "usEquity": 0,
+  
+      "debt": 5000,
+  
+      "gold": 0,
+  
+      "crypto": 0,
+  
+      "realEstate": 0
+  
+    },
+  
+    {
+  
+      "domesticEquity": 0,
+  
+      "usEquity": 0,
+  
+      "debt": 4000,
+  
+      "gold": 0,
+  
+      "crypto": 0,
+  
+      "realEstate": 0
+  
+    },
+  
+    {
+  
+      "domesticEquity": 6000,
+  
+      "usEquity": 1000,
+  
+      "debt": 1500,
+  
+      "gold": 500,
+  
+      "crypto": 500,
+  
+      "realEstate": 500
+  
+    },
+  
+    {
+  
+      "domesticEquity": 2400,
+  
+      "usEquity": 0,
+  
+      "debt": 3000,
+  
+      "gold": 600,
+  
+      "crypto": 0,
+  
+      "realEstate": 0
+  
+    },
+  
+    {
+  
+      "domesticEquity": 2000,
+  
+      "usEquity": 0,
+  
+      "debt": 2500,
+  
+      "gold": 500,
+  
+      "crypto": 0,
+  
+      "realEstate": 0
+  
+    }
+  
+  ]
+  
+ 
+function sumOfSip(sipAssetAllocation){
+    let sumValues = {
+        domesticEquity : 0,
+        usEquity : 0,
+        debt : 0,
+        gold : 0,
+        crypto : 0,
+        realEstate : 0,
+    }
+
+    for(let goal in sipAssetAllocation){
+        for(let asset in sipAssetAllocation[goal]){
+            sumValues[asset] += sipAssetAllocation[goal][asset];
+        }
+    }
+    return sumValues;
+}
+
+console.log(sumOfSip(sipAmountDistribution));

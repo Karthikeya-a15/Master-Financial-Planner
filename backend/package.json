@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "npx nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "repository": {
     "type": "git",
@@ -41,5 +41,14 @@
     "xml2js": "^0.6.2",
     "yahoo-finance2": "^2.13.3",
     "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@vitest/coverage-v8": "^3.0.9",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react": "^7.37.4",
+    "globals": "^16.0.0",
+    "prettier": "3.5.3",
+    "vitest": "^3.0.9"
   }
 }
