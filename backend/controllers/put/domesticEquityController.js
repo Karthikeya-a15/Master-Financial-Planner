@@ -4,8 +4,11 @@ import User from "../../models/User.js";
 import { domesticEquitySchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function domesticEquityController(req, res) {
-    const {directStocks, mutualFunds, sipEquity } = req.body;
+    const {directStocks, mutualFunds, sipEquity, selection } = req.body;
 
+    if(!selection)
+        return res.status(403).json({message : "Selection not provided"});
+    
     let { success, error } = domesticEquitySchema.safeParse({directStocks, mutualFunds, sipEquity });
 
     if (!success) {
@@ -17,11 +20,6 @@ export default async function domesticEquityController(req, res) {
 
     try {
         const userId = req.user;
-
-        const { selection } = req.body;
-
-        if(!selection)
-                return res.status(403).json({message : "Selection not provided"});
 
         const user = await User.findOne({ _id: userId });
         // console.log(user);
