@@ -40,8 +40,7 @@ const chatUploadController = async (req, res) => {
             roomId
         });
     } catch (error) {
-        console.error("Upload failed:", error);
-        res.status(500).json({ error: "File upload failed" });
+        res.status(500).json({ message: "File upload failed", error : error.message });
     }
 };
 

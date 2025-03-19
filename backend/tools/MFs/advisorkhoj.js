@@ -95,38 +95,38 @@ const fetchMutualFundNames = async (firstNames, Category = "Equity: Mid Cap") =>
   }
 }
 
-async function getSchemeStartAndEndDate(funds) {
-  const fiveYearCheck = []
+// async function getSchemeStartAndEndDate(funds) {
+//   const fiveYearCheck = []
 
-  try {
-    const promises = funds.map(fund =>
-      axios.post(
-        "https://www.advisorkhoj.com/mutual-funds-research/getSchemeStartAndEndDate",
-        new URLSearchParams({
-          scheme_name: fund.name
-        }),
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-          }
-        }
-      )
-    );
+//   try {
+//     const promises = funds.map(fund =>
+//       axios.post(
+//         "https://www.advisorkhoj.com/mutual-funds-research/getSchemeStartAndEndDate",
+//         new URLSearchParams({
+//           scheme_name: fund.name
+//         }),
+//         {
+//           headers: {
+//             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+//           }
+//         }
+//       )
+//     );
 
-    responses.forEach((response, index) => {
-      const dateArray = response.data;
+//     responses.forEach((response, index) => {
+//       const dateArray = response.data;
 
-      if (Date.parse(dateArray[0]) >= Date.parse("2025-01-01")) {
-        fiveYearCheck.push(funds[index]);
-      }
-    });
+//       if (Date.parse(dateArray[0]) >= Date.parse("2025-01-01")) {
+//         fiveYearCheck.push(funds[index]);
+//       }
+//     });
 
-    return fiveYearCheck;
-  } catch (e) {
-    console.error("Error fetching mutual fund names:", e);
-  }
+//     return fiveYearCheck;
+//   } catch (e) {
+//     console.error("Error fetching mutual fund names:", e);
+//   }
 
-}
+// }
 
 async function getBestFunds(schemeNo, Category) {
   //get aum total, cagr, expense ratio prefilled funds

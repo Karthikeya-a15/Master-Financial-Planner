@@ -24,8 +24,7 @@ router.get("/allNews", async(req, res)=>{
 
         xml2js.parseString(response.data, { explicitArray: false }, (err, result) => {
             if (err) {
-                console.error("XML Parsing Error:", err);
-                return res.status(500).json({ error: "Failed to parse XML" });
+                return res.status(500).json({ error: "Failed to parse XML" , err : err.message});
             }
 
             if (!result?.rss?.channel?.item) {
@@ -43,7 +42,6 @@ router.get("/allNews", async(req, res)=>{
         });
 
     }catch (error) {
-        console.error("Fetching Error:", error);
         res.status(500).json({ error: "Failed to fetch news", details: error.message });
     }
 })
@@ -68,7 +66,6 @@ router.get("/news", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Fetching Error:", error);
         res.status(500).json({ error: "Failed to fetch news", details: error.message });
     }
 });

@@ -56,7 +56,7 @@ export default async function financialGoalsController(req,res) {
             return res.status(403).json({message : "User Goals are NOT Updated"});
         }
 
-    }catch(e){
+    }catch(err){
         return res.status(500).json({message : "Internal error", err : err.message});
     }
 

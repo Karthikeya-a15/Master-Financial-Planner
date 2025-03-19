@@ -1,4 +1,3 @@
-import Result from "../../models/ToolsResults.js";
 import User from "../../models/User.js";
 import getRankOfFunds from "../../tools/Index/index.js";
 

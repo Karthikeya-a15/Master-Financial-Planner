@@ -1,6 +1,6 @@
 import getArbitrageFunds from "./advisorKhoj.js";
 
-async function main(weightage){
+async function main(){
     const funds = await getArbitrageFunds();
 
     return funds;

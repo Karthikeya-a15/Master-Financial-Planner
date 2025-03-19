@@ -1,5 +1,3 @@
-import express from "express";
-
 const calculateCompoundInterest = (principal, rate, years, timesCompounded = 1) => {
     let yearlyData = [];
     let currentInvestment = principal;

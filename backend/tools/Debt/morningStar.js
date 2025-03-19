@@ -43,8 +43,7 @@ async function getAccessToken(id, name) {
 
     return accessToken;
     }catch(err){
-        console.log(err.message);
-        return "";
+        return err.message;
     }
 }
 
@@ -103,22 +102,7 @@ function getCorrectName(name){
     return finalName;
 }
 
-function print(array){
-    array.forEach(element => {
-        console.log(element.legalName+"\n");
-    });
-}
 
-function customRound(num) {
-    const factor = 100; // To keep 2 decimal places
-    const thirdDecimal = Math.floor(num * 1000) % 10; // Extract the 3rd decimal place
-
-    if (thirdDecimal > 5) {
-        return ((Math.floor(num * factor) + 1) / factor).toFixed(2);
-    } else {
-        return (Math.floor(num * factor) / factor).toFixed(2);
-    }
-}
 
 async function getMorningStar(subsector, tickerTapeFunds) {
     try {
@@ -131,10 +115,8 @@ async function getMorningStar(subsector, tickerTapeFunds) {
         const finalFunds = await Promise.all(tickerTapeFunds.map(async (fund) => {
             const name = getCorrectName(fund.name);
             const expRatio = fund.expenseRatio;
-            const cagr = fund.cagr;
             const actualFund = msFunds[subsector].find(f => 
                 f.legalName.toLowerCase().includes(name.toLowerCase()) &&
-                // Math.abs(f.returnM36 - cagr) <= 0.1 &&
                 f.expenseRatio === expRatio &&
                 (!f.legalName.includes("Regular") && f.legalName.includes("Direct"))
             );
@@ -158,8 +140,7 @@ async function getMorningStar(subsector, tickerTapeFunds) {
 
         return finalFunds;
     } catch (error) {
-        console.error(`Error in getMorningStar: ${error.message}`);
-        throw error; // Re-throw the error if needed
+        return error.message; 
     }
 }
 

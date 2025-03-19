@@ -42,8 +42,6 @@ router.post("/signup",async (req, res) => {
         return res.status(403).json({message: "User inputs are incorrect",err : error.format()});
     }
 
-        const {name, email, password, age} = body;
-
         const user = new User(body);
 
         user.password = await user.hashPassword();
@@ -121,7 +119,7 @@ router.post("/login", async (req, res) => {
         }
     }
     catch(err){
-        return res.status(500).json({message : "Internal error"});
+        return res.status(500).json({message : err.message});
     }
 });
 
@@ -168,8 +166,7 @@ router.put("/profile", userAuth, async (req, res) => {
   
       return res.json({ message: "Profile updated successfully", user });
     } catch (e) {
-      console.error("Profile update error:", e);
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "Internal server error" , error : e.message});
     }
   });
 
@@ -198,8 +195,7 @@ try {
 
     return res.json({ message: "Fire Number updated successfully" });
     } catch (e) {
-    console.error("update error:", e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error", error : e.message });
     }
 })
 

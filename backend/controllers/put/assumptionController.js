@@ -23,8 +23,6 @@ export default async function (req, res){
 
         const ramId = user.ram;
 
-        const ram = await RAM.findOne({_id : ramId});
-
         const userRetruns  = await RAM.findOneAndUpdate({_id : ramId},
             {
                 $set : {
