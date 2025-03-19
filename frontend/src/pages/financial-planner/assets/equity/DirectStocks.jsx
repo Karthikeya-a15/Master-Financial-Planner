@@ -3,16 +3,16 @@ import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
 import axios from "axios";
-import LoadingSpinner from '../../../../components/common/LoadingSpinner';
+import LoadingSpinner from "../../../../components/common/LoadingSpinner";
 
 export default function DirectStocks({
-    formatCurrency,
-    equityData,
-    editedData,
-    setEditedData,
-    CATEGORY_OPTIONS,
-    COLORS,
-    handleSave,
+  formatCurrency,
+  equityData,
+  editedData,
+  setEditedData,
+  CATEGORY_OPTIONS,
+  COLORS,
+  handleSave,
 }) {
     const section = 'directStocks';
     const [showAddStockForm, setShowAddStockForm] = useState(false);
@@ -56,45 +56,50 @@ export default function DirectStocks({
     }, []);
 
 
-    const handleAddStock = useCallback(() => {
-        setEditedData((prev) => ({
-            ...prev,
-            [section]: [...prev[section], newStock],
-        }));
-        setShowAddStockForm(false);
-        setNewStock({ stockName: '', category: CATEGORY_OPTIONS[0], currentValue: 0 });
-        toast.success('Stock added successfully');
-    }, [newStock]);
+  const handleAddStock = useCallback(() => {
+    setEditedData((prev) => ({
+      ...prev,
+      [section]: [...prev[section], newStock],
+    }));
+    setShowAddStockForm(false);
+    setNewStock({
+      stockName: "",
+      category: CATEGORY_OPTIONS[0],
+      currentValue: 0,
+    });
+    toast.success("Stock added successfully");
+  }, [newStock]);
 
-    const handleDeleteStock = useCallback((index) => {
-        if (confirm('Are you sure you want to delete this stock?')) {
-            setEditedData((prev) => {
-                const updatedSection = [...prev[section]]; //
-                updatedSection.splice(index, 1);
-                return { ...prev, [section]: updatedSection };
-            });
-            toast.success('Stock deleted successfully');
-        }
-    }, []);
+  const handleDeleteStock = useCallback((index) => {
+    if (confirm("Are you sure you want to delete this stock?")) {
+      setEditedData((prev) => {
+        const updatedSection = [...prev[section]]; //
+        updatedSection.splice(index, 1);
+        return { ...prev, [section]: updatedSection };
+      });
+      toast.success("Stock deleted successfully");
+    }
+  }, []);
 
-    const handleChange = (index, field, value) => {
-        setEditedData((prevData) => {
-            const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy to avoid mutation issues
+  const handleChange = (index, field, value) => {
+    setEditedData((prevData) => {
+      const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy to avoid mutation issues
 
-            // Ensure the value is properly parsed for numerical fields
-            const parsedValue = field === 'currentValue' ? parseFloat(value) || 0 : value;
+      // Ensure the value is properly parsed for numerical fields
+      const parsedValue =
+        field === "currentValue" ? parseFloat(value) || 0 : value;
 
-            newData[section][index] = {
-                ...newData[section][index],
-                [field]: parsedValue,
-            };
+      newData[section][index] = {
+        ...newData[section][index],
+        [field]: parsedValue,
+      };
 
-            return newData;
-        });
-    };
+      return newData;
+    });
+  };
 
-    const autoSuggest = async (value) => {
-        if (debounceTimeout) clearTimeout(debounceTimeout);
+  const autoSuggest = async (value) => {
+    if (debounceTimeout) clearTimeout(debounceTimeout);
 
         const newTimeout = setTimeout(async () => {
             if (value.trim() === "") {
@@ -109,8 +114,8 @@ export default function DirectStocks({
             }
         }, 1500);
 
-        setDebounceTimeout(newTimeout);
-    };
+    setDebounceTimeout(newTimeout);
+  };
 
     const handleInputChange = (index, e) => {
         const value = e.target.value;
@@ -136,28 +141,31 @@ export default function DirectStocks({
     };
 
 
-    const handleStockSave = (index) => {
-        setEditedData((prevData) => {
-            const updatedStocks = [...prevData[section]];
+  const handleStockSave = (index) => {
+    setEditedData((prevData) => {
+      const updatedStocks = [...prevData[section]];
 
-            updatedStocks[index] = { ...editedData[section][index] };
+      updatedStocks[index] = { ...editedData[section][index] };
 
-            return {
-                ...prevData,
-                [section]: updatedStocks,
-            };
-        });
-        setEditingStockIndex(false);
-        toast.success('Stock Updated successfully');
-    };
+      return {
+        ...prevData,
+        [section]: updatedStocks,
+      };
+    });
+    setEditingStockIndex(false);
+    toast.success("Stock Updated successfully");
+  };
 
-
-    const handleCancelEdit = () => {
-        setEditingStockIndex(null);
-        setShowAddStockForm(false);
-        setEditedData(equityData);
-        setNewStock({ stockName: '', category: CATEGORY_OPTIONS[0], currentValue: 0 });
-    };
+  const handleCancelEdit = () => {
+    setEditingStockIndex(null);
+    setShowAddStockForm(false);
+    setEditedData(equityData);
+    setNewStock({
+      stockName: "",
+      category: CATEGORY_OPTIONS[0],
+      currentValue: 0,
+    });
+  };
 
     function capitalizeWords(str) {
         return str.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -165,10 +173,13 @@ export default function DirectStocks({
 
 
 
-    const summaryData = editedData[section].reduce((acc, { category, currentValue }) => {
-        acc[category] = (acc[category] || 0) + currentValue;
-        return acc;
-    }, {});
+  const summaryData = editedData[section].reduce(
+    (acc, { category, currentValue }) => {
+      acc[category] = (acc[category] || 0) + currentValue;
+      return acc;
+    },
+    {}
+  );
 
     const totalValue = Object.values(summaryData).reduce((sum, val) => sum + val, 0);
     const chartData = Object.entries(summaryData).map(([category, value]) => ({
@@ -179,65 +190,70 @@ export default function DirectStocks({
     }));
 
 
-    if (!equityData) return <LoadingSpinner />;
+  if (!equityData) return <LoadingSpinner />;
 
-    return (
-        <div key={section} className="space-y-8">
-            <h3 className="text-lg font-semibold text-secondary-700 capitalize">Direct Stocks</h3>
+  return (
+    <div key={section} className="space-y-8">
+      <h3 className="text-lg font-semibold text-secondary-700 capitalize">
+        Direct Stocks
+      </h3>
 
+      {/* Pie Chart */}
+      <div className="flex flex-row items-center">
+        <PieChart
+          series={[
+            {
+              data: chartData.map(({ category, contribution, color }) => ({
+                id: category,
+                value: parseFloat(contribution),
+                label: category,
+                color: color,
+              })),
+              innerRadius: 50,
+              outerRadius: 100,
+            },
+          ]}
+          slotProps={{
+            legend: {
+              direction: "column",
+              position: { vertical: "middle", horizontal: "right" },
+            },
+            tooltip: {
+              formatter: (params) => `${params.label}: ${params.value}%`,
+            },
+          }}
+          width={500}
+          height={250}
+        />
+      </div>
 
-            {/* Pie Chart */}
-            <div className="flex flex-row items-center">
-                <PieChart
-                    series={[
-                        {
-                            data: chartData.map(({ category, contribution, color }) => ({
-                                id: category,
-                                value: parseFloat(contribution),
-                                label: category,
-                                color: color,
-                            })),
-                            innerRadius: 50,
-                            outerRadius: 100,
-                        },
-                    ]}
-                    slotProps={{
-                        legend: {
-                            direction: 'column',
-                            position: { vertical: 'middle', horizontal: 'right' },
-                        },
-                        tooltip: {
-                            formatter: (params) => `${params.label}: ${params.value}%`,
-                        },
-                    }}
-                    width={500}
-                    height={250}
-                />
-            </div>
+      {/* Contribution Table */}
+      <div className="flex justify-center">
+        <table className="w-3/4 text-sm border-collapse border border-gray-200 mt-2">
+          <thead>
+            <tr className="bg-gray-100 text-secondary-800">
+              <th className="border px-2 py-1">Category</th>
+              <th className="border px-2 py-1">Value</th>
+              <th className="border px-2 py-1">Contribution (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chartData.map(({ category, value, contribution }, index) => (
+              <tr key={index} className="border border-gray-200">
+                <td className="border px-2 py-1">{category}</td>
+                <td className="border px-2 py-1 text-green-700">
+                  {formatCurrency(value)}
+                </td>
+                <td className="border px-2 py-1 text-green-700">
+                  {contribution}%
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-            {/* Contribution Table */}
-            <div className="flex justify-center">
-                <table className="w-3/4 text-sm border-collapse border border-gray-200 mt-2">
-                    <thead>
-                        <tr className="bg-gray-100 text-secondary-800">
-                            <th className="border px-2 py-1">Category</th>
-                            <th className="border px-2 py-1">Value</th>
-                            <th className="border px-2 py-1">Contribution (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chartData.map(({ category, value, contribution }, index) => (
-                            <tr key={index} className="border border-gray-200">
-                                <td className="border px-2 py-1">{category}</td>
-                                <td className="border px-2 py-1 text-green-700">{formatCurrency(value)}</td>
-                                <td className="border px-2 py-1 text-green-700">{contribution}%</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            <hr className="w-full border-t border-gray-300 my-10" />
+      <hr className="w-full border-t border-gray-300 my-10" />
 
             {/* Add Stock Form */}
             {showAddStockForm && (

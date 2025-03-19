@@ -1,3 +1,4 @@
+
 const calculateCompoundInterest = (principal, rate, years, timesCompounded = 1) => {
     let yearlyData = [];
     let currentInvestment = principal;
@@ -73,7 +74,6 @@ function stepSipCalculator(req, res) {
         const P = monthlyInvestment;
         const s = incrementRate / 100;
         const r = rateOfReturn / 100;
-        const n = year;
         const totalMonths = years * 12;
         const stepUpFrequency = 12;
         let totalInvestment = (12 * monthlyInvestment * (Math.pow((1 + s), year) - 1)) / s;

@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 import RAM from "../../models/returnsAndAssets.js";
 import ramSchema from "../../schemas/ramSchema.js";
 
-export default async function (req, res){
+export default async function assumptionController (req, res){
     const body = req.body;
 
     let {success, error} = ramSchema.safeParse(body);

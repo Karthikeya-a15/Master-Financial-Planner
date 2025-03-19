@@ -1,4 +1,4 @@
-{
+export const stockMapping = {
   "20 microns limited": "20MICRONS",
   "360 one wam limited": "360ONE",
   "3i infotech limited": "3IINFOLTD",
