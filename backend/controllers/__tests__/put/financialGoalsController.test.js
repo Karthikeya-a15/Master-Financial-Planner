@@ -4,36 +4,39 @@ import financialGoalsController, {
   sumOfSip,
 } from "../../put/financialGoalsController.js";
 import mongoose from "mongoose";
-import Goals from "../../../models/Goals.js";
 import goalSchema from "../../../schemas/goalSchema.js";
-import { createRequest, createResponse } from "node-mocks-http";
 
 jest.mock("../../../models/User.js", () => {
   const mockUserSchema = {
     methods: {
-      hashPassword: jest.fn(), // Provide a mock function
+      hashPassword: jest.fn(), 
       validatePassword: jest.fn(),
     },
-    // Add other required mock schema properties if needed
   };
   return {
-    __esModule: true, // Important for ES modules
+    __esModule: true, 
     default: {
       findOne: jest.fn(),
-      // ... any other User methods you use in your test ...
     },
-    userSchema: mockUserSchema, // Export the mock schema
+    userSchema: mockUserSchema, 
   };
 });
 import User from "../../../models/User.js";
+
+jest.mock("../../../models/Goals.js", () => ({
+  __esModule: true,
+  default : {
+    findOneAndUpdate : jest.fn()
+  }
+}))
+import Goals from "../../../models/Goals.js";
 
 jest.mock("../../../models/returnsAndAssets.js", () => ({
   __esModule: true,
   default: {
     findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
-    findById: jest.fn(), // <---  findById was added here
-    // ... other methods as needed
+    findById: jest.fn(), 
   },
 }));
 import RAM from "../../../models/returnsAndAssets.js";
@@ -45,43 +48,31 @@ jest.mock("../../../schemas/goalSchema.js");
 jest.mock("../../../models/returnsAndAssets.js");
 
 describe("financialGoalsController", () => {
-  it("should update financial goals for a valid user and valid input", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3", body: {} };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test("should update financial goals for a valid user and valid input", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       goals: "67b82107183c091d4d3990d7",
       ram: "67b82107183c091d4d3990d9",
     };
     const mockBody = {
       goals: [{ name: "Goal 1", amount: 1000, time: 5, sipRequired: 50 }],
-    }; //simplified goals
-    const mockRAM = {
-      shortTerm: {
-        debt: 50,
-        domesticEquity: 30,
-        usEquity: 10,
-        gold: 5,
-        crypto: 5,
-        realEstate: 0,
-      },
-      mediumTerm: {
-        debt: 30,
-        domesticEquity: 40,
-        usEquity: 15,
-        gold: 10,
-        crypto: 5,
-        realEstate: 0,
-      },
-      longTerm: {
-        debt: 10,
-        domesticEquity: 50,
-        usEquity: 20,
-        gold: 10,
-        crypto: 5,
-        realEstate: 5,
-      },
     };
-
+    const mockRAM = {
+      shortTerm: { debt: 50, domesticEquity: 30, usEquity: 10, gold: 5, crypto: 5, realEstate: 0 },
+      mediumTerm: { debt: 30, domesticEquity: 40, usEquity: 15, gold: 10, crypto: 5, realEstate: 0 },
+      longTerm: { debt: 10, domesticEquity: 50, usEquity: 20, gold: 10, crypto: 5, realEstate: 5 },
+    };
     const mockSession = {
       startTransaction: jest.fn(),
       commitTransaction: jest.fn(),
@@ -89,70 +80,52 @@ describe("financialGoalsController", () => {
       endSession: jest.fn(),
     };
 
-    // Mock schema validation
     goalSchema.safeParse.mockReturnValue({ success: true });
-
-    // Mock mongoose session
     mongoose.startSession.mockResolvedValue(mockSession);
-
     User.findOne.mockResolvedValue(mockUser);
-    RAM.findById.mockResolvedValue(mockRAM); // Mock successful update
+    RAM.findById.mockResolvedValue(mockRAM);
 
-    const updatedGoals = {
-      goals: mockBody.goals,
-      sipAmountDistribution: getSipAmountDistribution(mockBody.goals, mockRAM), // Assuming you have a function to calculate this
-      sipAssetAllocation: sumOfSip(
-        getSipAmountDistribution(mockBody.goals, mockRAM),
-      ),
-    };
+    const sipAmountDistribution = getSipAmountDistribution(mockBody.goals, mockRAM);
+    const sipAssetAllocation = sumOfSip(getSipAmountDistribution(mockBody.goals, mockRAM));
 
-    Goals.findOneAndUpdate.mockResolvedValue(updatedGoals);
+    Goals.findOneAndUpdate.mockResolvedValue(
+      { _id : mockUser.goals },
+      {
+        goals : mockBody.goals,
+        sipAmountDistribution,
+        sipAssetAllocation
+      },
+      {
+        new : true
+      }
+    )
 
-    const req = createRequest({ user: mockUserId, body: mockBody });
-    const res = createResponse();
+    req.body = mockBody;
     await financialGoalsController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({ message: "User Goals are Updated" });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "User Goals are Updated" });
     expect(mongoose.startSession).toHaveBeenCalled();
     expect(mockSession.startTransaction).toHaveBeenCalled();
-    expect(User.findOne).toHaveBeenCalledWith({ _id: mockUserId });
+    expect(User.findOne).toHaveBeenCalledWith({ _id: req.user });
     expect(Goals.findOneAndUpdate).toHaveBeenCalled();
     expect(mockSession.commitTransaction).toHaveBeenCalled();
     expect(mockSession.endSession).toHaveBeenCalled();
-    expect(goalSchema.safeParse).toHaveBeenCalledWith({
-      goals: mockBody.goals,
-    });
+    expect(goalSchema.safeParse).toHaveBeenCalledWith(mockBody);
   });
 
-  it("should return 403 if input is invalid", async () => {
+  test("should return 403 if input is invalid", async () => {
     const mockBody = { goals: "invalid" };
-    const mockValidationError = { format: () => "Validation Error" };
+    goalSchema.safeParse.mockReturnValue({ success: false, error: { format: () => "Validation Error" } });
+    req.body = mockBody;
 
-    // Mock schema validation to fail
-    goalSchema.safeParse.mockReturnValue({
-      success: false,
-      error: mockValidationError,
-    });
-
-    const req = createRequest({
-      user: "67b82107183c091d4d3990c3",
-      body: mockBody,
-    });
-    const res = createResponse();
     await financialGoalsController(req, res);
 
-    expect(res.statusCode).toBe(403);
-    expect(res._getJSONData()).toEqual({
-      message: "Financial Goals input are Wrong",
-      error: "Validation Error",
-    });
-    expect(goalSchema.safeParse).toHaveBeenCalledWith({
-      goals: mockBody.goals,
-    });
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Financial Goals input are Wrong", error: "Validation Error" });
   });
 
-  it("should handle database errors and abort transaction", async () => {
+  test("should handle database errors and abort transaction", async () => {
     const mockBody = {
       goals: [{ name: "Goal 1", amount: 1000, time: 5, sipRequired: 50 }],
     };
@@ -164,26 +137,16 @@ describe("financialGoalsController", () => {
     };
     const mockError = new Error("Database error");
 
-    // Mock schema validation
     goalSchema.safeParse.mockReturnValue({ success: true });
-
-    // Mock mongoose session
     mongoose.startSession.mockResolvedValue(mockSession);
+    User.findOne.mockRejectedValue(mockError);
 
-    User.findOne.mockRejectedValue(mockError); // Simulate database error
-    const req = createRequest({
-      user: "67b82107183c091d4d3990c3",
-      body: mockBody,
-    });
-    const res = createResponse();
+    req.body = mockBody;
     await financialGoalsController(req, res);
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({
-      message: "Internal error",
-      err: "Database error",
-    });
-    expect(mockSession.abortTransaction).toHaveBeenCalled(); // Corrected expectation
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ message: "Internal error", err: "Database error" });
+    expect(mockSession.abortTransaction).toHaveBeenCalled();
     expect(mockSession.endSession).toHaveBeenCalled();
   });
 });
@@ -246,7 +209,7 @@ describe("getSipAmountDistribution", () => {
     );
   });
 
-  it("should calculate SIP amount distribution correctly for a multiple goals", () => {
+  it("should calculate SIP amount distribution correctly for multiple goals", () => {
     const goals = [
       { sipRequired: 300, time: 10 },
       { sipRequired: 200, time: 5 },

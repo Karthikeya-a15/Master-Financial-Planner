@@ -51,16 +51,16 @@ export default async function financialGoalsController(req,res) {
         session.endSession();
 
         if(goalsUpdated){
-            return res.json({message : "User Goals are Updated"});
+            return res.status(200).json({message : "User Goals are Updated"});
         }else{
             return res.status(403).json({message : "User Goals are NOT Updated"});
         }
 
     }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
-
-
 }
 
 export function getSipAmountDistribution(goals, returnsAndAssets){

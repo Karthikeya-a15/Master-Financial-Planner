@@ -39,19 +39,27 @@ jest.mock("../../../models/User.js");
 jest.mock("../../../schemas/netWorthSchemas.js");
 
 describe("realEstatesController", () => {
-  it("should update real estate data for a valid user and valid input", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3", body: {} };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test("should update real estate data for a valid user and valid input", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       netWorth: { realEstate: "67b82107183c091d4d3990d4" },
     };
     const mockBody = { home: 120, otherRealEstate: 60, REITs: 20 };
     const mockExistingRealEstate = {
-      home: 100,
-      otherRealEstate: 50,
-      REITs: 15,
+      toObject: jest.fn().mockReturnValue({ home: 100, otherRealEstate: 50, REITs: 15 }),
     };
-
+    const mockUpdatedRealEstate = { home: 120, otherRealEstate: 60, REITs: 20 };
     const mockSession = {
       startTransaction: jest.fn(),
       commitTransaction: jest.fn(),
@@ -59,66 +67,47 @@ describe("realEstatesController", () => {
       endSession: jest.fn(),
     };
 
-    // Mock schema validation
     realEstateSchema.safeParse.mockReturnValue({ success: true });
-
-    // Mock mongoose session
     mongoose.startSession.mockResolvedValue(mockSession);
-
     User.findOne.mockResolvedValue(mockUser);
     RealEstate.findOne.mockResolvedValue(mockExistingRealEstate);
-    RealEstate.findOneAndUpdate.mockImplementation(() => ({
-      toObject: () => mockExistingRealEstate,
-      home: 120,
-      otherRealEstate: 60,
-      REITs: 20,
-    }));
+    RealEstate.findOneAndUpdate.mockResolvedValue(mockUpdatedRealEstate);
 
-    const req = createRequest({ user: mockUserId, body: mockBody });
-    const res = createResponse();
-
+    req.body = mockBody;
     await realEstatesController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({
-      message: "Real-Estate updated successfully to Networth",
-    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: "Real-Estate updated successfully to Networth" });
     expect(mongoose.startSession).toHaveBeenCalled();
     expect(mockSession.startTransaction).toHaveBeenCalled();
-    expect(User.findOne).toHaveBeenCalledWith({ _id: mockUserId });
-    expect(RealEstate.findOneAndUpdate).toHaveBeenCalled();
+    expect(User.findOne).toHaveBeenCalledWith({ _id: req.user });
+    expect(RealEstate.findOneAndUpdate).toHaveBeenCalledWith(
+      {_id : mockUser.netWorth.realEstate},
+      {
+        ...mockExistingRealEstate.toObject(),
+        ...mockBody
+      },
+      { new: true }
+    );
     expect(mockSession.commitTransaction).toHaveBeenCalled();
     expect(mockSession.endSession).toHaveBeenCalled();
     expect(realEstateSchema.safeParse).toHaveBeenCalledWith(mockBody);
   });
 
-  it("should return 403 if input is invalid", async () => {
+  test("should return 403 if input is invalid", async () => {
     const mockBody = { home: "invalid" };
-    const mockValidationError = { format: () => "Validation Error" };
+    realEstateSchema.safeParse.mockReturnValue({ success: false, error: { format: () => "Validation Error" } });
+    req.body = mockBody;
 
-    realEstateSchema.safeParse.mockReturnValue({
-      success: false,
-      error: mockValidationError,
-    });
-    const req = createRequest({
-      user: "67b82107183c091d4d3990c3",
-      body: mockBody,
-    });
-    const res = createResponse();
     await realEstatesController(req, res);
 
-    expect(res.statusCode).toBe(403);
-    expect(res._getJSONData()).toEqual({
-      message: "Real-Estate inputs are wrong",
-      err: "Validation Error",
-    });
-    expect(realEstateSchema.safeParse).toHaveBeenCalledWith(mockBody);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Real-Estate inputs are wrong", err: "Validation Error" });
   });
 
-  it("should return 403 if real estate data is NOT updated", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  test("should return 403 if real estate data is NOT updated", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       netWorth: { realEstate: "67b82107183c091d4d3990d4" },
     };
     const mockBody = { home: 120, otherRealEstate: 60, REITs: 20 };
@@ -132,16 +121,16 @@ describe("realEstatesController", () => {
     realEstateSchema.safeParse.mockReturnValue({ success: true });
     mongoose.startSession.mockResolvedValue(mockSession);
     User.findOne.mockResolvedValue(mockUser);
-    RealEstate.findOneAndUpdate.mockResolvedValue(null); // Update fails
-    const req = createRequest({ user: mockUserId, body: mockBody });
-    const res = createResponse();
+    RealEstate.findOneAndUpdate.mockResolvedValue(null);
+
+    req.body = mockBody;
     await realEstatesController(req, res);
 
-    expect(res.statusCode).toBe(403);
-    expect(res._getJSONData()).toEqual({ message: "Real-Estate not updated" });
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Real-Estate not updated" });
   });
 
-  it("should handle database errors and abort transaction", async () => {
+  test("should handle database errors and abort transaction", async () => {
     const mockBody = { home: 120, otherRealEstate: 60, REITs: 20 };
     const mockSession = {
       startTransaction: jest.fn(),
@@ -150,22 +139,18 @@ describe("realEstatesController", () => {
       endSession: jest.fn(),
     };
     const mockError = new Error("Database error");
+
     realEstateSchema.safeParse.mockReturnValue({ success: true });
     mongoose.startSession.mockResolvedValue(mockSession);
-    User.findOne.mockRejectedValue(mockError); // Simulate error
-    const req = createRequest({
-      user: "67b82107183c091d4d3990c3",
-      body: mockBody,
-    });
-    const res = createResponse();
+    User.findOne.mockRejectedValue(mockError);
+
+    req.body = mockBody;
     await realEstatesController(req, res);
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({
-      message: "Internal error",
-      err: "Database error",
-    });
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ message: "Internal error", err: "Database error" });
     expect(mockSession.abortTransaction).toHaveBeenCalled();
     expect(mockSession.endSession).toHaveBeenCalled();
   });
 });
+
