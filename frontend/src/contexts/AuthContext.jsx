@@ -111,6 +111,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try{
+      localStorage.removeItem('currentUser')
       localStorage.removeItem('token')
       const response = await axios.post('api/v1/user/logout');
       setToken(null)

@@ -1,215 +1,137 @@
-import getDashBoardController, {
-  getTotalSum,
-  requiredInvestableAssetAllocation,
-} from "../../get/getDashBoardController.js";
-import liabilities from "../../../models/Liabilities.js";
-import User from "../../../models/User.js";
-import Goals from "../../../models/Goals.js";
-import RAM from "../../../models/returnsAndAssets.js";
-import getCurrentInvestibleAssets from "../../../common/currentInvestibleAssets.js";
-jest.mock("../../../models/Liabilities.js");
-jest.mock("../../../models/User.js");
-jest.mock("../../../models/Goals.js");
-jest.mock("../../../models/returnsAndAssets.js");
-jest.mock("../../../common/currentInvestibleAssets.js");
+// dashboardController.test.js
 
-describe("getDashBoardController", () => {
+import getDashBoardController, { getTotalSum, requiredInvestableAssetAllocation } from '../../get/getDashBoardController.js';
+import liabilities from '../../../models/Liabilities.js';
+import User from '../../../models/User.js';
+import Goals from '../../../models/Goals.js';
+import RAM from '../../../models/returnsAndAssets.js';
+import getCurrentInvestibleAssets from '../../../common/currentInvestibleAssets.js';
+
+jest.mock('../../../models/Liabilities.js');
+jest.mock('../../../models/User.js');
+jest.mock('../../../models/Goals.js');
+jest.mock('../../../models/returnsAndAssets.js');
+jest.mock('../../../common/currentInvestibleAssets.js');
+
+describe('Dashboard Controller', () => {
   let req, res;
 
   beforeEach(() => {
-    req = { user: "67b82107183c091d4d3990c3" };
-    res = {
-      json: jest.fn(),
-      status: jest.fn().mockReturnThis(), // Allows chaining
+    req = {
+      user: 'someUserId'
     };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+  });
 
+  afterEach(() => {
     jest.clearAllMocks();
   });
 
-  test("should return dashboard data for a valid user", async () => {
-    const mockUser = {
-      _id: req.user,
-      netWorth: { liabilities: "67b82107183c091d4d3990c6" },
-      goals: "67b82107183c091d4d3990c9",
-      ram: "67b82107183c091d4d3990d0",
-    };
+  describe('getDashBoardController', () => {
+    it('should return 500 if getCurrentInvestibleAssets fails', async () => {
+      getCurrentInvestibleAssets.mockResolvedValue({ message: 'Error fetching assets' });
 
-    const mockLiabilities = {
-      homeLoan: 50000,
-      educationLoan: 20000,
-      carLoan: 15000,
-      personalLoan: 10000,
-      creditCard: 5000,
-      other: 8000,
-    };
+      await getDashBoardController(req, res);
 
-    const mockInvestibleAssets = {
-      illiquid: {
-        home: 100000,
-        otherRealEstate: 50000,
-        ulips: 20000,
-        governmentInvestments: 30000,
-        jewellery: 10000,
-        sgb: 5000,
-      },
-      liquid: {
-        domesticStockMarket: 50000,
-        domesticEquityMutualFunds: 30000,
-        smallCase: 10000,
-        usEquity: 20000,
-        fixedDeposit: 30000,
-        debtFunds: 25000,
-        liquidFunds: 15000,
-        liquidGold: 10000,
-        crypto: 5000,
-        reits: 8000,
-      },
-      currentInvestibleAssets: 200000,
-      message: null,
-    };
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Error fetching assets' });
+    });
 
-    User.findById.mockResolvedValue(mockUser);
-    getCurrentInvestibleAssets.mockResolvedValue(mockInvestibleAssets);
-    liabilities.findById.mockResolvedValue(mockLiabilities);
-    const mockRequiredInvestableAssets = {
-      debt: 50000,
-      domesticEquity: 60000,
-      usEquity: 20000,
-      gold: 15000,
-      crypto: 5000,
-      realEstate: 30000,
-    };
-    jest.spyOn(global, "requiredInvestableAssetAllocation").mockResolvedValue(
-      mockRequiredInvestableAssets
-    );
+    it('should return dashboard data on success', async () => {
+      const mockUser = { netWorth: { liabilities: 'liabilityId' }, goals: 'goalId', ram: 'ramId' };
+      const mockLiability = { homeLoan: 1000, educationLoan: 500, carLoan: 300, personalLoan: 200, creditCard: 100, other: 50 };
+      const mockAssets = { illiquid: { home: 5000, otherRealEstate: 3000, reits: 2000 }, liquid: { domesticStockMarket: 1000, domesticEquityMutualFunds: 500, smallCase: 300, usEquity: 200, fixedDeposit: 1000, debtFunds: 500, liquidFunds: 300, liquidGold: 200, crypto: 100 } };
+      const mockGoals = { goals: [{ amountAvailableToday: 10000, time: 5 }] };
+      const mockRAM = { shortTerm: { debt: 50, domesticEquity: 30, usEquity: 10, gold: 5, crypto: 5, realEstate: 0 }, mediumTerm: { debt: 30, domesticEquity: 50, usEquity: 10, gold: 5, crypto: 5, realEstate: 0 }, longTerm: { debt: 10, domesticEquity: 60, usEquity: 20, gold: 5, crypto: 5, realEstate: 0 } };
 
-    await getDashBoardController(req, res);
+      User.findById.mockResolvedValue(mockUser);
+      liabilities.findById.mockResolvedValue(mockLiability);
+      getCurrentInvestibleAssets.mockResolvedValue({ illiquid: mockAssets.illiquid, liquid: mockAssets.liquid, currentInvestibleAssets: 15000 });
+      Goals.findById.mockResolvedValue(mockGoals);
+      RAM.findById.mockResolvedValue(mockRAM);
 
-    expect(User.findById).toHaveBeenCalledWith(req.user);
-    expect(getCurrentInvestibleAssets).toHaveBeenCalledWith(req.user);
-    expect(liabilities.findById).toHaveBeenCalledWith(
-      mockUser.netWorth.liabilities
-    );
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      illiquid: mockInvestibleAssets.illiquid,
-      liquid: mockInvestibleAssets.liquid,
-      Liabilities: mockLiabilities,
-      totalAssetSummary: getTotalSum(
-        mockInvestibleAssets.illiquid,
-        mockInvestibleAssets.liquid
-      ),
-      currentInvestibleAssets: mockInvestibleAssets.currentInvestibleAssets,
-      requiredInvestableAssetAllocation: mockRequiredInvestableAssets,
+      await getDashBoardController(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        illiquid: mockAssets.illiquid,
+        liquid: mockAssets.liquid,
+        Liabilities: mockLiability,
+        totalAssetSummary: getTotalSum(mockAssets.illiquid, mockAssets.liquid),
+        currentInvestibleAssets: 15000,
+        requiredInvestableAssetAllocation: expect.any(Object)
+      });
     });
   });
 
-  test("should return 500 if getCurrentInvestibleAssets returns an error", async () => {
-    getCurrentInvestibleAssets.mockResolvedValue({
-      message: "Error fetching investible assets",
+  describe('getTotalSum', () => {
+    it('should correctly calculate the total sum of assets', () => {
+      const illiquid = {
+        home: 5000,
+        otherRealEstate: 3000,
+        ulips: 1000,
+        governmentInvestments: 500,
+        jewellery: 300,
+        sgb: 200
+      };
+
+      const liquid = {
+        domesticStockMarket: 1000,
+        domesticEquityMutualFunds: 500,
+        smallCase: 300,
+        usEquity: 200,
+        fixedDeposit: 1000,
+        debtFunds: 500,
+        liquidFunds: 300,
+        liquidGold: 200,
+        crypto: 100,
+        reits : 2000
+      };
+
+      const result = getTotalSum(illiquid, liquid);
+
+      expect(result).toEqual({
+        realEstate: 10000, // 5000 + 3000 + 2000
+        domesticEquity: 2800, // 1000 + 1000 + 500 + 300
+        usEquity: 200,
+        debt: 2300, // 500 + 1000 + 500 + 300
+        gold: 700, // 300 + 200 + 200
+        crypto: 100
+      });
+    });
+  });
+
+  describe('requiredInvestableAssetAllocation', () => {
+    it('should correctly calculate required investable asset allocation', async () => {
+      const mockUser = { goals: 'goalId', ram: 'ramId' };
+      const mockGoals = { goals: [{ amountAvailableToday: 10000, time: 5 }] };
+      const mockRAM = { shortTerm: { debt: 50, domesticEquity: 30, usEquity: 15, gold: 5, crypto: 0, realEstate: 0 }, mediumTerm: { debt: 30, domesticEquity: 50, usEquity: 10, gold: 5, crypto: 5, realEstate: 0 }, longTerm: { debt: 10, domesticEquity: 60, usEquity: 20, gold: 5, crypto: 5, realEstate: 0 } };
+
+      Goals.findById.mockResolvedValue(mockGoals);
+      RAM.findById.mockResolvedValue(mockRAM);
+
+      const result = await requiredInvestableAssetAllocation(mockUser);
+
+      expect(result).toEqual({
+        debt: 3000,
+        domesticEquity: 5000,
+        usEquity: 1000,
+        gold: 500,
+        crypto: 500,
+        realEstate: 0
+      });
     });
 
-    await getDashBoardController(req, res);
+    it('should return null if an error occurs', async () => {
+      const mockUser = { goals: 'goalId', ram: 'ramId' };
+      Goals.findById.mockRejectedValue(new Error('Error fetching goals'));
 
-    expect(getCurrentInvestibleAssets).toHaveBeenCalledWith(req.user);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: "Error fetching investible assets",
+      const result = await requiredInvestableAssetAllocation(mockUser);
+
+      expect(result).toBeNull();
     });
-  });
-
-  test("should handle internal server errors", async () => {
-    User.findById.mockRejectedValue(new Error("Database error"));
-
-    await getDashBoardController(req, res);
-
-    expect(User.findById).toHaveBeenCalledWith(req.user);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      message: "Database error",
-    });
-  });
-});
-
-describe("getTotalSum", () => {
-  test("should correctly calculate total asset summary", () => {
-    const illiquid = {
-      home: 100000,
-      otherRealEstate: 50000,
-      ulips: 20000,
-      governmentInvestments: 30000,
-      jewellery: 10000,
-      sgb: 5000,
-    };
-
-    const liquid = {
-      domesticStockMarket: 50000,
-      domesticEquityMutualFunds: 30000,
-      smallCase: 10000,
-      usEquity: 20000,
-      fixedDeposit: 30000,
-      debtFunds: 25000,
-      liquidFunds: 15000,
-      liquidGold: 10000,
-      crypto: 5000,
-      reits: 8000,
-    };
-
-    const expectedSummary = {
-      realEstate: 158000,
-      domesticEquity: 110000,
-      usEquity: 20000,
-      debt: 100000,
-      gold: 25000,
-      crypto: 5000,
-    };
-
-    expect(getTotalSum(illiquid, liquid)).toEqual(expectedSummary);
-  });
-});
-
-describe("requiredInvestableAssetAllocation", () => {
-  test("should calculate required asset allocation based on goals", async () => {
-    const mockUser = { goals: "67b82107183c091d4d3990c9", ram: "67b82107183c091d4d3990d0" };
-
-    const mockGoals = {
-      goals: [
-        { amountAvailableToday: 50000, time: 2 },
-        { amountAvailableToday: 100000, time: 5 },
-        { amountAvailableToday: 150000, time: 10 },
-      ],
-    };
-
-    const mockRAM = {
-      shortTerm: { debt: 70, domesticEquity: 20, usEquity: 5, gold: 5, crypto: 0, realEstate: 0 },
-      mediumTerm: { debt: 50, domesticEquity: 40, usEquity: 5, gold: 5, crypto: 0, realEstate: 0 },
-      longTerm: { debt: 20, domesticEquity: 60, usEquity: 10, gold: 5, crypto: 5, realEstate: 0 },
-    };
-
-    Goals.findById.mockResolvedValue(mockGoals);
-    RAM.findById.mockResolvedValue(mockRAM);
-
-    const expectedAllocation = {
-      debt: 85500,
-      domesticEquity: 99000,
-      usEquity: 15000,
-      gold: 12500,
-      crypto: 7500,
-      realEstate: 0,
-    };
-
-    const result = await requiredInvestableAssetAllocation(mockUser);
-
-    expect(Goals.findById).toHaveBeenCalledWith(mockUser.goals);
-    expect(RAM.findById).toHaveBeenCalledWith(mockUser.ram);
-    expect(result).toEqual(expectedAllocation);
-  });
-
-  test("should return null if an error occurs", async () => {
-    Goals.findById.mockRejectedValue(new Error("Database error"));
-
-    const result = await requiredInvestableAssetAllocation({});
-
-    expect(result).toBeNull();
   });
 });

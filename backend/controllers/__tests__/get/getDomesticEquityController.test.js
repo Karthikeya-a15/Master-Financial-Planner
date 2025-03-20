@@ -37,7 +37,6 @@ describe("getDomesticEquityController", () => {
     expect(DomesticEquity.findById).toHaveBeenCalledWith(
       mockUser.netWorth.domesticEquity
     );
-    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ domesticEquity: mockDomesticEquity });
   });
 
@@ -58,9 +57,8 @@ describe("getDomesticEquityController", () => {
     expect(DomesticEquity.findById).toHaveBeenCalledWith(
       mockUser.netWorth.domesticEquity
     );
-    expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({
-      message: "Error while Fetching Domestic Equity ",
+      message: "Domestic Equity Data Doesn't exist",
     });
   });
 

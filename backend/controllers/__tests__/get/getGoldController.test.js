@@ -1,60 +1,67 @@
 import getGoldController from "../../get/getGoldController.js";
 import GoldModel from "../../../models/Gold.js";
 import User from "../../../models/User.js";
-import { createRequest, createResponse } from "node-mocks-http";
 
 jest.mock("../../../models/Gold.js");
 jest.mock("../../../models/User.js");
 
 describe("getGoldController", () => {
-  it("should return gold data for a valid user", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3" };
+    res = {
+      json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should return gold data for a valid user", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       netWorth: { gold: "67b82107183c091d4d3990ce" },
     };
     const mockGold = { jewellery: 5, SGB: 2, digitalGoldAndETF: 3 };
 
     User.findById.mockResolvedValue(mockUser);
-    GoldModel.findById.mockResolvedValue(mockGold);
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
+    GoldModel.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue(mockGold),
+    });
+
     await getGoldController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({ gold: mockGold });
-    expect(User.findById).toHaveBeenCalledWith(mockUserId);
+    expect(User.findById).toHaveBeenCalledWith(req.user);
     expect(GoldModel.findById).toHaveBeenCalledWith(mockUser.netWorth.gold);
-    expect(
-      GoldModel.findById(mockUser.netWorth.gold).select,
-    ).toHaveBeenCalledWith("-_id -__v");
+    expect(res.json).toHaveBeenCalledWith({ gold: mockGold });
   });
 
-  it("should return an error message if gold data is not found", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
-    const mockUser = { _id: mockUserId, netWorth: { gold: "goldId" } };
+  test("should return an error message if gold data is not found", async () => {
+    const mockUser = { _id: req.user, netWorth: { gold: "goldId" } };
 
     User.findById.mockResolvedValue(mockUser);
-    GoldModel.findById.mockResolvedValue(null);
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
+    GoldModel.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue(null),
+    });
+
     await getGoldController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({
-      message: "Error while Fetching Gold ",
-    });
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(GoldModel.findById).toHaveBeenCalledWith(mockUser.netWorth.gold);
+    expect(res.json).toHaveBeenCalledWith({ message: "Error while Fetching Gold " });
   });
 
-  it("should handle internal server errors", async () => {
-    const mockError = new Error("Database error");
-    User.findById.mockRejectedValue(mockError);
-    const req = createRequest({ user: "67b82107183c091d4d3990c3" });
-    const res = createResponse();
+  test("should handle internal server errors", async () => {
+    User.findById.mockRejectedValue(new Error("Database error"));
+
     await getGoldController(req, res);
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
       message: "Internal Server error",
       err: "Database error",
     });

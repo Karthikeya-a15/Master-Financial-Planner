@@ -1,51 +1,62 @@
 import indexFundsController from "../../get/indexFundsController.js";
 import User from "../../../models/User.js";
-import getRankOfFunds from "../../../tools/Index/index.js";
-import { createRequest, createResponse } from "node-mocks-http";
+import getFinalIndexFunds from "../../../tools/Index/index.js";
 
 jest.mock("../../../models/User.js");
 jest.mock("../../../tools/Index/index.js");
 
 describe("indexFundsController", () => {
-  it("should return index funds for a valid user", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
-    const mockUser = { _id: mockUserId };
-    const mockFunds = [{ name: "Index Fund 1", rank: 1 }];
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3" };
+    res = {
+      json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should return index funds for a valid user", async () => {
+    const mockUser = { _id: req.user };
+    const mockFunds = [{
+      name: 'Motilal Oswal Nifty 200 Momentum 30 Index Fund',
+      aum: 773.1619000000001,
+      expRatio: 0.31,
+      trackErr: 0.1523952755173204
+    }];
 
     User.findById.mockResolvedValue(mockUser);
-    getRankOfFunds.mockResolvedValue(mockFunds);
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
+    getFinalIndexFunds.mockResolvedValue(mockFunds);
 
     await indexFundsController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({ funds: mockFunds });
-    expect(User.findById).toHaveBeenCalledWith(mockUserId);
-    expect(getRankOfFunds).toHaveBeenCalled();
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(getFinalIndexFunds).toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ funds: mockFunds });
   });
 
-  it("should return 403 if user is not found", async () => {
+  test("should return 403 if user is not found", async () => {
     User.findById.mockResolvedValue(null);
 
-    const req = createRequest({ user: "in67b82107183c091d4d3990c3" });
-    const res = createResponse();
     await indexFundsController(req, res);
 
-    expect(res.statusCode).toBe(403);
-    expect(res._getJSONData()).toEqual({ message: "user Not Found" });
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "User Not Found" });
   });
 
-  it("should handle internal server errors", async () => {
-    const mockError = new Error("Database error");
-    User.findById.mockRejectedValue(mockError);
-    const req = createRequest({ user: "67b82107183c091d4d3990c3" });
-    const res = createResponse();
+  test("should handle internal server errors", async () => {
+    User.findById.mockRejectedValue(new Error("Database error"));
 
     await indexFundsController(req, res);
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
       message: "Internal Server Error",
       err: "Database error",
     });

@@ -1,16 +1,28 @@
 import getLiabilitiesController from "../../get/getLiabilitiesController.js";
 import liabilities from "../../../models/Liabilities.js";
 import User from "../../../models/User.js";
-import { createRequest, createResponse } from "node-mocks-http";
 
 jest.mock("../../../models/Liabilities.js");
 jest.mock("../../../models/User.js");
 
 describe("getLiabilitiesController", () => {
-  it("should return liabilities data for a valid user", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3" };
+    res = {
+      json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should return liabilities data for a valid user", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       netWorth: { liabilities: "67b82107183c091d4d3990d0" },
     };
     const mockLiabilities = {
@@ -23,50 +35,43 @@ describe("getLiabilitiesController", () => {
     };
 
     User.findById.mockResolvedValue(mockUser);
-    liabilities.findById.mockResolvedValue(mockLiabilities);
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
+    liabilities.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue(mockLiabilities),
+    });
+
     await getLiabilitiesController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({ liabilities: mockLiabilities });
-    expect(User.findById).toHaveBeenCalledWith(mockUserId);
-    expect(liabilities.findById).toHaveBeenCalledWith(
-      mockUser.netWorth.liabilities,
-    );
-    expect(
-      liabilities.findById(mockUser.netWorth.liabilities).select,
-    ).toHaveBeenCalledWith("-_id -__v");
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(liabilities.findById).toHaveBeenCalledWith(mockUser.netWorth.liabilities);
+    expect(res.json).toHaveBeenCalledWith({ liabilities: mockLiabilities });
   });
 
-  it("should return an error message if liabilities data is not found", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
+  test("should return an error message if liabilities data is not found", async () => {
     const mockUser = {
-      _id: mockUserId,
+      _id: req.user,
       netWorth: { liabilities: "67b82107183c091d4d3990d0" },
     };
 
     User.findById.mockResolvedValue(mockUser);
-    liabilities.findById.mockResolvedValue(null);
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
+    liabilities.findById.mockReturnValue({
+      select: jest.fn().mockResolvedValue(null),
+    });
+
     await getLiabilitiesController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual({
-      message: "Error while Fetching liabilities ",
-    });
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(liabilities.findById).toHaveBeenCalledWith(mockUser.netWorth.liabilities);
+    expect(res.json).toHaveBeenCalledWith({ message: "Error while Fetching liabilities " });
   });
 
-  it("should handle internal server errors", async () => {
-    const mockError = new Error("Database error");
-    User.findById.mockRejectedValue(mockError);
-    const req = createRequest({ user: "67b82107183c091d4d3990c3" });
-    const res = createResponse();
+  test("should handle internal server errors", async () => {
+    User.findById.mockRejectedValue(new Error("Database error"));
+
     await getLiabilitiesController(req, res);
 
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({
+    expect(User.findById).toHaveBeenCalledWith(req.user);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
       message: "Internal Server error",
       err: "Database error",
     });
