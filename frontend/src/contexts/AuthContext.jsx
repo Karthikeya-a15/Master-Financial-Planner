@@ -131,9 +131,8 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true)
       // This would typically call an API endpoint
-      // await axios.post('/api/v1/user/forgot-password', { email })
+      await axios.post('/api/v1/user/forgot-password', { email })
       
-      // For now, we'll just simulate a successful response
       setTimeout(() => {
         toast.success('Password reset instructions sent to your email')
       }, 1000)

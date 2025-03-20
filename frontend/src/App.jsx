@@ -34,6 +34,7 @@ import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
 import UserEngagement from './pages/admin/UserEngagement'
 import GoalChart from './pages/admin/GoalsAnalytics'
 import Rooms from './components/chat-app/Rooms'
+import ResetPassword from './pages/auth/ResetPassword'
 
 function App() {
   const { isAuthenticated } = useAuth()
@@ -44,7 +45,10 @@ function App() {
       {/* Public Routes */}
       <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
       <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/forgot-password">
+        <Route path="" element={<ForgotPassword/>}/>
+      </Route>
+      <Route path="/forgot-password/:token" element={<ResetPassword/>}/>
       <Route path="/home" element={<Landing/>} />
 
       {/* Admin Routes */}
