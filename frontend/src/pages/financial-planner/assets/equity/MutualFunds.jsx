@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { PieChart } from "@mui/x-charts";
 import { motion } from 'framer-motion';
 import { toast } from "react-toastify";
 import LoadingSpinner from "../../../../components/common/LoadingSpinner";
+import axios from "axios";
 
 export default function MutualFunds({
     formatCurrency,
@@ -21,8 +22,37 @@ export default function MutualFunds({
         currentValue: 0,
     });
     const [editingFundIndex, setEditingFundIndex] = useState(null);
+    const [suggestions, setSuggestions] = useState([]);
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [nav, setNav] = useState([]);
 
     if (!equityData) return <LoadingSpinner />;
+
+    const fetchNav = async( value, category ) => {
+        try {
+            const response = await axios.get(`/api/v1/realtime/autoSuggestionMF?name=${value}&category=${category}`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching suggestions:", error);
+        }
+    }
+
+    useEffect(() => {
+            const updatePrices = async () => {
+                const newPrices = new Array(editedData[section].length);
+                await Promise.all(
+                    editedData[section].map(async (mf, index) => {
+                        if (mf.fundName) {
+                            const fund = await fetchNav(mf.fundName, mf.category);
+                            newPrices[index] = fund.length === 1 ? fund[0].nav : "Not Found";
+                        }
+                    })
+                );
+                setNav(newPrices);
+            };
+    
+            updatePrices();
+        }, []);
 
     const handleAddFund = useCallback(() => {
         setEditedData((prev) => ({
@@ -77,6 +107,61 @@ export default function MutualFunds({
         setEditedData(equityData);
         setNewFund({ fundName: "", category: CATEGORY_OPTIONS[0], currentValue: 0 });
     };
+
+    const autoSuggest = async (value, category) => {
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+
+        const newTimeout = setTimeout(async () => {
+            if (value.trim() === "") {
+                setSuggestions([]);
+                return;
+            }
+            try {
+                const response = await axios.get(`/api/v1/realtime/autoSuggestionMF?name=${value}&category=${category}`);
+                setSuggestions(response.data || []); // Ensure it's always an array
+                return response.data;
+            } catch (error) {
+                console.error("Error fetching suggestions:", error);
+            }
+        }, 1500);
+
+        setDebounceTimeout(newTimeout);
+    };
+
+    const handleInputChange = (index, e) => {
+        const value = e.target.value;
+        if (index === -1) {
+            setNewFund({ ...newFund, fundName: value });
+            autoSuggest(value, newFund.category);
+            return;
+        }
+
+        handleChange(index, "fundName", value);
+        const category = editedData[section][index].category;
+        autoSuggest(value, category);
+    };
+
+    const handleSelect = async (index, selectedMF) => {
+        setSuggestions([]);
+        if(index === -1){
+            setNewFund({...newFund , fundName: selectedMF});
+            const newFundNav = await fetchNav(selectedMF, newFund.category);
+            console.log(newFundNav)
+            if(newFundNav.length === 1)
+                nav.push(newFundNav[0].nav);
+            else
+                nav.push("Not Found")
+            return;
+        }
+        handleChange(index, "fundName", selectedMF);
+        const category = editedData[section][index].category
+        const selectedFund = await fetchNav(selectedMF, category);
+        nav[index] = selectedFund.length === 1 ? selectedFund[0].nav : "Not Found";
+    };
+
+    function capitalizeWords(str) {
+        return str.replace(/\b\w/g, (char) => char.toUpperCase());
+    }
 
     const summaryData = editedData[section].reduce((acc, { category, currentValue }) => {
         acc[category] = (acc[category] || 0) + currentValue;
@@ -161,10 +246,23 @@ export default function MutualFunds({
                                     type="text"
                                     id="fundName"
                                     className="input"
-                                    value={newFund.fundName}
-                                    onChange={(e) => setNewFund({ ...newFund, fundName: e.target.value })}
+                                    value={capitalizeWords(newFund.fundName) || ""}
+                                    onChange={(e) => handleInputChange(-1, e)}
                                     placeholder="e.g., SBI Bluechip, Axis Growth"
                                 />
+                                {suggestions.length > 0 && (
+                                    <ul className="absolute z-10 bg-white border border-gray-300 mt-1 max-w-150px shadow-lg rounded-md max-h-40 overflow-y-auto">
+                                        {suggestions.map((suggestion, i) => (
+                                            <li
+                                                key={i}
+                                                className="p-2 cursor-pointer hover:bg-gray-100"
+                                                onClick={() => handleSelect(-1, suggestion.name)}
+                                            >
+                                                {suggestion.name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                             </div>
                             <div className="form-group">
                                 <label htmlFor="category" className="form-label">Category</label>
@@ -230,6 +328,9 @@ export default function MutualFunds({
                                         Current Value
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 uppercase tracking-wider">
+                                        NAV
+                                    </th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -239,14 +340,29 @@ export default function MutualFunds({
                                     <tr key={index} className={editingFundIndex === index ? 'bg-primary-50' : ''}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {editingFundIndex === index ? (
+                                                <div className="relative">
                                                 <input
                                                     type="text"
                                                     className="input"
-                                                    value={fund.fundName}
-                                                    onChange={(e) => handleChange(index, 'fundName', e.target.value)}
+                                                    value={capitalizeWords(fund.fundName) || ""}
+                                                    onChange={(e) => handleInputChange(index, e)}
                                                 />
+                                                {suggestions.length > 0 && (
+                                                    <ul className="absolute z-10 bg-white border border-gray-300 mt-1 w-full shadow-lg rounded-md max-h-40 overflow-y-auto">
+                                                        {suggestions.map((suggestion, i) => (
+                                                            <li
+                                                                key={i}
+                                                                className="p-2 cursor-pointer hover:bg-gray-100"
+                                                                onClick={() => handleSelect(index, suggestion.name)}
+                                                            >
+                                                                {suggestion.name}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                                </div>
                                             ) : (
-                                                <div className="text-sm font-medium text-secondary-900">{fund.fundName}</div>
+                                                <div className="text-sm font-medium text-secondary-900">{capitalizeWords(fund.fundName)}</div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -276,6 +392,15 @@ export default function MutualFunds({
                                                 />
                                             ) : (
                                                 <div className="text-sm text-secondary-900">{formatCurrency(fund.currentValue)}</div>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            {editingFundIndex === index ? (
+                                                <div className="text-sm text-secondary-900">NULL</div>
+                                            ) : nav[index] !== undefined && nav[index] != 'Not Found' ? (
+                                                <div className="text-sm text-green-700 font-bold">{`${parseFloat(nav[index].toFixed(2))} / U`}</div>
+                                            ) : (
+                                                <div className="text-sm">Not Found</div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

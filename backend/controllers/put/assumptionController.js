@@ -3,7 +3,7 @@ import User from "../../models/User.js";
 import RAM from "../../models/returnsAndAssets.js";
 import ramSchema from "../../schemas/ramSchema.js";
 
-export default async function (req, res){
+export default async function assumptionController (req, res){
     const body = req.body;
 
     let {success, error} = ramSchema.safeParse(body);
@@ -22,8 +22,6 @@ export default async function (req, res){
         const user = await User.findOne({_id : userId});
 
         const ramId = user.ram;
-
-        const ram = await RAM.findOne({_id : ramId});
 
         const userRetruns  = await RAM.findOneAndUpdate({_id : ramId},
             {

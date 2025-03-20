@@ -1,12 +1,10 @@
-import { loadStockMapping } from "../../utils/nse.js";
+import { stockMapping } from "../../utils/stock_mapping.js";
 
-var stocks;
 var stockNames;
 
 export default async function autoSuggestionStockController(req, res){
-    if (!stocks) {
-        stocks = await loadStockMapping();
-        stockNames = Object.keys(stocks);
+    if (!stockNames) {
+        stockNames = Object.keys(stockMapping);
     }
     
     const { name } = req.query;

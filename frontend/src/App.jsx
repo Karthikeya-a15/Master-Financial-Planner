@@ -34,6 +34,7 @@ import ProtectedAdminRoute from './pages/admin/ProtectedAdminRoute'
 import UserEngagement from './pages/admin/UserEngagement'
 import GoalChart from './pages/admin/GoalsAnalytics'
 import Rooms from './components/chat-app/Rooms'
+import EducationPath from './components/dashboard/EducationPage'
 import ResetPassword from './pages/auth/ResetPassword'
 
 function App() {
@@ -143,6 +144,10 @@ function App() {
             <EquitySaver />
           </ProtectedRoute>
         } />
+      </Route>
+
+      <Route path="education">
+        <Route path="" element = { <EducationPath/> }/>
       </Route>
 
       <Route path="calculators">

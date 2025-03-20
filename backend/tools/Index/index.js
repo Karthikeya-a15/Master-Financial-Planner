@@ -2,7 +2,7 @@ import getIndexFunds from "./tickerTape.js"
 
 
 
-async function getRankOfFunds(){
+async function getFinalIndexFunds(){
     const funds = await getIndexFunds();
     
     // Calculate and display the final rankings
@@ -23,4 +23,5 @@ async function getRankOfFunds(){
     
 }
 
-export default getRankOfFunds;
+// getFinalIndexFunds().then((data) => {console.log(data)})
+export default getFinalIndexFunds;

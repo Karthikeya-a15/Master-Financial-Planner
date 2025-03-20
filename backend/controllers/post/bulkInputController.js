@@ -1,4 +1,3 @@
-import express from "express";
 import CashFlows from "../../models/CashFlows.js";
 import RealEstate from "../../models/RealEstate.js";
 import Miscellaneous from "../../models/miscellaneous.js";
@@ -12,7 +11,6 @@ import CryptoCurrency from "../../models/CryptoCurrency.js";
 import User from "../../models/User.js";
 import RAM from "../../models/returnsAndAssets.js";
 
-const router = express.Router();
 
 export default async function bulkInputController(req, res) {
     try {

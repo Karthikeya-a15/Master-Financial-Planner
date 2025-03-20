@@ -1,4 +1,3 @@
-import Result from "../../models/ToolsResults.js";
 import User from "../../models/User.js";
 import main from "../../tools/MFs/index.js";
 

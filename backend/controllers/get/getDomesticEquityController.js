@@ -13,7 +13,7 @@ export default async function getDomesticEquityController(req, res) {
         if(userDomesticEquity)
             return res.json({domesticEquity : userDomesticEquity});
         else 
-            return res.json({message : "Error while Fetching Domestic Equity "});
+            return res.json({message : "Domestic Equity Data Doesn't exist"});
     }catch(e){
         return res.status(500).json({message : "Internal Server error" , err : e.message});
     }

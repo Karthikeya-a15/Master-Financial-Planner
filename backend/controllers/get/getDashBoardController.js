@@ -35,7 +35,7 @@ export default async function getDashBoardController(req, res){
 
 }
 
-function getTotalSum(illiquid, liquid){
+export function getTotalSum(illiquid, liquid){
     const realEstate = illiquid.home + illiquid.otherRealEstate + liquid.reits;
     const domesticEquity = illiquid.ulips + liquid.domesticStockMarket + liquid.domesticEquityMutualFunds + liquid.smallCase;
     const usEquity = liquid.usEquity;
@@ -47,7 +47,7 @@ function getTotalSum(illiquid, liquid){
 }
 
 
-async function requiredInvestableAssetAllocation(user){
+export async function requiredInvestableAssetAllocation(user){
     try{
         const userGoals = await Goals.findById(user.goals);
         const goals = userGoals.goals;
@@ -85,7 +85,7 @@ async function requiredInvestableAssetAllocation(user){
 
         return riaa;
     }catch(e){
-        console.log(e.message);
+        return null;
     }
 }
 

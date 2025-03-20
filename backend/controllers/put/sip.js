@@ -117,4 +117,4 @@ function sumOfSip(sipAssetAllocation){
     return sumValues;
 }
 
-console.log(sumOfSip(sipAmountDistribution));
+// console.log(sumOfSip(sipAmountDistribution));

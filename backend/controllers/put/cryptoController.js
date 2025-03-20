@@ -24,8 +24,6 @@ export default async function cryptoController(req,res){
 
         const cryptoId = user.netWorth.cryptocurrency;
 
-        const existingCrypto = await CryptoCurrency.findOne({_id : cryptoId});
-
         const userCrypto = await CryptoCurrency.findOneAndUpdate(
             {_id : cryptoId},
             {

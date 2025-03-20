@@ -39,8 +39,7 @@ export default async function autoSuggestionMFController(req, res){
         await fetchFunds();
     
         // Set up a daily update
-        const id = setInterval(async () => {
-            console.log("Fetching funds...");
+        setInterval(async () => {
             await fetchFunds();
         }, 1000 * 60 * 60 * 24);
     }

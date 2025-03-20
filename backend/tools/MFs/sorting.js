@@ -74,4 +74,4 @@ function calculateWeightedScores(funds,weightage) {
     
     return rankedFunds;
 }
-const {expenseRatio, rollingReturn, greaterThan15, sortinoRatio} = weightage;
+// const {expenseRatio, rollingReturn, greaterThan15, sortinoRatio} = weightage;
