@@ -1,6 +1,5 @@
-import Result from "../../models/ToolsResults.js";
 import User from "../../models/User.js";
-import getRankOfFunds from "../../tools/Index/index.js";
+import getFinalIndexFunds from "../../tools/Index/index.js";
 
 export default async function indexFundsController(req, res){
     const userId = req.user;
@@ -8,10 +7,10 @@ export default async function indexFundsController(req, res){
     try{
         const user = await User.findById(userId);
         if(!user){
-            return res.status(403).json({message : "user Not Found"});
+            return res.status(403).json({message : "User Not Found"});
         }
 
-        const funds = await getRankOfFunds();
+        const funds = await getFinalIndexFunds();
 
         return res.status(200).json({funds});
         

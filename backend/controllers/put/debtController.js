@@ -4,7 +4,11 @@ import User from "../../models/User.js";
 import { debtSchema } from "../../schemas/netWorthSchemas.js";
 
 export default async function debtController(req,res){
-    const {liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt} = req.body;
+    const {liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt, selection} = req.body;
+
+    if(!selection){
+        return res.status(403).json({message : "Selection not provided"});
+    }
 
     const { success, error } = debtSchema.safeParse({liquidFund, fixedDeposit, debtFunds, governmentInvestments, sipDebt});
 
@@ -18,15 +22,6 @@ export default async function debtController(req,res){
 
     try{
         const userId = req.user;
-        
-        const { selection }= req.body; 
-
-        if(!selection){
-            return res.status(403).json({message : "Selection not provided"});
-        }
-
-        if(!selection)
-            return res.status(403).json({message : "Selection not provided"});
 
         const user = await User.findOne({_id : userId});
 

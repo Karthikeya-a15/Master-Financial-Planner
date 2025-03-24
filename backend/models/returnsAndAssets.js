@@ -34,9 +34,9 @@ const ramSchema = new mongoose.Schema({
             realEstate: { type: Number, default: 5 },
         },
         effectiveReturns : {
-            shortTermReturns : {type : Number},
-            mediumTermReturns : {type : Number},
-            longTermReturns : {type : Number}
+            shortTermReturns : {type : Number, default: 6 },
+            mediumTermReturns : {type : Number, default: 8.4},
+            longTermReturns : {type : Number, default : 11.1}
         }
 })
 

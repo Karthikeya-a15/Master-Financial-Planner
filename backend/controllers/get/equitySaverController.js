@@ -1,6 +1,5 @@
 import User from "../../models/User.js";
 import main from "../../tools/EquitySaver/index.js";
-import Result from "../../models/ToolsResults.js";
 
 export default async function equitySaverController(req, res){
     const userId = req.user;

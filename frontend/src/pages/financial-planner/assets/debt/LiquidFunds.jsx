@@ -233,7 +233,7 @@ export default function LiquidFund({
                     </div>
                 </motion.div>
             ) : (
-                !setShowAddLiquidForm && (
+                !showAddLiquidForm && (
                     <motion.div
                         className="card text-center py-12"
                         initial={{ opacity: 0, y: 20 }}

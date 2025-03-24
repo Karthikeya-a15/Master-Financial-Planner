@@ -64,5 +64,5 @@ function calculateWeightedScores(funds, weightage){
     return rankedFunds;
 }
 
-const {cagrRanksRatio, volatalityRankRatio, tenureRankRatio, sortinoRatio, expectedInterestRateChange} = weightage;
-const expectedReturns = Number(customRound(modifiedDuration * -1 * expectedInterestRateChange + fund.avgYTM - fund.expenseRatio));
+// const {cagrRanksRatio, volatalityRankRatio, tenureRankRatio, sortinoRatio, expectedInterestRateChange} = weightage;
+// const expectedReturns = Number(customRound(modifiedDuration * -1 * expectedInterestRateChange + fund.avgYTM - fund.expenseRatio));

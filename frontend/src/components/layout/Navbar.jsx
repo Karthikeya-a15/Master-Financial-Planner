@@ -117,19 +117,6 @@ export default function Navbar() {
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
-                            className={classNames(
-                              active ? "bg-secondary-100" : "",
-                              "block px-4 py-2 text-sm text-secondary-700"
-                            )}
-                          >
-                            Settings
-                          </a>
-                        )}
-                      </Menu.Item>
-                      <Menu.Item>
-                        {({ active }) => (
                           <button
                             onClick={handleLogout}
                             className={classNames(
@@ -203,13 +190,7 @@ export default function Navbar() {
                 >
                   Your Profile
                 </Disclosure.Button>
-                <Disclosure.Button
-                  as="a"
-                  href="#"
-                  className="block px-4 py-2 text-base font-medium text-secondary-500 hover:bg-secondary-100 hover:text-secondary-800"
-                >
-                  Settings
-                </Disclosure.Button>
+                
                 <Disclosure.Button
                   as="button"
                   onClick={handleLogout}

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
-
+import { useNavigate } from "react-router-dom";
 
 export default function FireCalculator() {
   const {updateUser} = useAuth();
@@ -15,7 +15,7 @@ export default function FireCalculator() {
   const [inflation, setInflation] = useState(6)
   const [coastAge, setCoastAge] = useState(35)
   const [fire, setFire] = useState(0);
-  
+  const navigate = useNavigate();
   const [results, setResults] = useState({
     yearlyExpensesRetirement: 0,
     leanFireNumber: 0,
@@ -81,6 +81,7 @@ export default function FireCalculator() {
       if (response.status === 200) {
         fetchUserData();
         toast.success('FIRE Number saved successfully!', { position: 'top-right', autoClose: 2000 })
+        navigate("./../../dashboard");
       } else {
         toast.error('Failed to save FIRE Number', { position: 'top-right', autoClose: 2000 })
       }

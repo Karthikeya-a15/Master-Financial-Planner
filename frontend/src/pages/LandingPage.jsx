@@ -16,7 +16,6 @@ export default function Landing(){
           <CallToAction />
         </main>
         <Footer />
-      </div>
-  
+    </div>
   </>
 }

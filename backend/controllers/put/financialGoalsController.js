@@ -51,19 +51,19 @@ export default async function financialGoalsController(req,res) {
         session.endSession();
 
         if(goalsUpdated){
-            return res.json({message : "User Goals are Updated"});
+            return res.status(200).json({message : "User Goals are Updated"});
         }else{
             return res.status(403).json({message : "User Goals are NOT Updated"});
         }
 
-    }catch(e){
+    }catch(err){
+        await session.abortTransaction();
+        session.endSession();
         return res.status(500).json({message : "Internal error", err : err.message});
     }
-
-
 }
 
-function getSipAmountDistribution(goals, returnsAndAssets){
+export function getSipAmountDistribution(goals, returnsAndAssets){
     const { shortTerm, mediumTerm, longTerm } = returnsAndAssets;
 
     const sipAmounts = [];
@@ -88,7 +88,7 @@ function getSipAmountDistribution(goals, returnsAndAssets){
     return sipAmounts;
 }
 
-function getAmountDistribution(sip, plan){
+export function getAmountDistribution(sip, plan){
     let amount = {
         domesticEquity : 0,
         usEquity : 0,
@@ -113,7 +113,7 @@ function getAmountDistribution(sip, plan){
 }
 
 
-function sumOfSip(sipAmountDistribution){
+export function sumOfSip(sipAmountDistribution){
     let sumValues = {
         domesticEquity : 0,
         usEquity : 0,

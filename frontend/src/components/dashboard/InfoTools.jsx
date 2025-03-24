@@ -54,7 +54,6 @@ export default function InfoTools() {
 const fetchAllNews = async()=>{
   try {
     const response = await axios.get(`/api/v1/realtime/allNews`);
-
   
   } catch (error) {
     console.error("Error fetching news:", error);

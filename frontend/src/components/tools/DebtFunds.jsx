@@ -102,10 +102,10 @@ export default function DebtFunds() {
     const [error, setError] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [weightage, setWeightage] = useState({
-        cagrRanksRatio: 0.40,
+        cagrRanksRatio: 0.20,
         volatalityRankRatio: 0.10,
         tenureRankRatio: 0.40,
-        expectedReturns: 0.20
+        expectedReturns: 0.30
     });
     const [expectedInterestRateChange, setExpectedInterestRateChange] = useState(0);
 

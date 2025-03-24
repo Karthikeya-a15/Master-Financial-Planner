@@ -26,9 +26,13 @@ export const GoalsProvider = ({ children }) => {
   useEffect(() => {
     fetchGoalsData();
   }, []);
-
+  
+  const value = {
+    goalsData,
+    setGoalsData
+  }
   return (
-    <GoalsContext.Provider value={{ goalsData, setGoalsData }}>
+    <GoalsContext.Provider value={value}>
       {children}
     </GoalsContext.Provider>
   );

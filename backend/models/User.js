@@ -72,10 +72,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'returnsAndAssets',
     },
-    toolResult : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'ToolResults'
-    },
     userEngagement: {
         loginFrequency: {
             type: Number,
@@ -97,7 +93,9 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: Date.now 
         }
-    }
+    },
+    resetPasswordToken: { type: String },   
+    resetPasswordExpires: { type: Date }
 });
 
 userSchema.methods.hashPassword = async function(){

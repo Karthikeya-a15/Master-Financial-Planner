@@ -1,6 +1,0 @@
-express
-zod
-jsonwebtoken
-mongoose
-bcrypt
-dotenv

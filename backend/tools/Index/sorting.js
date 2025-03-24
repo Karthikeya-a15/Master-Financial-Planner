@@ -61,4 +61,4 @@ function calculateWeightedScores(funds, expenseRatio, trackingError) {
     return rankedFunds;
 }
 
-const { expenseRatio, trackingError} = weightage;
+// const { expenseRatio, trackingError} = weightage;

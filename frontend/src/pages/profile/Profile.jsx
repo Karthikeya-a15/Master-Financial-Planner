@@ -175,15 +175,6 @@ export default function Profile() {
                   Change Password
                 </button>
               </div>
-              <div className="flex items-center justify-between py-4">
-                <div>
-                  <h3 className="text-lg font-medium text-secondary-900">Two-Factor Authentication</h3>
-                  <p className="text-secondary-600">Add an extra layer of security to your account</p>
-                </div>
-                <button className="btn btn-secondary" disabled>
-                  Coming Soon
-                </button>
-              </div>
             </div>
           </motion.div>
         </div>

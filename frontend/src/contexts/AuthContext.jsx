@@ -34,12 +34,6 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser))
-    }
-  }, [currentUser])
-
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`/api/v1/user/me`)
@@ -51,6 +45,12 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser))
+    }
+  }, [currentUser])
 
   const login = async (email, password) => {
     try {
@@ -111,8 +111,11 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try{
+      localStorage.removeItem('currentUser')
       localStorage.removeItem('token')
+
       const response = await axios.post('api/v1/user/logout');
+      
       setToken(null)
       setCurrentUser(null)
       setIsAuthenticated(false)
@@ -131,9 +134,8 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true)
       // This would typically call an API endpoint
-      // await axios.post('/api/v1/user/forgot-password', { email })
+      await axios.post('/api/v1/user/forgot-password', { email })
       
-      // For now, we'll just simulate a successful response
       setTimeout(() => {
         toast.success('Password reset instructions sent to your email')
       }, 1000)

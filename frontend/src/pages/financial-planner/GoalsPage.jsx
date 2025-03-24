@@ -213,9 +213,11 @@ export default function GoalsPage() {
   const calculateFV = (index) => {
     // console.log(goalsData.goals);
     const goal = goalsData.goals[index];
-    // console.log(goal);
-    const type = findGoalType(goal.goalInflation);
-    // console.log(ramData);
+    if(index == 0)
+    console.log(goal);
+    const type = findGoalType(goal);
+    if(index  == 0)
+    console.log(ramData);
     let effectiveReturnsRatio;
     if(type.at(0)==='S'){
       effectiveReturnsRatio = ramData.shortTerm;
@@ -224,6 +226,8 @@ export default function GoalsPage() {
     }else{
       effectiveReturnsRatio = ramData.longTerm;
     }
+    if(index == 0)
+    console.log(effectiveReturnsRatio)
     const { amountAvailableToday, amountRequiredToday, goalInflation, time } =
       goal;
     if(amountAvailableToday === amountRequiredToday) return 0;

@@ -14,7 +14,7 @@ export default async function getMiscellaneousController(req, res) {
         if(userMisc)
             return res.json({miscellaneous : userMisc});
         else
-        return res.json({message : "Error while Fetching liabilities "});
+        return res.json({message : "Error while Fetching miscellaneous "});
     }catch(e){
         return res.status(500).json({message : "Internal Server error" , err : e.message});
     }

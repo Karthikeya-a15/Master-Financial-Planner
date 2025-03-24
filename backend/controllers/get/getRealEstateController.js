@@ -12,7 +12,7 @@ export default async function getRealEstateController(req, res) {
         if(userRealEstate)
             return res.json({realEstate : userRealEstate});
         else
-            return res.json({message : "Error while Fetching Real Estate "});
+            return res.json({message : "Error while Fetching Real Estate"});
 
     }catch(e){
         return res.status(500).json({message : "Internal Server error" , err : e.message});

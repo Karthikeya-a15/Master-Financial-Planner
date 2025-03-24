@@ -21,7 +21,6 @@ async function main(){
         }
     });
     return funds;
-    // console.log(funds);
     // responses.forEach((finalRankingType, index)=>{
     //         console.log(`\nFinal Rankings of ${category[index]}(s) (Name - Weighted Score - Rank):`);
     //         finalRankingType.forEach(fund => {
@@ -31,4 +30,5 @@ async function main(){
     
     // console.log(`\n ${Date.now() - start}`)
 }
+
 export default main;

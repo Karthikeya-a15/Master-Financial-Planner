@@ -10,9 +10,9 @@ export default async function getAssumptionController (req, res) {
         const ram = await RAM.findById(user.ram).select('-_id -__v');
 
         if(ram)
-            return res.json({returnsAndAssets : ram});
+            return res.status(200).json({returnsAndAssets : ram});
         else
-            return res.json({message : "Error while Fetching Returns & Assets Mix Assumption "});
+            return res.status(403).json({message : "Error while Fetching Returns & Assets Mix Assumption "});
     }catch(e){
         return res.status(500).json({message : "Internal Server error" , err : e.message});
     }
