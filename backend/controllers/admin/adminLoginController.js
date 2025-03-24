@@ -1,5 +1,5 @@
-import { loginSchema } from "../../schemas/adminSchema";
-import Admin from "../../models/Admin";
+import { loginSchema } from "../../schemas/adminSchema.js";
+import Admin from "../../models/Admin.js";
 import jwt from "jsonwebtoken"
 export default async function adminLoginController(req, res) {
     const body = req.body;

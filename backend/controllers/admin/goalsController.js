@@ -1,4 +1,4 @@
-import Goals from "../../models/Goals";
+import Goals from "../../models/Goals.js";
 export default async function goaslController(req, res) {
     try{
         const calculateOverallAverages = (goalsAggregation) => {

@@ -1,4 +1,4 @@
-import User from "../../models/user.js"
+import User from "../../models/User.js"
 
 export default async function saveFireController(req, res){
     const id = req.user;
@@ -8,7 +8,7 @@ export default async function saveFireController(req, res){
         const user = await User.findOneAndUpdate(
             { _id: id }, 
             { $set: { fireNumber } },
-            { new: true, fields: { fireNumber } } // `new: true` returns the updated user
+            { new: true, fields: { fireNumber } } 
         ).select("-_id");
     
         if (!user) {
@@ -17,7 +17,6 @@ export default async function saveFireController(req, res){
     
         return res.json({ message: "Fire Number updated successfully" });
         } catch (e) {
-        console.error("update error:", e);
-        return res.status(500).json({ message: "Internal server error" });
+            return res.status(500).json({ message: "Internal server error" });
         }
     }

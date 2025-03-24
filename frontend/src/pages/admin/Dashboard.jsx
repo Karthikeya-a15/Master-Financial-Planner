@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,10 +14,9 @@ import {
   ArcElement,
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
-import { PieChart } from '@mui/x-charts/PieChart';
+import { PieChart } from "@mui/x-charts/PieChart";
 import { useAdminAuth } from "./AdminAuthContext";
 import AdminNavbar from "./AdminNavbar";
-
 
 ChartJS.register(
   CategoryScale,
@@ -35,19 +34,25 @@ export default function AdminDashboard() {
   const [error, setError] = useState(null);
   const [userEngagementData, setUserEngagementData] = useState(null);
   const navigate = useNavigate();
-  const {logout} = useAdminAuth();
+  const { logout } = useAdminAuth();
+  const [showRoomForm, setShowRoomForm] = useState(false);
+  const [roomForm, setRoomForm] = useState({
+    name: "",
+    description: ""
+  });
+
 
   useEffect(() => {
-    document.title = 'Dashboard | DarwInvest'
+    document.title = "Dashboard | DarwInvest";
     fetchDashboardData();
     // fetchUserEnagementData();
-  }, [])
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
       const response = await axios.get("/api/v1/admin/dashboard");
       setDashboardData(response.data);
-    //   console.log(response.data);
+      //   console.log(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -57,19 +62,33 @@ export default function AdminDashboard() {
     }
   };
 
-  const fetchUserEnagementData = async () => {
-    try{
-      const response = await axios.get("/api/v1/admin/analytics/user-engagement");
-      // console.log(response.data);
-      setUserEngagementData(response.data);
+  const handleRoomInputChange = (e) => {
+    const { name, value } = e.target;
+    setRoomForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleRoomSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/v1/admin/rooms", roomForm);
+      
+      toast.success("Room created successfully!");
+      setRoomForm({ name: "", description: "" });
+      setShowRoomForm(false);
+      
+    } catch (error) {
+      console.error("Error creating room:", error);
+      toast.error(error.response?.data?.message || "Failed to create room");
+      setRoomCreationStatus("error");
+    } finally {
       setLoading(false);
-    }catch(error){
-      console.error("Error fetching user engagement data: ",error);
-      setError("Failed to load user engagement data");
-      setLoading(false);
-      toast.error("Failed to load user engagement data");
     }
-  }
+  };
+
 
   if (loading) {
     return (
@@ -97,42 +116,13 @@ export default function AdminDashboard() {
     );
   }
 
-  const componentUsageData = {
-    labels:
-      (dashboardData.componentStats.length > 0 &&
-        dashboardData?.componentStats.map((stat) => stat._id)) ||
-      [],
-    datasets: [
-      {
-        label: "Usage Count",
-        data: dashboardData?.componentStats.map((stat) => stat.count) || [],
-        backgroundColor: [
-          "rgba(59, 130, 246, 0.5)",
-          "rgba(34, 197, 94, 0.5)",
-          "rgba(245, 158, 11, 0.5)",
-          "rgba(239, 68, 68, 0.5)",
-          "rgba(168, 85, 247, 0.5)",
-        ],
-        borderColor: [
-          "rgb(59, 130, 246)",
-          "rgb(34, 197, 94)",
-          "rgb(245, 158, 11)",
-          "rgb(239, 68, 68)",
-          "rgb(168, 85, 247)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-
   const investmentData = dashboardData?.investmentDistribution
-  .filter((dist) => dist.totalAmount >= 0) 
-  .map((dist, index) => ({
-    id: index,
-    value: dist.totalAmount,
-    label: dist._id,
-  }));
+    .filter((dist) => dist.totalAmount >= 0)
+    .map((dist, index) => ({
+      id: index,
+      value: dist.totalAmount,
+      label: dist._id,
+    }));
 
   return (
     <div className="min-h-screen bg-secondary-50">
@@ -148,6 +138,14 @@ export default function AdminDashboard() {
               <p className="mt-1 text-secondary-600">
                 Monitor user activity and investment trends
               </p>
+            </div>
+            <div>
+            <button
+                onClick={() => setShowRoomForm(!showRoomForm)}
+                className="btn btn-primary"
+              >
+                Create New Room
+            </button>
             </div>
           </div>
 
@@ -167,19 +165,8 @@ export default function AdminDashboard() {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <motion.div
-              className="card"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <h2 className="text-xl font-bold text-secondary-900 mb-6">
-                Component Usage
-              </h2>
-              <Bar data={componentUsageData} />
-            </motion.div>
-
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            
             <motion.div
               className="card"
               initial={{ opacity: 0, y: 20 }}
@@ -199,7 +186,7 @@ export default function AdminDashboard() {
               />
             </motion.div>
           </div>
-          
+
           {/* Navigation Links */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <button
@@ -223,6 +210,77 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+        
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ duration: 0.3 }}
+      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${showRoomForm ? 'visible' : 'hidden'}`}
+    >
+      <motion.div
+        className="bg-white rounded-lg shadow-lg p-6 w-96"
+        initial={{ y: -20 }}
+        animate={{ y: 0 }}
+        exit={{ y: -20 }}
+        transition={{ duration: 0.3 }}
+      >
+        <h2 className="text-xl font-bold text-secondary-900 mb-4">Create New Room</h2>
+        <form onSubmit={handleRoomSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">
+                Room Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={roomForm.name}
+                onChange={handleRoomInputChange}
+                className="input w-full"
+                required
+                minLength={3}
+                maxLength={50}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-secondary-700 mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={roomForm.description}
+                onChange={handleRoomInputChange}
+                className="textarea w-full"
+                rows={3}
+                required
+                minLength={10}
+                maxLength={500}
+              />
+            </div>
+            <div className="flex justify-end space-x-3">
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create Room"}
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={()=>{ setShowRoomForm(false); setRoomForm({name : "" , description : ""})}}
+              >
+                Cancel
+              </button>
+             
+            </div>
+          </div>
+        </form>
+      </motion.div>
+    </motion.div>
+    
     </div>
   );
 }

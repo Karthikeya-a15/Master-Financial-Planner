@@ -1,4 +1,4 @@
-import User from "../../models/User";
+import User from "../../models/User.js";
 export default async function userEngagementController(req, res) {
     // console.log(req);
     try {

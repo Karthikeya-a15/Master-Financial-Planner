@@ -24,7 +24,7 @@ export default async function loginController(req, res){
         if(isUserExist){
             user.userEngagement.loginFrequency += 1;
             user.userEngagement.lastLogin = new Date();
-            const token = await jwt.sign({id : user._id},process.env.JWT_SECRET,{
+            const token = jwt.sign({id : user._id},process.env.JWT_SECRET,{
                 expiresIn: "1d",
             });
             await user.save();

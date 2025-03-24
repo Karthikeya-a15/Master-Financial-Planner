@@ -18,7 +18,7 @@ export default async function signupController (req, res){
     const body = req.body;
 
     let {success, error} = signUpSchema.safeParse(body);
-
+    // console.log(success);
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
@@ -27,12 +27,9 @@ export default async function signupController (req, res){
         return res.status(403).json({message: "User inputs are incorrect",err : error.format()});
     }
 
-        const {name, email, password, age} = body;
-
         const user = new User(body);
 
         user.password = await user.hashPassword();
-        
         const userCashFlows = await CashFlows.create({});
         const userCrypto = await CryptoCurrency.create({});
         const userDebt = await Debt.create({});

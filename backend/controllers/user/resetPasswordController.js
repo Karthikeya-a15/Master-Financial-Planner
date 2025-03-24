@@ -11,7 +11,7 @@ export default async function resetPasswordController (req,res) {
         // Find user by reset token
         const user = await User.findOne({
           resetPasswordToken: hashedToken,
-          resetPasswordExpires: { $gt: Date.now() }, // Check if token is valid
+          resetPasswordExpires: { $gt: Date.now() },
         });
     
         if (!user) {
@@ -27,7 +27,6 @@ export default async function resetPasswordController (req,res) {
         await user.save();
         return res.status(200).json({ message: "Password reset successful" });
       } catch (error) {
-        console.error("Reset password error:", error);
         return res.status(500).json({ message: "Something went wrong" });
       }
 }

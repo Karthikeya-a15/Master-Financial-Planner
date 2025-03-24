@@ -31,4 +31,4 @@ export async function getStockPriceByName(stockName) {
   // }
 }
 
-// getStockPriceByName("tata elxsi limited")
+// getStockPriceByName("tata elxsi limited").then(console.log);

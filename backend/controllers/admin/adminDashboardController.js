@@ -1,6 +1,6 @@
-import User from "../../models/User";
-import UserActivity from "../../models/UserActivity";
-import Goals from "../../models/Goals";
+import User from "../../models/User.js";
+import UserActivity from "../../models/UserActivity.js";
+import Goals from "../../models/Goals.js";
 
 export default async function adminDashboardController(req, res)  {
     try {
