@@ -98,7 +98,9 @@ function App() {
         } />
         <Route path="assumptions" element={
           <ProtectedRoute>
-            <AssumptionsPage />
+            <GoalsProvider>
+              <AssumptionsPage />
+            </GoalsProvider>
           </ProtectedRoute>
         } />
         <Route path="goals" element={

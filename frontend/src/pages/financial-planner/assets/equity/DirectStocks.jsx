@@ -15,6 +15,7 @@ export default function DirectStocks({
   handleSave,
 }) {
     const section = 'directStocks';
+    const STOCK_PRICE_CACHE_KEY = 'stockPriceCache'
     const [showAddStockForm, setShowAddStockForm] = useState(false);
     const [newStock, setNewStock] = useState({
         stockName: '',
@@ -25,6 +26,24 @@ export default function DirectStocks({
     const [suggestions, setSuggestions] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [stockPrices, setStockPrices] = useState([]);
+    const [lastFetchedTime, setLastFetchedTime] = useState(() => {
+        return JSON.parse(localStorage.getItem(STOCK_PRICE_CACHE_KEY))?.timestamp || 0;
+      });
+    const FIFTEEN_MINUTES = 15 * 60 * 1000;
+
+    useEffect(() => {
+        const currentTime = Date.now();
+    
+        if (!lastFetchedTime || currentTime - lastFetchedTime >= FIFTEEN_MINUTES) {
+          fetchStockPrices();
+        }else{
+            const cachedData = JSON.parse(localStorage.getItem(STOCK_PRICE_CACHE_KEY));
+            if (cachedData?.prices) {
+                setStockPrices(cachedData.prices);
+            }
+        }
+      }, []);
+
 
     // Function to fetch stock prices
     const fetchStockPrice = async (stockName) => {
@@ -37,9 +56,8 @@ export default function DirectStocks({
         }
     };
 
-    // Fetch stock prices when stock names change
-    useEffect(() => {
-        const updatePrices = async () => {
+    async function fetchStockPrices() {
+        try {
             const newPrices = new Array(editedData[section].length);
             await Promise.all(
                 editedData[section].map(async (stock, index) => {
@@ -50,11 +68,19 @@ export default function DirectStocks({
                 })
             );
             setStockPrices(newPrices);
-        };
 
-        updatePrices();
-    }, []);
-
+            const cacheData = {
+                timestamp: Date.now(),
+                prices: newPrices
+              };
+        
+            localStorage.setItem(STOCK_PRICE_CACHE_KEY, JSON.stringify(cacheData));
+    
+            setLastFetchedTime(Date.now());
+        } catch (error) {
+          console.error("Error fetching stock prices:", error);
+        }
+      }
 
   const handleAddStock = useCallback(() => {
     setEditedData((prev) => ({

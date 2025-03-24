@@ -3,13 +3,12 @@ import { toast } from 'react-toastify';
 import { PieChart } from '@mui/x-charts';
 import { motion } from 'framer-motion';
 import LoadingSpinner from '../../../../components/common/LoadingSpinner';
-import { useGoals } from '../../../../contexts/GoalsContext';
 
-const CATEGORY_OPTIONS = ["FD/RD/Arbitrage", "Banking PSUs/Corporate funds", "Government securities/Equity Saver funds"];
+const CATEGORY_OPTIONS = ["FD/RD/Arbitrage", "Banking PSUs/Corporate funds", "Government securities/Equity Saver"];
 const COLORS = {
     "FD/RD/Arbitrage": "#0088FE",
-    "Banking PSU/Corporate funds": "#00C49F",
-    "Government Securities/Equity Saver": "#FFBB28",
+    "Banking PSUs/Corporate funds": "#00C49F",
+    "Government securities/Equity Saver": "#FFBB28",
     default: "#DDDDDD",
 };
 
@@ -153,8 +152,8 @@ export default function SipDebt({
                                 label: duration,
                                 color: color,
                             })),
-                            innerRadius: 50,
-                            outerRadius: 100,
+                            innerRadius: 60,
+                            outerRadius: 120,
                         },
                     ]}
                     slotProps={{

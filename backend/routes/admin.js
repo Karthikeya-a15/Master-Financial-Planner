@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 import { loginSchema } from "../schemas/adminSchema.js";
 import adminAuth from "../middleware/adminAuthMiddleware.js";
 import User from "../models/User.js";
-import UserActivity from "../models/UserActivity.js";
 import DomesticEquity from "./../models/DomesticEquity.js"
 import Goals from "../models/Goals.js";
 import ChatRoom from "../models/chat-app/ChatRoom.js";
@@ -50,14 +49,14 @@ router.post("/login", async (req, res) => {
 router.get("/dashboard", adminAuth, async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
-        const componentStats = await UserActivity.aggregate([
-            {
-                $group: {
-                    _id: "$component",
-                    count: { $sum: 1 }
-                }
-            }
-        ]);
+        // const componentStats = await UserActivity.aggregate([
+        //     {
+        //         $group: {
+        //             _id: "$component",
+        //             count: { $sum: 1 }
+        //         }
+        //     }
+        // ]);
         const investmentDistribution = await Goals.aggregate([
             {
                 $unwind : "$goals"

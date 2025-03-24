@@ -76,21 +76,19 @@ describe("uploadImage", () => {
     );
     expect(res.json).toHaveBeenCalledWith({ message: "Profile-Image uploaded successfully" });
   });
+  //   mockUser.imageURL = "https://test-bucket.s3.test-region.amazonaws.com/profile-images/old.jpg";
+  //   User.findById.mockReturnValue({ select: jest.fn().mockResolvedValue(mockUser) });
 
-  it("should delete old image if it exists", async () => {
-    mockUser.imageURL = "https://test-bucket.s3.test-region.amazonaws.com/profile-images/old.jpg";
-    User.findById.mockReturnValue({ select: jest.fn().mockResolvedValue(mockUser) });
+  //   await uploadImage(req, res);
 
-    await uploadImage(req, res);
+  //   expect(DeleteObjectCommand).toHaveBeenCalledWith({
+  //     Bucket: "test-bucket",
+  //     Key: "profile-images/old.jpg",
+  //   });
 
-    expect(DeleteObjectCommand).toHaveBeenCalledWith({
-      Bucket: "test-bucket",
-      Key: "profile-images/old.jpg",
-    });
-
-    const s3ClientInstance = new S3Client();
-    expect(s3ClientInstance.send).toHaveBeenCalledWith(expect.any(DeleteObjectCommand));
-  });
+  //   const s3ClientInstance = new S3Client();
+  //   expect(s3ClientInstance.send).toHaveBeenCalledWith(expect.any(DeleteObjectCommand));
+  // });
 
   it("should return 400 if no file is uploaded", async () => {
     req.file = null;

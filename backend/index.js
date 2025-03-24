@@ -17,13 +17,6 @@ import initializeSocket from "./socket.js";
 
 const app = express();
 
-app.use(
-    cors({
-      origin: "http://localhost:5173/",
-      methods: "GET,POST,PUT,DELETE",
-      allowedHeaders: "Content-Type,Authorization",
-    })
-  );
 connectDB();
 
 app.use(cors());

@@ -72,10 +72,6 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'returnsAndAssets',
     },
-    toolResult : {
-        type : mongoose.Schema.Types.ObjectId,
-        ref : 'ToolResults'
-    },
     userEngagement: {
         loginFrequency: {
             type: Number,

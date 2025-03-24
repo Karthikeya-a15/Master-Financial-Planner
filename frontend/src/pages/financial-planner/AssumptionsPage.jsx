@@ -4,18 +4,17 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import Navbar from '../../components/layout/Navbar'
 import { motion } from 'framer-motion'
+import { useGoals } from '../../contexts/GoalsContext'
+
 
 export default function AssumptionsPage() {
+  const { goalsData } = useGoals();
   const [assumptions, setAssumptions] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(null)
-  const [expectedReturns, setExpectedReturns] = useState({
-    "shortTerm" : 0,
-    "mediumTerm" : 0,
-    "longTerm" : 0
-  })
+  
   const shortTermReturns = useRef(0);
   const mediumTermReturns = useRef(0);
   const longTermReturns = useRef(0);
@@ -72,13 +71,6 @@ export default function AssumptionsPage() {
       ans += expectedReturns[i] * categoryReturns[i];
     }
     ans/=100;
-    // return ans;
-    // setExpectedReturns((prev) => {
-    //   return {
-    //     ...prev,
-    //     category : ans
-    //   }
-    // })
     return ans;
   }
 
@@ -96,21 +88,22 @@ export default function AssumptionsPage() {
     try {
       setLoading(true)
       // console.log(formData);
-      // console.log(shortTermReturns.current.innerText.slice(0, -1));
-      // formData.effectiveReturns.shortTermReturns = shortTermReturns.current.innerText.slice(0, -1)
-      const change =  parseFloat(shortTermReturns.current.innerText.slice(0,-1))
+      // console.log(mediumTermReturns.current.innerText.slice(0, -1));
       setFormData((prev) => {
         return {
           ...prev,
           effectiveReturns : {
             shortTermReturns : parseFloat(shortTermReturns.current.innerText.slice(0,-1)),
-            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)) * 0.4 + 0.6 * change,
+            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)),
             longTermReturns : parseFloat(longTermReturns.current.innerText.slice(0,-1))
           }
         }
       })
       // console.log(formData);
       const response = await axios.put('/api/v1/planner/assumptions', formData)
+      const res = await axios.put("/api/v1/planner/financialGoals",{
+        goals : goalsData.goals
+      })
       
       if (response.data.message) {
         toast.success('Assumptions updated successfully')
@@ -403,7 +396,7 @@ export default function AssumptionsPage() {
                 
                 <div className="flex justify-end">
                   {/* <h2 className="text-lg font-semibold">Effective Returns</h2>*/}
-                  <p ref={mediumTermReturns} className="text-lg font-bold text-green-700">{calculateEffectiveReturns("mediumTerm")}%</p>
+                  <p ref={mediumTermReturns} className="text-lg font-bold text-green-700">{(calculateEffectiveReturns("mediumTerm") * 0.4 + 0.6 * calculateEffectiveReturns("shortTerm")).toFixed(1)}%</p>
                 </div>
 
                 {isEditing && (

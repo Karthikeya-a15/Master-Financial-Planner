@@ -3,13 +3,13 @@ import RealEstate from "../../models/RealEstate.js";
 import Miscellaneous from "../../models/miscellaneous.js";
 import Liabilities from "../../models/Liabilities.js";
 import Gold from "../../models/Gold.js";
-import Goals from "../../models/Goals.js";
+// import Goals from "../../models/Goals.js";
 import ForeignEquity from "../../models/ForeignEquity.js";
 import DomesticEquity from "../../models/DomesticEquity.js";
 import Debt from "../../models/Debt.js";
 import CryptoCurrency from "../../models/CryptoCurrency.js";
 import User from "../../models/User.js";
-import RAM from "../../models/returnsAndAssets.js";
+// import RAM from "../../models/returnsAndAssets.js";
 
 
 export default async function bulkInputController(req, res) {
@@ -17,12 +17,12 @@ export default async function bulkInputController(req, res) {
         const userId = req.user;
         const {
             cashFlows,
-            ramSchema,
+            // ramSchema,
             realEstate,
             miscellaneous,
             liabilities,
             gold,
-            goalSchema,
+            // goalSchema,
             foreignEquity,
             domesticEquity,
             debt,
@@ -47,15 +47,16 @@ export default async function bulkInputController(req, res) {
 
         // Updating documents (wrapping arrays inside objects)
         const updatedCashFlows = await updateDocument(CashFlows, user.netWorth.cashFlows, cashFlows);
-        const updatedReturnsAndAssets = await updateDocument(RAM, user.ram, ramSchema);
+        // const updatedReturnsAndAssets = await updateDocument(RAM, user.ram, ramSchema);
         const updatedRealEstate = await updateDocument(RealEstate, user.netWorth.realEstate, realEstate);
         const updatedMiscellaneous = await updateDocument(Miscellaneous, user.netWorth.miscellaneous, miscellaneous);
         const updatedLiabilities = await updateDocument(Liabilities, user.netWorth.liabilities, liabilities);
         const updatedGold = await updateDocument(Gold, user.netWorth.gold, gold);
-        const updatedGoals = await updateDocument(Goals, user.goals, { 
-            goals: goalSchema.goals, 
-            sipAssetAllocation: goalSchema.sipAssetAllocation 
-        });
+        // const updatedGoals = await updateDocument(Goals, user.goals, { 
+        //     goals: goalSchema.goals, 
+        //     sipAmountDistribution : goalSchema.sipAmountDistribution,
+        //     sipAssetAllocation: goalSchema.sipAssetAllocation 
+        // });
         const updatedForeignEquity = await updateDocument(ForeignEquity, user.netWorth.foreignEquity, foreignEquity);
         const updatedDomesticEquity = await updateDocument(DomesticEquity, user.netWorth.domesticEquity, { ...domesticEquity });
         const updatedDebt = await updateDocument(Debt, user.netWorth.debt, { ...debt });
@@ -63,12 +64,12 @@ export default async function bulkInputController(req, res) {
 
         // Updating user's net worth references
         user.netWorth.cashFlows = updatedCashFlows._id;
-        user.ram = updatedReturnsAndAssets._id;
+        // user.ram = updatedReturnsAndAssets._id;
         user.netWorth.realEstate = updatedRealEstate._id;
         user.netWorth.miscellaneous = updatedMiscellaneous._id;
         user.netWorth.liabilities = updatedLiabilities._id;
         user.netWorth.gold = updatedGold._id;
-        user.goals = updatedGoals._id;
+        // user.goals = updatedGoals._id;
         user.netWorth.foreignEquity = updatedForeignEquity._id;
         user.netWorth.domesticEquity = updatedDomesticEquity._id;
         user.netWorth.debt = updatedDebt._id;
@@ -80,12 +81,12 @@ export default async function bulkInputController(req, res) {
             message: "Net worth data updated successfully",
             data: {
                 cashFlows: updatedCashFlows,
-                returnsAndAssets: updatedReturnsAndAssets,
+                // returnsAndAssets: updatedReturnsAndAssets,
                 realEstate: updatedRealEstate,
                 miscellaneous: updatedMiscellaneous,
                 liabilities: updatedLiabilities,
                 gold: updatedGold,
-                goals: updatedGoals,
+                // goals: updatedGoals,
                 foreignEquity: updatedForeignEquity,
                 domesticEquity: updatedDomesticEquity,
                 debt: updatedDebt,

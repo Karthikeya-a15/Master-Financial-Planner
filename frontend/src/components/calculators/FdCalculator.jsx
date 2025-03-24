@@ -82,8 +82,8 @@ export default function FdCalculator() {
         borderWidth: 1
       },
       {
-        label: 'Interest (Monthly Compounding)',
-        data: yearlyResults.map(r => r.interestMonthly),
+        label: 'Interest (Yearly Compounding)',
+        data: yearlyResults.map(r => r.interestYearly),
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
         borderColor: 'rgb(34, 197, 94)',
         borderWidth: 1

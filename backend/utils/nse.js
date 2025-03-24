@@ -1,20 +1,16 @@
-import  {NSELive} from "nse-api-package";
 import { stockMapping } from "./stock_mapping.js";
-import liveStockPrice from "live-stock-price";
-
-const nseLive = new NSELive();
+import { NSE } from "nse-js";
+const nse = new NSE();
 
 async function getStockPrice(symbol) {
   try {
-    const data = await nseLive.stockQuote(symbol);
+    const data = await nse.quote(symbol);
     return data?.priceInfo?.lastPrice || "Price Not Available";
   } catch (error) {
     console.error(`Error fetching stock price for ${symbol}:`, error);
     return "Error fetching price";
   }
 }
-
-
 
 // Function to get stock symbol by name
 function getStockSymbolByName(stockName) {
@@ -27,18 +23,7 @@ export async function getStockPriceByName(stockName) {
     const price = await getStockPrice(symbol);
     return price;
   } 
-  // else {
-  //   // console.log(`Stock ${stockName} not found.`);
-  // }
 }
-
-liveStockPrice('ABCAPITAL')
-    .then((price) => {
-        console.log('Stock price:', price);
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
 
 // getStockPriceByName("tata elxsi limited").then(function(res){
 //   console.log(res)

@@ -34,12 +34,6 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser))
-    }
-  }, [currentUser])
-
   const fetchUserData = async () => {
     try {
       const response = await axios.get(`/api/v1/user/me`)
@@ -51,6 +45,12 @@ export function AuthProvider({ children }) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser))
+    }
+  }, [currentUser])
 
   const login = async (email, password) => {
     try {
@@ -113,7 +113,9 @@ export function AuthProvider({ children }) {
     try{
       localStorage.removeItem('currentUser')
       localStorage.removeItem('token')
+
       const response = await axios.post('api/v1/user/logout');
+      
       setToken(null)
       setCurrentUser(null)
       setIsAuthenticated(false)

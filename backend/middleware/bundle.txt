@@ -1,0 +1,163 @@
+// File: adminAuthMiddleware.js
+import jwt from "jsonwebtoken";
+import Admin from "../models/Admin.js";
+
+async function adminAuth(req, res, next) {
+    const jwtToken = req.headers.authorization;  
+
+    if (!jwtToken || !jwtToken.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "Admin not authenticated" });
+    }
+    
+    const token = jwtToken.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Token is missing" });
+    }
+
+    try {
+        const { id } = jwt.verify(token, process.env.JWT_SECRET);
+        const admin = await Admin.findById(id);
+        
+        if (!admin) {
+            return res.status(401).json({ message: "Invalid admin token" });
+        }
+        
+        req.admin = id;
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+export default adminAuth;
+
+// File: chatMulterConfig.js
+import multer from "multer";
+
+// Store files in memory (Buffer)
+const storage = multer.memoryStorage();
+
+// Updated file filter to allow images & documents
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = [
+    "image/jpeg", "image/png", "image/jpg", 
+    "application/pdf", "application/msword", 
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ];
+
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only JPG, JPEG, PNG, PDF, and DOC/DOCX files are allowed!"), false);
+  }
+};
+
+const chatUpload = multer({ 
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // Increased limit to 10MB
+  fileFilter,
+});
+
+export default chatUpload;
+
+
+// File: mergeFiles.js
+import { readdirSync, statSync, lstatSync, readFileSync, writeFileSync } from "fs";
+import { join } from "path";
+
+const sourceDir = "./"; // Change this to your target directory
+const outputFile = "./bundle.txt"; // Output file name
+
+// Function to recursively get all JS files
+function getJsFiles(dir, depth = 5) {
+  if (depth === 0) return []; // Stop recursion after 5 levels
+
+  let files = readdirSync(dir);
+  let jsFiles = [];
+
+  files.forEach((file) => {
+    let fullPath = join(dir, file);
+    let stat = lstatSync(fullPath); // Use lstatSync to check symbolic links
+
+    if (stat.isSymbolicLink()) return; // Skip symbolic links to avoid infinite loops
+    if (stat.isDirectory()) {
+      jsFiles = jsFiles.concat(getJsFiles(fullPath, depth - 1));
+    } else if (stat.isFile() && file.endsWith(".js")) {
+      jsFiles.push(fullPath);
+    }
+  });
+
+  return jsFiles;
+}
+
+// Get all JS files
+const jsFiles = getJsFiles(sourceDir);
+
+// Read and merge files
+let mergedContent = jsFiles
+  .map((file) => {
+    const fileContent = readFileSync(file, "utf8");
+    return `// File: ${file}\n${fileContent}`;
+  })
+  .join("\n\n");
+
+// Write to output file
+writeFileSync(outputFile, mergedContent, "utf8");
+
+console.log(`✅ Merged ${jsFiles.length} JavaScript files into ${outputFile}`);
+
+// File: multerConfig.js
+import multer from "multer";
+
+// Store files in memory (Buffer)
+const storage = multer.memoryStorage();
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only JPG, JPEG, and PNG images are allowed!"), false);
+  }
+};
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter,
+});
+
+export default upload;
+
+
+// File: userAuthMiddleware.js
+import jwt from "jsonwebtoken";
+
+async function userAuth(req, res, next) {
+    const jwtToken = req.headers.authorization;  
+
+    if (!jwtToken || !jwtToken.startsWith('Bearer ')) {
+        return res.status(401).json({ message: "User not authenticated" });
+    }
+    const token = jwtToken.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Token is missing" });
+    }
+
+    try {
+        const { id } = jwt.verify(token, process.env.JWT_SECRET);
+        if (id) {
+            req.user = id;
+            // console.log(req.user)
+            next();
+        } else {
+            return res.status(500).json({ message: "User not authenticated" });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+export default userAuth;
