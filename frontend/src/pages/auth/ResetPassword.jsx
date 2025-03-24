@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -11,16 +13,15 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    console.log("called")
     e.preventDefault();
     if (password !== confirmPassword) {
-      return toast.error("Passwords do not match!");
+      toast.error("Passwords do not match!");
+      return;
     }
 
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/v1/user/reset-password",{ token, password });
-
+      const { data } = await axios.post("/api/v1/user/reset-password", { token, password });
       toast.success(data.message);
       navigate("/login");
     } catch (error) {
@@ -35,7 +36,7 @@ const ResetPassword = () => {
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
         <h2 className="text-2xl font-semibold text-center">Reset Password</h2>
-        <form onSubmit={(e)=>handleSubmit(e)} className="mt-4">
+        <form onSubmit={handleSubmit} className="mt-4">
           <input
             type="password"
             placeholder="New Password"
