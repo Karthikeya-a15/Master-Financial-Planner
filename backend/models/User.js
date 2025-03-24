@@ -93,7 +93,9 @@ const userSchema = new mongoose.Schema({
             type: Date,
             default: Date.now 
         }
-    }
+    },
+    resetPasswordToken: { type: String },   
+    resetPasswordExpires: { type: Date }
 });
 
 userSchema.methods.hashPassword = async function(){

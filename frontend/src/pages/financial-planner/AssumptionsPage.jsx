@@ -88,13 +88,16 @@ export default function AssumptionsPage() {
     try {
       setLoading(true)
       // console.log(formData);
-      // console.log(mediumTermReturns.current.innerText.slice(0, -1));
+      // console.log(shortTermReturns.current.innerText.slice(0, -1));
+      // formData.effectiveReturns.shortTermReturns = shortTermReturns.current.innerText.slice(0, -1)
+      const change =  parseFloat(shortTermReturns.current.innerText.slice(0,-1))
+      console.log(change)
       setFormData((prev) => {
         return {
           ...prev,
           effectiveReturns : {
-            shortTermReturns : parseFloat(shortTermReturns.current.innerText.slice(0,-1)),
-            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)),
+            shortTermReturns : change,
+            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)) * 0.4 + 0.6 * change,
             longTermReturns : parseFloat(longTermReturns.current.innerText.slice(0,-1))
           }
         }
@@ -396,7 +399,7 @@ export default function AssumptionsPage() {
                 
                 <div className="flex justify-end">
                   {/* <h2 className="text-lg font-semibold">Effective Returns</h2>*/}
-                  <p ref={mediumTermReturns} className="text-lg font-bold text-green-700">{(calculateEffectiveReturns("mediumTerm") * 0.4 + 0.6 * calculateEffectiveReturns("shortTerm")).toFixed(1)}%</p>
+                  <p ref={mediumTermReturns} className="text-lg font-bold text-green-700">{calculateEffectiveReturns("mediumTerm")* 0.4 + 0.6 * calculateEffectiveReturns("shortTerm")}%</p>
                 </div>
 
                 {isEditing && (
