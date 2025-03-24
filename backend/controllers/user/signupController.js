@@ -9,7 +9,6 @@ import miscellaneous from "../../models/miscellaneous.js";
 import GoldModel from "../../models/Gold.js";
 import Goals from "../../models/Goals.js";
 import RAM from "../../models/returnsAndAssets.js";
-import Result from "../../models/ToolsResults.js";
 import mongoose from "mongoose";
 import User from "../../models/User.js";
 import { signUpSchema } from "../../schemas/userSchemas.js";
@@ -41,7 +40,6 @@ export default async function signupController (req, res){
         const userRealEstate = await RealEstate.create({});
         const userGoals = await Goals.create({});
         const userReturnsAndAssets = await RAM.create({});
-        const userToolResults = await Result.create({});
         user.netWorth = {
             cashFlows : userCashFlows._id,
             domesticEquity : userDomesticEquity._id,

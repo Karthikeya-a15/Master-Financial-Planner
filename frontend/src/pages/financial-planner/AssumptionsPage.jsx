@@ -91,18 +91,19 @@ export default function AssumptionsPage() {
       // console.log(shortTermReturns.current.innerText.slice(0, -1));
       // formData.effectiveReturns.shortTermReturns = shortTermReturns.current.innerText.slice(0, -1)
       const change =  parseFloat(shortTermReturns.current.innerText.slice(0,-1))
-      console.log(change)
+      console.log(mediumTermReturns.current.innerText.slice(0,-1))
+      console.log(formData);
       setFormData((prev) => {
         return {
           ...prev,
           effectiveReturns : {
             shortTermReturns : change,
-            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)) * 0.4 + 0.6 * change,
+            mediumTermReturns : parseFloat(mediumTermReturns.current.innerText.slice(0,-1)),
             longTermReturns : parseFloat(longTermReturns.current.innerText.slice(0,-1))
           }
         }
       })
-      // console.log(formData);
+      console.log(formData);
       const response = await axios.put('/api/v1/planner/assumptions', formData)
       const res = await axios.put("/api/v1/planner/financialGoals",{
         goals : goalsData.goals
