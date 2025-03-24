@@ -1,5 +1,6 @@
 import  {NSELive} from "nse-api-package";
 import { stockMapping } from "./stock_mapping.js";
+import liveStockPrice from "live-stock-price";
 
 const nseLive = new NSELive();
 
@@ -31,4 +32,14 @@ export async function getStockPriceByName(stockName) {
   // }
 }
 
-// getStockPriceByName("tata elxsi limited")
+liveStockPrice('ABCAPITAL')
+    .then((price) => {
+        console.log('Stock price:', price);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+// getStockPriceByName("tata elxsi limited").then(function(res){
+//   console.log(res)
+// })
