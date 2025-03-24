@@ -1,55 +1,44 @@
 import arbitrageController from "../../get/arbitrageController.js";
 import User from "../../../models/User.js";
 import main from "../../../tools/Arbitrage/index.js";
-import { createRequest, createResponse } from "node-mocks-http"; //for creating mock req and res
 
 jest.mock("../../../models/User.js");
 jest.mock("../../../tools/Arbitrage/index.js");
 
 describe("arbitrageController", () => {
-  it("should return arbitrage funds for a valid user", async () => {
-    const mockUserId = "67b82107183c091d4d3990c3";
-    const mockUser = { _id: mockUserId };
+  let req, res;
+
+  beforeEach(() => {
+    req = { user: "67b82107183c091d4d3990c3" };
+    res = {
+      json: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test("should return arbitrage funds for a valid user", async () => {
+    const mockUser = { _id: req.user };
     const mockFunds = [{ name: "Fund 1", value: 100 }];
 
     User.findById.mockResolvedValue(mockUser);
     main.mockResolvedValue(mockFunds);
 
-    const req = createRequest({ user: mockUserId });
-    const res = createResponse();
-
     await arbitrageController(req, res);
 
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual(mockFunds);
-    expect(User.findById).toHaveBeenCalledWith(mockUserId);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(mockFunds);
+    expect(User.findById).toHaveBeenCalledWith(req.user);
     expect(main).toHaveBeenCalled();
   });
 
-  it("should return 403 if user is not found", async () => {
+  test("should return 403 if user is not found", async () => {
     User.findById.mockResolvedValue(null);
-
-    const req = createRequest({ user: "in67b82107183c091d4d3990c3" });
-    const res = createResponse();
 
     await arbitrageController(req, res);
 
-    expect(res.statusCode).toBe(403);
-    expect(res._getJSONData()).toEqual({ message: "User not found" });
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "User not found" });
   });
 
-  // it("should handle internal server errors", async () => {
-  //     const mockError = new Error("Database connection error");
-  //     User.findById.mockRejectedValue(mockError);
-
-  //     const req = createRequest({ user: "67b82107183c091d4d3990c3" });
-  //     const res = createResponse();
-
-  //     await arbitrageController(req, res);
-  //     expect(res.statusCode).toBe(500);
-  //     expect(res._getJSONData()).toEqual({
-  //         message: "Internal Server Error",
-  //         err: "Database connection error",
-  //     });
-  // });
 });

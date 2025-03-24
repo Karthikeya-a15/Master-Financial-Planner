@@ -16,5 +16,15 @@ export default {
     ],
     moduleFileExtensions: ['js', 'mjs', 'cjs', 'jsx', 'ts', 'tsx', 'json', 'node'], // Important for module resolution
     verbose: true,
-    testTimeout: 10000, // Increase timeout to 10 seconds
+    testTimeout: 10000, 
+    collectCoverage: true,
+    coveragePathIgnorePatterns: [
+      "/node_modules/",
+      "/common/",
+      "/models/",
+      "/schemas/",
+      "/tools/",
+      "/utils/nse.js", // Ignore specific file
+      "/utils/stock_mapping.js" // Ignore another specific file
+    ],
   };
