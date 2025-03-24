@@ -10,7 +10,6 @@ import plannerRouter from "./routes/planner.js"
 import toolsRouter from "./routes/tools.js"
 import adminRouter from "./routes/admin.js"
 import realTimeRouter from "./routes/realtime.js";
-import creditRouter from "./routes/creditcard.js";
 
 import http from "http";
 import initializeSocket from "./socket.js";
@@ -38,7 +37,6 @@ app.use("/api/v1/realtime", realTimeRouter);
 app.use("/api/v1/planner", plannerRouter);
 app.use("/api/v1/tools",toolsRouter);
 app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/creditcard",creditRouter);
 
 server.listen(process.env.PORT,() => {
     console.log(`The app is running on port ${process.env.PORT}`);

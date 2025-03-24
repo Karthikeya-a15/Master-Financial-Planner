@@ -13,8 +13,6 @@ const router = express.Router();
 
 router.use(userAuth);
 
-// router.get("/indexfunds",getToolsController);
-
 router.get("/indexfunds",indexFundsController);
 
 router.get("/mutualfunds",mutualFundsConroller);

@@ -88,7 +88,7 @@ const governmentInvestmentSchema = zod.object({
 
 const sipDebtSchema = zod.object({
     name: zod.string(),
-    duration: zod.enum(["FD/RD/Arbitrage", "Banking PSU/Corporate funds", "Government Securities/Equity Saver"]),
+    duration: zod.enum(["FD/RD/Arbitrage", "Banking PSUs/Corporate funds", "Government securities/Equity Saver"]),
     currentValue: zod.number().nonnegative(),
   });
   
