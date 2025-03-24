@@ -43,7 +43,7 @@ const debtSchema = new mongoose.Schema({
                 name : { type: String },
                 duration: { 
                     type: String, 
-                    enum: ["FD/RD/Arbitrage", "Banking PSU/Corporate funds", "Goverment Securities/Equity Saver"], 
+                    enum: ["FD/RD/Arbitrage", "Banking PSUs/Corporate funds", "Government securities/Equity Saver"], 
                 },
                 currentValue: { type: Number }
             }

@@ -54,7 +54,6 @@ export default async function signupController (req, res){
         
         user.goals = userGoals._id;
         user.ram = userReturnsAndAssets._id;
-        user.toolResult = userToolResults._id;
         
         await user.save();
         await session.commitTransaction();

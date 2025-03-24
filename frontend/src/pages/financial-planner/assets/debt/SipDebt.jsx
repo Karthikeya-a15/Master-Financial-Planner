@@ -24,13 +24,15 @@ export default function SipDebt({
     const debtTotal = goalsData?.sipAssetAllocation.debt || 0;
 
     const debtAmounts = goalsData?.sipAmountDistribution || [];
+    console.log(debtAmounts)
     const timePeriods = goalsData?.goals.map((goal) => goal.time);
+    console.log(timePeriods)
 
     const requiredContribution = useMemo(() => {
         const contribution = {
             "FD/RD/Arbitrage": 0,
-            "Banking PSU/Corporate funds": 0,
-            "Government Securities/Equity Saver": 0
+            "Banking PSUs/Corporate funds": 0,
+            "Government securities/Equity Saver": 0
         };
 
         for (let i = 0; i < debtAmounts.length; i++) {
@@ -38,9 +40,9 @@ export default function SipDebt({
             if (time < 3) {
                 contribution["FD/RD/Arbitrage"] += debtAmounts[i].debt;
             } else if (time < 7) {
-                contribution["Banking PSU/Corporate funds"] += debtAmounts[i].debt;
+                contribution["Banking PSUs/Corporate funds"] += debtAmounts[i].debt;
             } else {
-                contribution["Government Securities/Equity Saver"] += debtAmounts[i].debt;
+                contribution["Government securities/Equity Saver"] += debtAmounts[i].debt;
             }
         }
 
@@ -128,8 +130,6 @@ export default function SipDebt({
         color: COLORS[duration] || COLORS.default,
     }));
 
-    console.log(Object.entries(chartData))
-    console.log(requiredContribution["FD/RD/Arbitrage"])
 
     const sumOfSips = editedData[section].reduce((acc, { currentValue }) => {
         return acc + currentValue || 0;
