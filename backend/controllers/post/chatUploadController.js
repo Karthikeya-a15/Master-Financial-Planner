@@ -2,7 +2,6 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { fromEnv } from "@aws-sdk/credential-providers";
 
 const uploadToS3 = async (buffer, fileName, mimeType) => {
-  try {
     const s3Client = new S3Client({
       region: process.env.AWS_REGION,
       credentials: fromEnv(),
@@ -21,9 +20,6 @@ const uploadToS3 = async (buffer, fileName, mimeType) => {
     await s3Client.send(new PutObjectCommand(params));
 
     return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  } catch (err) {
-    throw err; // Throw the error so it can be caught in the controller
-  }
 };
 
 const chatUploadController = async (req, res) => {

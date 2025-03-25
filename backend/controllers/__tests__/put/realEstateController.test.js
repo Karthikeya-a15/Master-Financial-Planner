@@ -1,7 +1,6 @@
 import realEstatesController from "../../put/realEstateController.js";
 import mongoose from "mongoose";
 import { realEstateSchema } from "../../../schemas/netWorthSchemas.js";
-import { createRequest, createResponse } from "node-mocks-http";
 
 jest.mock("../../../models/User.js", () => {
   const mockUserSchema = {

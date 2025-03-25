@@ -56,7 +56,7 @@ const AssetTable = ({ data, totalAssets, formatCurrency }) => {
               
               return (
                 <tr key={key} className="border border-gray-300">
-                  <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</td>
+                  <td className="border border-gray-300 px-4 py-2 capitalize">{key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, ' $1').trim()}</td>
                   <td className="border border-gray-300 px-4 py-2 text-green-700">{formatCurrency(value)}</td>
                   <td className="border border-gray-300 px-4 py-2 text-green-700">{percentage}%</td>
                 </tr>
@@ -69,7 +69,6 @@ const AssetTable = ({ data, totalAssets, formatCurrency }) => {
     );
   };
   
-  const formatLabel = (key) => key.replace(/([A-Z])/g, " $1").trim().replace(/^./, str => str.toUpperCase());
   
   const COLORS = {
     realEstate: "#2563EB", // primary-600
@@ -80,6 +79,7 @@ const AssetTable = ({ data, totalAssets, formatCurrency }) => {
     crypto: "#7C3AED", // purple-600
     default: "#2563EB"
   };
+  const formatLabel = (key) => key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, " $1").trim().replace(/^./, str => str.toUpperCase());
   
   const CurrentAssetTable = ({ data, formatCurrency }) => {
     const chartData = Object.entries(data.totalAssetSummary).map(([key, value]) => {
@@ -249,73 +249,6 @@ const AssetTable = ({ data, totalAssets, formatCurrency }) => {
                 
               </motion.div>
               
-              {/* Quick Actions */}
-              <motion.div 
-                className="card"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
-              >
-                <h2 className="text-xl font-bold text-secondary-900 mb-4">Quick Actions</h2>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Link to="#" className="p-4 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="font-medium text-secondary-900">Add Asset</h3>
-                        <p className="text-sm text-secondary-500">Record a new investment</p>
-                      </div>
-                    </div>
-                  </Link>
-                  
-                  <Link to="#" className="p-4 bg-secondary-50 rounded-lg hover:bg-secondary-100 transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="font-medium text-secondary-900">Update Values</h3>
-                        <p className="text-sm text-secondary-500">Refresh asset prices</p>
-                      </div>
-                    </div>
-                  </Link>
-                  
-                  <Link to="#" className="p-4 bg-success-50 rounded-lg hover:bg-success-100 transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-success-100 flex items-center justify-center text-success-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="font-medium text-secondary-900">Download Report</h3>
-                        <p className="text-sm text-secondary-500">Export as PDF</p>
-                      </div>
-                    </div>
-                  </Link>
-                  
-                  <Link to="/financial-planner/goals" className="p-4 bg-warning-50 rounded-lg hover:bg-warning-100 transition-colors">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded-full bg-warning-100 flex items-center justify-center text-warning-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <h3 className="font-medium text-secondary-900">View Goals</h3>
-                        <p className="text-sm text-secondary-500">Track your progress</p>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              </motion.div>
             </div>
       </>
     )

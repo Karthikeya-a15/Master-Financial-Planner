@@ -985,7 +985,7 @@ export default function GoalsPage() {
                           <div key={key}>
                             <div className="flex justify-between mb-1">
                               <span className="text-secondary-700 capitalize">
-                                {key.replace(/([A-Z])/g, " $1").trim()}
+                                {key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, " $1").trim()}
                               </span>
                               <span className="text-secondary-900 font-medium">
                                 {formatCurrency(value)} ({percentage}%)

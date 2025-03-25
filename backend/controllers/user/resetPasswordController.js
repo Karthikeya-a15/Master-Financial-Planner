@@ -32,6 +32,7 @@ export default async function resetPasswordController (req,res) {
         await user.save();
         return res.status(200).json({ message: "Password reset successful" });
       } catch (error) {
+        console.log(error.message)
         return res.status(500).json({ message: "Something went wrong" });
       }
 }

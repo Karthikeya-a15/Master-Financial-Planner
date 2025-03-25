@@ -34,6 +34,7 @@ export default async function loginController(req, res){
         }
     }
     catch(err){
+        console.log(err.message);
         return res.status(500).json({message : "Internal error"});
     }
 }

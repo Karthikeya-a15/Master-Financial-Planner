@@ -9,9 +9,6 @@ jest.mock("../../../utils/stock_mapping.js", () => ({
   },
 }));
 
-// Import the mocked stockMapping
-import { stockMapping } from "../../../utils/stock_mapping.js";
-
 describe("autoSuggestionStockController", () => {
   let req, res;
 
@@ -22,7 +19,6 @@ describe("autoSuggestionStockController", () => {
       status: jest.fn().mockReturnThis(), // Enables method chaining
     };
 
-    // Reset stockNames before each test
     jest.resetModules(); // This ensures the module is reloaded and stockNames is reset
   });
 

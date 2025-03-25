@@ -8,7 +8,7 @@ export default [
     languageOptions: {
       ecmaVersion: "latest", // Supports latest ECMAScript features
       sourceType: "module",  // Enables ES Modules (import/export)
-      globals: globals.node, // Enables browser-specific globals
+      globals: {...globals.node, ...globals.jest}, // Enables browser-specific globals
     },
     plugins: {
       prettier: prettierPlugin, // Prettier integration

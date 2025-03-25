@@ -1,5 +1,5 @@
 import miscellaneousController from "../../put/miscellaneousController.js";
-import mongoose, { startSession } from "mongoose";
+import mongoose from "mongoose";
 import { miscellaneousSchema } from "../../../schemas/netWorthSchemas.js";
 
 jest.mock("../../../models/User.js", () => {

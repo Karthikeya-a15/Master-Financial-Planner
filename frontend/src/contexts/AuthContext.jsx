@@ -113,6 +113,7 @@ export function AuthProvider({ children }) {
     try{
       localStorage.removeItem('currentUser')
       localStorage.removeItem('token')
+      localStorage.removeItem('stockPriceCache')
 
       const response = await axios.post('api/v1/user/logout');
       

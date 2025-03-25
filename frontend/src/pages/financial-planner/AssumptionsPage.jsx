@@ -224,10 +224,11 @@ export default function AssumptionsPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-secondary-200">
+                  {console.log(formData)}
                   {formData && Object.entries(formData.expectedReturns).map(([key, value]) => (
                     <tr key={key}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-secondary-900 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                        {key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, ' $1').trim()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900 text-right">
                         {isEditing ? (
@@ -295,7 +296,7 @@ export default function AssumptionsPage() {
                   return (
                     <div key={key} className="mb-4">
                       <div className="flex justify-between mb-1">
-                        <span className="text-secondary-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-secondary-700 capitalize">{key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, ' $1').trim()}</span>
                         {isEditing ? (
                           <div className="flex items-center">
                             <input
@@ -373,7 +374,7 @@ export default function AssumptionsPage() {
                   return (
                     <div key={key} className="mb-4">
                       <div className="flex justify-between mb-1">
-                        <span className="text-secondary-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-secondary-700 capitalize">{key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, ' $1').trim()}</span>
                         {isEditing ? (
                           <div className="flex items-center">
                             <input
@@ -452,7 +453,7 @@ export default function AssumptionsPage() {
                   return (
                     <div key={key} className="mb-4">
                       <div className="flex justify-between mb-1">
-                        <span className="text-secondary-700 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                        <span className="text-secondary-700 capitalize">{key==="realEstate"? key.replace("realEstate", "Real Estate / REITs") : key.replace(/([A-Z])/g, ' $1').trim()}</span>
                         {isEditing ? (
                           <div className="flex items-center">
                             <input

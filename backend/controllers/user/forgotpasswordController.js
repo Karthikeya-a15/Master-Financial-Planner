@@ -30,6 +30,7 @@ export default async function forgotPasswordController (req, res){
     
         res.status(200).json({ message: "Password reset instructions sent to your email" });
       } catch (error) {
+        console.log(error.message)
         res.status(500).json({ message: "Something went wrong" });
       }
 }

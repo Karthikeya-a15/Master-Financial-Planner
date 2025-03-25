@@ -39,6 +39,7 @@ export default function InfoTools() {
 
   const fetchNews = async (page) => {
     try {
+
         const response = await axios.get(`/api/v1/realtime/news?page=${page}&limit=${limit}`);
 
         const data = response.data;

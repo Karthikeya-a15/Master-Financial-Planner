@@ -5,14 +5,11 @@ import multer from 'multer';
 jest.mock('multer');
 
 describe('Multer Configuration', () => {
-  let mockFileFilter;
   let mockMulterInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    mockFileFilter = jest.fn();
-    
+        
     mockMulterInstance = {
       single: jest.fn(),
       array: jest.fn(),

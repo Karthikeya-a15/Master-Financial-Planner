@@ -4,7 +4,6 @@ import * as chatUpload from '../../../middleware/chatMulterConfig.js'; // Adjust
 jest.mock('multer');
 
 describe('Chat Upload Configuration', () => {
-  let mockFileFilter;
   let mockMulterInstance;
 
   beforeEach(() => {

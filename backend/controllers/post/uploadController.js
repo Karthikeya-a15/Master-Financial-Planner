@@ -10,7 +10,6 @@ const s3Client = new S3Client({
 
 // Upload buffer directly to S3
 const uploadToS3 = async (buffer, fileName, mimeType) => {
-  try {
     const time = Date.now();
     const sanitizedFileName = fileName.replaceAll(" ", "+"); // Replace spaces with "+"
     const key = `profile-images/${time}_${sanitizedFileName}`;
@@ -26,9 +25,6 @@ const uploadToS3 = async (buffer, fileName, mimeType) => {
     await s3Client.send(command);
 
     return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-  } catch (err) {
-    throw err;
-  }
 };
 
 // Controller function

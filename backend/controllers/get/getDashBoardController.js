@@ -85,6 +85,7 @@ export async function requiredInvestableAssetAllocation(user){
 
         return riaa;
     }catch(e){
+        console.log(e.message)
         return null;
     }
 }

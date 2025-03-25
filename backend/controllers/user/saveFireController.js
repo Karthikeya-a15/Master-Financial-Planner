@@ -17,6 +17,7 @@ export default async function saveFireController(req, res){
     
         return res.json({ message: "Fire Number updated successfully" });
         } catch (e) {
-            return res.status(500).json({ message: "Internal server error" });
+            console.log(e.message);
+            return res.status(500).json({ message: "Internal server error"});
         }
     }

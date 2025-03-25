@@ -16,6 +16,7 @@ export default function initializeSocket(server) {
       socket.userId = decoded.id;
       next();
     } catch (err) {
+      console.log(err.message);
       next(new Error("Invalid token"));
     }
   });
