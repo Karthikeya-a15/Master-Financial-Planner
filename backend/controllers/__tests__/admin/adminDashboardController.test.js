@@ -1,10 +1,8 @@
 import adminDashboardController from "../../admin/adminDashboardController";
 import User from "../../../models/User";
-import UserActivity from "../../../models/UserActivity";
 import Goals from "../../../models/Goals";
 
 jest.mock("../../../models/User");
-jest.mock("../../../models/UserActivity");
 jest.mock("../../../models/Goals");
 
 describe("adminDashboardController", () => {
@@ -20,7 +18,6 @@ describe("adminDashboardController", () => {
 
     it("should return dashboard data", async () => {
         User.countDocuments.mockResolvedValueOnce(100);
-        UserActivity.aggregate.mockResolvedValueOnce([{ _id: "component1", count: 50 }]);
         Goals.aggregate.mockResolvedValueOnce([
             { _id: "Short Term", count: 10, totalAmount: 5000 }
         ]);
@@ -29,7 +26,6 @@ describe("adminDashboardController", () => {
 
         expect(res.json).toHaveBeenCalledWith({
             totalUsers: 100,
-            componentStats: [{ _id: "component1", count: 50 }],
             investmentDistribution: [{ _id: "Short Term", count: 10, totalAmount: 5000 }]
         });
     });

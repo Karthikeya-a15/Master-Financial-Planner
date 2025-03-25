@@ -37,7 +37,6 @@ jest.mock("../../../models/miscellaneous.js", () => ({ create: jest.fn().mockRes
 jest.mock("../../../models/Gold.js", () => ({ create: jest.fn().mockResolvedValue({ _id: "mocked_id" }) }));
 jest.mock("../../../models/Goals.js", () => ({ create: jest.fn().mockResolvedValue({ _id: "mocked_id" }) }));
 jest.mock("../../../models/returnsAndAssets.js", () => ({ create: jest.fn().mockResolvedValue({ _id: "mocked_id" }) }));
-jest.mock("../../../models/ToolsResults.js", () => ({ create: jest.fn().mockResolvedValue({ _id: "mocked_id" }) }));
 jest.mock("mongoose");
 
 describe("signupController", () => {

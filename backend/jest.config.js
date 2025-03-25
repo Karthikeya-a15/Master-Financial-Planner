@@ -24,7 +24,6 @@ export default {
       "/models/",
       "/schemas/",
       "/tools/",
-      "/utils/nse.js", // Ignore specific file
-      "/utils/stock_mapping.js" // Ignore another specific file
+      "/utils/", // Ignore specific file
     ],
   };

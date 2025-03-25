@@ -4,7 +4,7 @@ import multer from "multer";
 const storage = multer.memoryStorage();
 
 // Updated file filter to allow images & documents
-const fileFilter = (req, file, cb) => {
+export const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "image/jpeg", "image/png", "image/jpg", 
     "application/pdf", "application/msword", 

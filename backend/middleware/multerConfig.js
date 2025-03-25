@@ -3,7 +3,7 @@ import multer from "multer";
 // Store files in memory (Buffer)
 const storage = multer.memoryStorage();
 
-const fileFilter = (req, file, cb) => {
+export const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);

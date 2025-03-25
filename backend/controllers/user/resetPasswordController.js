@@ -24,9 +24,7 @@ export default async function resetPasswordController (req,res) {
         if (!user) {
           return res.status(400).json({ message: "Invalid or expired token" });
         }
-        console.log(newPassword)
     
-        // Hash the new password
         user.password = await bcrypt.hash(newPassword, 10);
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
