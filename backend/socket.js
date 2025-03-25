@@ -56,7 +56,6 @@ export default function initializeSocket(server) {
           attachment: attachment || null,
           createdAt: new Date(),
         });
-        console.log(newMessage)
         io.to(roomId).emit("newMessage", newMessage);
       } catch (error) {
         console.error("Error in sendMessage:", error);

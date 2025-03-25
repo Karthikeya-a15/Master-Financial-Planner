@@ -22,10 +22,7 @@ export default function AdminNavbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6">
-            <button onClick={() => navigate("/admin/profile")} className="hover:underline flex items-center space-x-2">
-              <User size={18} />
-              <span>Profile</span>
-            </button>
+           
             <button
               onClick={() => {
                 logout();
